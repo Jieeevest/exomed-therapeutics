@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Play, TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
+import { Play, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
 import type { Exchange, MarketType, Ticker } from '@/types'
-import { useBacktest, type BtParams, type BtResult, type BtTrade } from '@/hooks/useBacktest'
+import { useBacktest, type BtTrade } from '@/hooks/useBacktest'
 import { SIGNAL_TIMEFRAMES, type SignalTimeframe } from '@/hooks/useSignalData'
 import { cn } from '@/lib/utils'
 
@@ -333,8 +333,8 @@ export function BacktestPanel({ ticker, exchange, marketType }: Props) {
                 <span>Exit</span>
                 <span className="text-right">P&L</span>
               </div>
-              {displayTrades.map((t, i) => (
-                <TradeRow key={t.index} trade={t} idx={result.trades.length - displayTrades.length + i + 1} />
+              {displayTrades.map((t) => (
+                <TradeRow key={t.index} trade={t} />
               ))}
             </div>
           </div>
@@ -359,7 +359,7 @@ export function BacktestPanel({ ticker, exchange, marketType }: Props) {
   )
 }
 
-function TradeRow({ trade, idx }: { trade: BtTrade; idx: number }) {
+function TradeRow({ trade }: { trade: BtTrade }) {
   const time = new Date(trade.time)
   const timeStr = `${time.getMonth() + 1}/${time.getDate()} ${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
   const pnlColor = trade.win ? 'text-green-400' : 'text-red-400'

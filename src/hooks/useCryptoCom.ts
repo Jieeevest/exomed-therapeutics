@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import type { Ticker, OrderBook, Trade } from '@/types'
 
@@ -23,7 +23,7 @@ export function useCryptoComTickers() {
             quoteAsset: 'USDT',
             price: parseFloat(t.a || t.k || 0),
             priceChange: parseFloat(t.c || 0),
-            priceChangePercent: parseFloat(t.h && t.l ? (((t.a - t.l) / t.l) * 100).toFixed(2) : 0),
+            priceChangePercent: parseFloat(t.h && t.l ? (((t.a - t.l) / t.l) * 100).toFixed(2) : '0'),
             volume: parseFloat(t.vv || 0),
             high24h: parseFloat(t.h || 0),
             low24h: parseFloat(t.l || 0),

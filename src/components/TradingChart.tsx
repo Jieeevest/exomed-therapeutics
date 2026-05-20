@@ -31,7 +31,7 @@ export const TradingChart = memo(function TradingChart({ tvSymbol }: Props) {
 
   useEffect(() => {
     loadTvJs(() => {
-      widgetRef.current?.remove?.()
+      try { widgetRef.current?.remove?.() } catch (e) {}
       widgetRef.current = new window.TradingView.widget({
         container_id: divId,
         autosize: true,
@@ -58,7 +58,10 @@ export const TradingChart = memo(function TradingChart({ tvSymbol }: Props) {
         ],
       })
     })
-    return () => { widgetRef.current?.remove?.(); widgetRef.current = null }
+    return () => { 
+      try { widgetRef.current?.remove?.() } catch (e) {}
+      widgetRef.current = null 
+    }
   }, [tvSymbol])
 
   return <div id={divId} className="h-full w-full" />

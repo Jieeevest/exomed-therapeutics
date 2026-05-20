@@ -1,5 +1,6 @@
 import {
   calcEMA, calcRSI, calcMACD, calcStochRSI, calcSupertrend,
+  calcBollingerBands, calcOBV,
   detectPattern, findSR,
   type Candle, type PatternResult,
 } from './indicators'
@@ -51,7 +52,7 @@ export function generateSignal(candles: Candle[]): SignalResult | null {
   const ema21 = calcEMA(closes, 21)
   const ema50 = calcEMA(closes, 50)
   const rsiArr = calcRSI(closes, 14)
-  const { macd: macdArr, signal: sigArr, histogram: histArr } = calcMACD(closes)
+  const { histogram: histArr } = calcMACD(closes)
   const { k: stochK, d: stochD } = calcStochRSI(closes)
   const stArr = calcSupertrend(candles)
   const pattern = detectPattern(candles)
@@ -209,3 +210,330 @@ export function generateSignal(candles: Candle[]): SignalResult | null {
     summary: summaryMap[direction],
   }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WEIGHTED SIGNAL ENGINE — sesuai docs-analisis.md
+// Formula: Price 30% + Volume 20% + Technical 35% + Sentiment 15%
+// Output: bullishPct (0–100%) + label
+// ══════════════════════════════════════════════════════════════════════════════
+
+export type BullishLabel = 'Bullish' | 'Mild Bullish' | 'Neutral' | 'Mild Bearish' | 'Bearish'
+
+export interface WeightedCategory {
+  score: number      // -1.0 to +1.0
+  breakdown: Record<string, number>
+}
+
+export interface WeightedSignalResult {
+  bullishPct: number           // 0–100
+  label: BullishLabel
+  rawSignal: number            // -1.0 to +1.0
+  volumeVsAvg: number          // ratio e.g. 1.4 = 40% di atas rata-rata
+  price: WeightedCategory
+  volume: WeightedCategory
+  technical: WeightedCategory
+  sentiment: WeightedCategory
+}
+
+/** Linear interpolation antara a dan b sebesar t (0–1) */
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t
+}
+
+/** Clamp nilai ke range -1 .. +1 */
+function clamp1(v: number): number {
+  return Math.max(-1, Math.min(1, v))
+}
+
+// ── RSI score sesuai docs-analisis.md ─────────────────────────────────────
+function scoreRSI(rsi: number): number {
+  if (rsi < 30)  return lerp(0.8, 1.0, (30 - rsi) / 30)    // +0.8 → +1.0
+  if (rsi < 45)  return lerp(0.2, 0.8, (45 - rsi) / 15)    // +0.2 → +0.8
+  if (rsi <= 55) return 0
+  if (rsi <= 70) return -lerp(0.2, 0.5, (rsi - 55) / 15)   // -0.2 → -0.5
+  return -lerp(0.8, 1.0, Math.min((rsi - 70) / 30, 1))      // -0.8 → -1.0
+}
+
+// ── MACD score sesuai docs-analisis.md ────────────────────────────────────
+function scoreMACD(macd: number, signal: number, hist: number, prevHist: number): number {
+  const aboveSignal = macd > signal
+  const histRising  = hist > prevHist
+  if (aboveSignal && histRising)   return  1.0
+  if (aboveSignal)                 return  0.5
+  if (!aboveSignal && !histRising) return -1.0
+  return -0.5
+}
+
+// ── EMA alignment score (EMA 20/50/200) sesuai docs-analisis.md ───────────
+function scoreEMA(price: number, ema20: number, ema50: number, ema200: number): number {
+  if (price > ema20 && ema20 > ema50 && ema50 > ema200) return  1.0
+  if (price > ema20 && ema20 > ema50)                   return  0.6
+  if (price > ema20)                                     return  0.3
+  if (price < ema20 && ema20 < ema50 && ema50 < ema200) return -1.0
+  if (price < ema20 && ema20 < ema50)                   return -0.6
+  return -0.3
+}
+
+// ── Bollinger Bands score sesuai docs-analisis.md ─────────────────────────
+function scoreBB(price: number, upper: number, lower: number, width: number): number {
+  const bandWidth  = upper - lower
+  const isSqueeze  = width < 0.04
+  if (bandWidth === 0) return 0
+  const pctInBand  = (price - lower) / bandWidth   // 0 = at lower, 1 = at upper
+
+  let score = 0
+  if (price <= lower)        score =  0.8
+  else if (pctInBand < 0.2)  score =  0.3
+  else if (price >= upper)   score = -0.8
+  else if (pctInBand > 0.8)  score = -0.8
+  else                        score =  0
+
+  if (isSqueeze) score *= 0.5   // uncertainty saat band menyempit
+  return clamp1(score)
+}
+
+// ── Volume vs 7d avg score sesuai docs-analisis.md ────────────────────────
+function scoreVolumeRatio(volRatio: number, priceUp: boolean): number {
+  if (volRatio >= 2)                         return priceUp ?  1.0 : -1.0
+  if (volRatio >= 0.8 && volRatio <= 1.2)   return 0
+  if (volRatio > 1.2)                        return priceUp ?  0.5 : -0.5
+  return 0   // volume rendah, sinyal lemah
+}
+
+// ── OBV score sesuai docs-analisis.md ─────────────────────────────────────
+function scoreOBV(obvArr: number[], closeArr: number[], lookback = 7): number {
+  if (obvArr.length < lookback + 1 || closeArr.length < lookback) return 0
+  const recentObv   = obvArr.slice(-lookback)
+  const recentClose = closeArr.slice(-lookback)
+
+  const obvTrend   = recentObv[recentObv.length - 1] - recentObv[0]
+  const closeTrend = recentClose[recentClose.length - 1] - recentClose[0]
+
+  // OBV divergence: harga naik tapi OBV turun
+  if (closeTrend > 0 && obvTrend < 0) return -0.6
+  // OBV naik konsisten
+  const obvRising = recentObv.every((v, i) => i === 0 || v >= recentObv[i - 1])
+  if (obvRising) return 0.7
+  // OBV flat
+  if (Math.abs(obvTrend) < Math.abs(recentObv[0]) * 0.01) return 0
+  return obvTrend > 0 ? 0.3 : -0.3
+}
+
+// ── Funding Rate score sesuai docs-analisis.md ────────────────────────────
+export function scoreFundingRate(fundingRatePct: number): number {
+  if (fundingRatePct < -0.1) return  0.5
+  if (fundingRatePct < 0)    return  0.2
+  if (fundingRatePct <= 0.05) return  0
+  if (fundingRatePct <= 0.1) return -0.2
+  return -0.5
+}
+
+// ── Fear & Greed score (inline, hindari circular import) ──────────────────
+function scoreFG(value: number | null): number {
+  if (value === null) return 0
+  if (value <= 25)   return  0.7   // Extreme Fear — contrarian bullish
+  if (value <= 40)   return  0.3   // Fear
+  if (value <= 60)   return  0     // Neutral
+  if (value <= 75)   return -0.3   // Greed
+  return -0.7                       // Extreme Greed — contrarian bearish
+}
+
+/**
+ * Hitung weighted signal sesuai formula docs-analisis.md.
+ *
+ * @param candles        - OHLCV candles (min 60, ideal 200+)
+ * @param fgValue        - Fear & Greed index 0–100 (null → tidak tersedia)
+ * @param fundingRatePct - Funding rate dalam % (null → spot market)
+ */
+export function generateWeightedSignal(
+  candles: Candle[],
+  fgValue: number | null = null,
+  fundingRatePct: number | null = null
+): WeightedSignalResult | null {
+  if (candles.length < 60) return null
+
+  const closes  = candles.map((c) => c.close)
+  const volumes = candles.map((c) => c.volume)
+  const lastClose  = closes[closes.length - 1]
+  const lastCandle = candles[candles.length - 1]
+  const priceUp    = lastCandle.close >= lastCandle.open
+
+  // ── Hitung indikator ──────────────────────────────────────────────────
+  const rsiArr  = calcRSI(closes, 14)
+  const { macd: macdArr, signal: sigArr, histogram: histArr } = calcMACD(closes)
+  const ema20Arr  = calcEMA(closes, 20)
+  const ema50Arr  = calcEMA(closes, 50)
+  const ema200Arr = calcEMA(closes, 200)
+  const bb        = calcBollingerBands(closes, 20, 2)
+  const obvArr    = calcOBV(closes, volumes)
+
+  // Volume vs 7-candle avg
+  const vol7   = volumes.slice(-7)
+  const avgVol = vol7.reduce((a, b) => a + b, 0) / vol7.length
+  const volRatio = avgVol > 0 ? volumes[volumes.length - 1] / avgVol : 1
+
+  // Nilai terakhir
+  const rsi      = rsiArr[rsiArr.length - 1]
+  const macdVal  = macdArr[macdArr.length - 1]
+  const sigVal   = sigArr[sigArr.length - 1]
+  const hist     = histArr[histArr.length - 1]
+  const prevHist = histArr[histArr.length - 2] ?? 0
+  const ema20    = ema20Arr[ema20Arr.length - 1]
+  const ema50    = ema50Arr[ema50Arr.length - 1]
+  const ema200   = ema200Arr.length > 0 ? ema200Arr[ema200Arr.length - 1] : ema50
+  const bbUpper  = bb.upper[bb.upper.length - 1]
+  const bbLower  = bb.lower[bb.lower.length - 1]
+  const bbWidth  = bb.width[bb.width.length - 1]
+
+  if (!rsi || !ema20) return null
+
+  // ── Skor per indikator ────────────────────────────────────────────────
+  const rsiScore  = scoreRSI(rsi)
+  const bbScore   = scoreBB(lastClose, bbUpper, bbLower, bbWidth)
+  const macdScore = scoreMACD(macdVal, sigVal, hist, prevHist)
+  const emaScore  = scoreEMA(lastClose, ema20, ema50, ema200)
+  const volScore  = scoreVolumeRatio(volRatio, priceUp)
+  const obvScore  = scoreOBV(obvArr, closes)
+  const fgS       = scoreFG(fgValue)
+  const fundingS  = fundingRatePct !== null ? scoreFundingRate(fundingRatePct) : 0
+
+  // ── Step 1: Skor per kategori (docs-analisis.md) ─────────────────────
+  const scorePrice     = rsiScore    * 0.5 + bbScore  * 0.5
+  const scoreVol       = volScore    * 0.5 + obvScore * 0.5
+  const scoreTech      = macdScore   * 0.4 + emaScore * 0.6
+  const scoreSentiment = fundingRatePct !== null
+    ? fgS * 0.5 + fundingS * 0.5   // futures: fg + funding
+    : fgS                            // spot: hanya fear & greed
+
+  // ── Step 2: Weighted aggregate ────────────────────────────────────────
+  let rawSignal =
+    scorePrice     * 0.30 +
+    scoreVol       * 0.20 +
+    scoreTech      * 0.35 +
+    scoreSentiment * 0.15
+  rawSignal = clamp1(rawSignal)
+
+  // ── Step 3: Konversi ke % bullish ─────────────────────────────────────
+  let bullishPct = ((rawSignal + 1) / 2) * 100
+
+  // ── Step 4: Volume confidence multiplier ──────────────────────────────
+  if (volRatio < 0.5) {
+    bullishPct = lerp(bullishPct, 50, 0.4)   // tarik ke netral
+  }
+  bullishPct = Math.max(0, Math.min(100, bullishPct))
+
+  // ── Step 5: Label ─────────────────────────────────────────────────────
+  let label: BullishLabel
+  if (bullishPct >= 65)       label = 'Bullish'
+  else if (bullishPct >= 55)  label = 'Mild Bullish'
+  else if (bullishPct >= 45)  label = 'Neutral'
+  else if (bullishPct >= 35)  label = 'Mild Bearish'
+  else                         label = 'Bearish'
+
+  return {
+    bullishPct: Math.round(bullishPct * 10) / 10,
+    label,
+    rawSignal: Math.round(rawSignal * 1000) / 1000,
+    volumeVsAvg: Math.round(volRatio * 100) / 100,
+    price:     { score: scorePrice,     breakdown: { rsi: rsiScore, bb: bbScore } },
+    volume:    { score: scoreVol,       breakdown: { volume: volScore, obv: obvScore } },
+    technical: { score: scoreTech,      breakdown: { macd: macdScore, ema: emaScore } },
+    sentiment: { score: scoreSentiment, breakdown: { fearGreed: fgS, ...(fundingRatePct !== null ? { funding: fundingS } : {}) } },
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MULTI-TIMEFRAME (MTF) ENGINE
+// Menggabungkan Classic & Weighted Signal untuk 15m, 30m, 1h, 4h
+// ══════════════════════════════════════════════════════════════════════════════
+
+export type Timeframe = '15m' | '30m' | '1h' | '4h'
+
+export interface MTFSignalResult {
+  bullishPct: number
+  label: BullishLabel
+  trend: 'Uptrend' | 'Downtrend' | 'Sideways'
+  breakdown: Partial<Record<Timeframe, {
+    classicDirection: Direction | null
+    weightedPct: number
+    combinedScore: number
+  }>>
+}
+
+function directionToScore(dir: Direction): number {
+  switch (dir) {
+    case 'STRONG_BUY': return 100
+    case 'BUY': return 75
+    case 'NEUTRAL': return 50
+    case 'SELL': return 25
+    case 'STRONG_SELL': return 0
+  }
+}
+
+export function generateMTFSignal(
+  candlesMap: Record<string, Candle[]>,
+  fgValue: number | null = null,
+  fundingRatePct: number | null = null
+): MTFSignalResult | null {
+  const weights: Record<string, number> = {
+    '15m': 0.10,
+    '30m': 0.20,
+    '1h':  0.30,
+    '4h':  0.40,
+  }
+
+  const breakdown: MTFSignalResult['breakdown'] = {}
+  let totalScore = 0
+  let totalWeight = 0
+  let primaryTrend: 'Uptrend' | 'Downtrend' | 'Sideways' = 'Sideways'
+
+  for (const [tf, candles] of Object.entries(candlesMap)) {
+    if (!candles || candles.length < 60) continue
+    
+    const classic = generateSignal(candles)
+    const weighted = generateWeightedSignal(candles, fgValue, fundingRatePct)
+    
+    if (!classic || !weighted) continue
+
+    const classicScore = directionToScore(classic.direction)
+    const weightedScore = weighted.bullishPct
+
+    // Gabungkan metode Classic (40%) dan Weighted (60%) untuk TF ini
+    const combinedScore = (classicScore * 0.4) + (weightedScore * 0.6)
+    
+    breakdown[tf as Timeframe] = {
+      classicDirection: classic.direction,
+      weightedPct: weighted.bullishPct,
+      combinedScore,
+    }
+
+    const w = weights[tf] || 0
+    totalScore += combinedScore * w
+    totalWeight += w
+
+    // Gunakan trend dari 1h atau 4h (timframe besar)
+    if (tf === '1h' || tf === '4h') {
+      primaryTrend = classic.trend
+    }
+  }
+
+  if (totalWeight === 0) return null
+
+  const finalPct = totalScore / totalWeight
+  
+  let label: BullishLabel
+  if (finalPct >= 65)       label = 'Bullish'
+  else if (finalPct >= 55)  label = 'Mild Bullish'
+  else if (finalPct >= 45)  label = 'Neutral'
+  else if (finalPct >= 35)  label = 'Mild Bearish'
+  else                      label = 'Bearish'
+
+  return {
+    bullishPct: Math.round(finalPct * 10) / 10,
+    label,
+    trend: primaryTrend,
+    breakdown,
+  }
+}
+
+

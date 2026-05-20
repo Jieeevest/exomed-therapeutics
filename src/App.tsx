@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Clock, Zap, BarChart2, FlaskConical } from 'lucide-react'
+import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
+import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan } from 'lucide-react'
 
 import { CoinList } from '@/components/CoinList'
 import { TradingChart } from '@/components/TradingChart'
+import { DashboardGrid } from '@/components/DashboardGrid'
 import { OrderBook } from '@/components/OrderBook'
 import { TradeHistory } from '@/components/TradeHistory'
 import { SignalPanel } from '@/components/SignalPanel'
 import { BacktestPanel } from '@/components/BacktestPanel'
+import { BullishWatchlist } from '@/components/BullishWatchlist'
 
 // Spot hooks
 import { useBinanceTickers, useBinanceOrderBook, useBinanceTrades, useBinancePrice } from '@/hooks/useBinance'
@@ -25,7 +28,7 @@ import type { Ticker, Exchange, MarketType } from '@/types'
 import { cn } from '@/lib/utils'
 import { getTVSources } from '@/lib/tvSymbol'
 
-type RightTab = 'orderbook' | 'trades' | 'signal' | 'backtest'
+type RightTab = 'orderbook' | 'trades' | 'signal' | 'backtest' | 'scanner'
 
 const EXCHANGES: { id: Exchange; label: string; color: string }[] = [
   { id: 'binance', label: 'Binance', color: '#F0B90B' },
@@ -56,6 +59,8 @@ export default function App() {
   const [currentPrice, setCurrentPrice] = useState(0)
   const [rightTab, setRightTab] = useState<RightTab>('orderbook')
   const [tvSourceIdx, setTvSourceIdx] = useState(0)
+  const [chartMode, setChartMode] = useState<'single' | 'grid'>('single')
+  const [gridSymbols, setGridSymbols] = useState<{ symbol: string; tvSymbol: string }[]>([])
 
   // ── Spot data ──────────────────────────────────────────────
   const { tickers: binanceSpotTickers, loading: binanceSpotLoading } = useBinanceTickers()
@@ -141,6 +146,7 @@ export default function App() {
     setSymbol(ticker.symbol)
     setCurrentPrice(ticker.price)
     setTvSourceIdx(0)
+    setChartMode('single')
   }
 
   const activeExchangeInfo = EXCHANGES.find((e) => e.id === exchange)!
@@ -177,6 +183,38 @@ export default function App() {
               {mt === 'spot' ? 'Spot' : 'Futures'}
             </motion.button>
           ))}
+        </div>
+
+        <div className="w-px h-4 bg-border" />
+
+        {/* Chart Mode toggle */}
+        <div className="flex rounded-md overflow-hidden border border-border">
+          <motion.button
+            onClick={() => setChartMode('single')}
+            className={cn(
+              'px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold transition-colors',
+              chartMode === 'single'
+                ? 'bg-primary/20 text-primary'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            )}
+            whileTap={{ scale: 0.96 }}
+          >
+            <Square className="h-3.5 w-3.5" />
+            Single
+          </motion.button>
+          <motion.button
+            onClick={() => setChartMode('grid')}
+            className={cn(
+              'px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold transition-colors',
+              chartMode === 'grid'
+                ? 'bg-primary/20 text-primary'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            )}
+            whileTap={{ scale: 0.96 }}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+            Grid
+          </motion.button>
         </div>
 
         <div className="w-px h-4 bg-border" />
@@ -221,18 +259,19 @@ export default function App() {
       </header>
 
       {/* Main layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
 
         {/* LEFT — Coin list */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${exchange}-${marketType}`}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: 0.18 }}
-            className="w-60 shrink-0 overflow-hidden flex flex-col"
-          >
+        <Panel defaultSize="20" minSize="15" maxSize="30" className="flex flex-col">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${exchange}-${marketType}`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.18 }}
+              className="w-full h-full flex flex-col overflow-hidden"
+            >
             <div
               className="px-3 py-1.5 text-[10px] font-semibold border-b border-border flex items-center justify-between"
             >
@@ -257,84 +296,117 @@ export default function App() {
               />
             </div>
           </motion.div>
-        </AnimatePresence>
+          </AnimatePresence>
+        </Panel>
 
-        {/* CENTER — Chart */}
-        <div className="flex-1 flex flex-col overflow-hidden border-x border-border">
-          {/* Symbol bar */}
-          <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-foreground text-sm">
-                {selectedTicker?.baseAsset ?? 'BTC'}/{isFutures ? 'PERP' : 'USDT'}
-              </span>
-              {isFutures && (
-                <span className="text-[10px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded font-mono">
-                  {exchange === 'binance' ? 'PERP' : exchange === 'okx' ? 'SWAP' : 'PERP'}
-                </span>
-              )}
-              <span className="text-xs text-muted-foreground">{activeExchangeInfo.label}</span>
-            </div>
-            {selectedTicker && (
-              <>
-                <span className={cn(
-                  'text-sm font-bold font-mono',
-                  selectedTicker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'
-                )}>
-                  {currentPrice.toLocaleString('en-US', { maximumFractionDigits: 8 })}
-                </span>
-                <span className={cn('text-xs', selectedTicker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400')}>
-                  {selectedTicker.priceChangePercent >= 0 ? '+' : ''}{selectedTicker.priceChangePercent.toFixed(2)}%
-                </span>
-                <div className="flex gap-4 text-[10px] text-muted-foreground ml-auto">
-                  {isFutures && selectedTicker.markPrice && (
-                    <span>Mark: {selectedTicker.markPrice.toFixed(4)}</span>
-                  )}
-                  <span>H: {selectedTicker.high24h.toFixed(4)}</span>
-                  <span>L: {selectedTicker.low24h.toFixed(4)}</span>
-                  {isFutures && selectedTicker.fundingRate !== undefined ? (
-                    <span className={selectedTicker.fundingRate >= 0 ? 'text-green-400' : 'text-red-400'}>
-                      Fund: {selectedTicker.fundingRate >= 0 ? '+' : ''}{selectedTicker.fundingRate.toFixed(4)}%
+        <PanelResizeHandle className="w-2 mx-[-1px] z-10 flex items-center justify-center cursor-col-resize group bg-transparent">
+          <div className="w-[1px] h-full bg-border group-hover:bg-primary transition-colors" />
+        </PanelResizeHandle>
+
+        {/* CENTER — Chart / Grid */}
+        <Panel defaultSize="55" minSize="30" className="flex flex-col overflow-hidden">
+          {chartMode === 'grid' ? (
+            <DashboardGrid 
+              items={gridSymbols} 
+              onRemove={(sym) => setGridSymbols(prev => prev.filter(p => p.symbol !== sym))} 
+            />
+          ) : (
+            <>
+              {/* Symbol bar */}
+              <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-foreground text-sm">
+                    {selectedTicker?.baseAsset ?? 'BTC'}/{isFutures ? 'PERP' : 'USDT'}
+                  </span>
+                  {isFutures && (
+                    <span className="text-[10px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded font-mono">
+                      {exchange === 'binance' ? 'PERP' : exchange === 'okx' ? 'SWAP' : 'PERP'}
                     </span>
-                  ) : (
-                    <span>Vol: {(selectedTicker.volume / 1_000_000).toFixed(2)}M</span>
                   )}
+                  <span className="text-xs text-muted-foreground">{activeExchangeInfo.label}</span>
                 </div>
-              </>
-            )}
-          </div>
+                {selectedTicker && (
+                  <>
+                    <span className={cn(
+                      'text-sm font-bold font-mono',
+                      selectedTicker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'
+                    )}>
+                      {currentPrice.toLocaleString('en-US', { maximumFractionDigits: 8 })}
+                    </span>
+                    <span className={cn('text-xs', selectedTicker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400')}>
+                      {selectedTicker.priceChangePercent >= 0 ? '+' : ''}{selectedTicker.priceChangePercent.toFixed(2)}%
+                    </span>
+                    
+                    <button
+                      onClick={() => {
+                        if (!gridSymbols.find(g => g.symbol === selectedTicker.symbol) && gridSymbols.length < 9) {
+                          setGridSymbols(prev => [...prev, { symbol: selectedTicker.symbol, tvSymbol: activeTvSource.symbol }])
+                        }
+                        setChartMode('grid')
+                      }}
+                      className="ml-2 px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded hover:bg-primary/20 transition-colors flex items-center gap-1"
+                      title="Tambahkan ke Dashboard Grid"
+                    >
+                      <Plus className="h-3 w-3" />
+                      Grid
+                    </button>
 
-          {/* TradingView source selector */}
-          <div className="flex items-center gap-2 px-3 py-1 border-b border-border bg-muted/30 shrink-0">
-            <span className="text-[10px] text-muted-foreground">Chart sumber:</span>
-            <div className="flex gap-1">
-              {tvSources.map((src, i) => (
-                <button
-                  key={src.symbol}
-                  onClick={() => setTvSourceIdx(i)}
-                  className={cn(
-                    'px-2 py-0.5 text-[10px] rounded transition-colors',
-                    i === tvSourceIdx % tvSources.length
-                      ? 'bg-primary/20 text-primary font-medium'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  )}
-                >
-                  {src.label}
-                </button>
-              ))}
-            </div>
-            <span className="text-[10px] text-muted-foreground ml-auto font-mono opacity-60">
-              {activeTvSource.symbol}
-            </span>
-          </div>
+                    <div className="flex gap-4 text-[10px] text-muted-foreground ml-auto">
+                      {isFutures && selectedTicker.markPrice && (
+                        <span>Mark: {selectedTicker.markPrice.toFixed(4)}</span>
+                      )}
+                      <span>H: {selectedTicker.high24h.toFixed(4)}</span>
+                      <span>L: {selectedTicker.low24h.toFixed(4)}</span>
+                      {isFutures && selectedTicker.fundingRate !== undefined ? (
+                        <span className={selectedTicker.fundingRate >= 0 ? 'text-green-400' : 'text-red-400'}>
+                          Fund: {selectedTicker.fundingRate >= 0 ? '+' : ''}{selectedTicker.fundingRate.toFixed(4)}%
+                        </span>
+                      ) : (
+                        <span>Vol: {(selectedTicker.volume / 1_000_000).toFixed(2)}M</span>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
 
-          {/* TradingView chart */}
-          <div className="flex-1 overflow-hidden">
-            <TradingChart tvSymbol={activeTvSource.symbol} />
-          </div>
-        </div>
+              {/* TradingView source selector */}
+              <div className="flex items-center gap-2 px-3 py-1 border-b border-border bg-muted/30 shrink-0">
+                <span className="text-[10px] text-muted-foreground">Chart sumber:</span>
+                <div className="flex gap-1">
+                  {tvSources.map((src, i) => (
+                    <button
+                      key={src.symbol}
+                      onClick={() => setTvSourceIdx(i)}
+                      className={cn(
+                        'px-2 py-0.5 text-[10px] rounded transition-colors',
+                        i === tvSourceIdx % tvSources.length
+                          ? 'bg-primary/20 text-primary font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      )}
+                    >
+                      {src.label}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[10px] text-muted-foreground ml-auto font-mono opacity-60">
+                  {activeTvSource.symbol}
+                </span>
+              </div>
+
+              {/* TradingView chart */}
+              <div className="flex-1 overflow-hidden">
+                <TradingChart tvSymbol={activeTvSource.symbol} />
+              </div>
+            </>
+          )}
+        </Panel>
+
+        <PanelResizeHandle className="w-2 mx-[-1px] z-10 flex items-center justify-center cursor-col-resize group bg-transparent">
+          <div className="w-[1px] h-full bg-border group-hover:bg-primary transition-colors" />
+        </PanelResizeHandle>
 
         {/* RIGHT — Tabs + panels */}
-        <div className="w-72 shrink-0 flex flex-col overflow-hidden">
+        <Panel defaultSize="25" minSize="20" maxSize="40" className="flex flex-col overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-border">
             {([
@@ -342,6 +414,7 @@ export default function App() {
               { id: 'trades',    icon: <Clock className="h-3 w-3" />,          label: 'Trades' },
               { id: 'signal',    icon: <BarChart2 className="h-3 w-3" />,      label: 'Sinyal' },
               { id: 'backtest',  icon: <FlaskConical className="h-3 w-3" />,   label: 'Backtest' },
+              { id: 'scanner',   icon: <Scan className="h-3 w-3" />,           label: 'Scanner' },
             ] as { id: RightTab; icon: React.ReactNode; label: string }[]).map((tab) => (
               <button
                 key={tab.id}
@@ -375,6 +448,15 @@ export default function App() {
             <div className="flex-1 overflow-hidden">
               <BacktestPanel ticker={selectedTicker} exchange={exchange} marketType={marketType} />
             </div>
+          ) : rightTab === 'scanner' ? (
+            <div className="flex-1 overflow-hidden">
+              <BullishWatchlist 
+                tickers={activeTickers} 
+                exchange={exchange} 
+                marketType={marketType} 
+                onSelectCoin={handleSelectCoin} 
+              />
+            </div>
           ) : (
             <div className="flex-1 overflow-hidden">
               <AnimatePresence mode="wait">
@@ -394,8 +476,8 @@ export default function App() {
               </AnimatePresence>
             </div>
           )}
-        </div>
-      </div>
+        </Panel>
+      </PanelGroup>
     </div>
   )
 }

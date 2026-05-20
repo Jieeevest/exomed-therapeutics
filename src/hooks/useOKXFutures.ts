@@ -11,7 +11,7 @@ export function useOKXFutureTickers() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [{ data: tickerData }, { data: fundingData }] = await Promise.all([
+      const [{ data: tickerData }] = await Promise.all([
         axios.get(`${BASE}/tickers`, { params: { instType: 'SWAP' } }),
         axios.get(`${PUBLIC}/funding-rate-history`, { params: { instId: 'BTC-USDT-SWAP', limit: 1 } }),
       ])

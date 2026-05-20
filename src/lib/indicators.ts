@@ -115,6 +115,48 @@ export function calcStochRSI(closes: number[], rsiP = 14, stochP = 14, smoothK =
   return { k, d }
 }
 
+// ── Bollinger Bands ────────────────────────────────────────────
+export interface BollingerBands {
+  upper: number[]
+  middle: number[] // SMA
+  lower: number[]
+  width: number[]  // (upper - lower) / middle — normalized band width
+}
+
+export function calcBollingerBands(closes: number[], period = 20, stdDevMult = 2): BollingerBands {
+  const upper: number[] = []
+  const middle: number[] = []
+  const lower: number[] = []
+  const width: number[] = []
+
+  for (let i = period - 1; i < closes.length; i++) {
+    const slice = closes.slice(i - period + 1, i + 1)
+    const sma = slice.reduce((a, b) => a + b, 0) / period
+    const variance = slice.reduce((sum, v) => sum + Math.pow(v - sma, 2), 0) / period
+    const sd = Math.sqrt(variance)
+    const up = sma + stdDevMult * sd
+    const lo = sma - stdDevMult * sd
+    upper.push(up)
+    middle.push(sma)
+    lower.push(lo)
+    width.push(sma > 0 ? (up - lo) / sma : 0)
+  }
+  return { upper, middle, lower, width }
+}
+
+// ── OBV (On Balance Volume) ────────────────────────────────────
+export function calcOBV(closes: number[], volumes: number[]): number[] {
+  if (closes.length < 2 || closes.length !== volumes.length) return []
+  const result: number[] = [0]
+  for (let i = 1; i < closes.length; i++) {
+    const prev = result[result.length - 1]
+    if (closes[i] > closes[i - 1]) result.push(prev + volumes[i])
+    else if (closes[i] < closes[i - 1]) result.push(prev - volumes[i])
+    else result.push(prev)
+  }
+  return result
+}
+
 export interface PatternResult {
   name: string
   signal: 1 | -1 | 0

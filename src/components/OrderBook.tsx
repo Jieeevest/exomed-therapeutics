@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { OrderBook as OrderBookType } from '@/types'
-import { formatPrice, cn } from '@/lib/utils'
+import { formatPrice } from '@/lib/utils'
 
 interface Props {
   orderBook: OrderBookType
