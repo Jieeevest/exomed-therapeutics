@@ -36,6 +36,7 @@ export function useBinanceFutureTickers() {
           high24h: parseFloat(t.highPrice),
           low24h: parseFloat(t.lowPrice),
           fundingRate: fundingMap[t.symbol] ?? 0,
+          openInterest: parseFloat(t.openInterest || 0),
           markPrice: markMap[t.symbol] ?? 0,
         }))
         .sort((a, b) => b.volume - a.volume)

@@ -39,6 +39,7 @@ export function useCryptoComFutureTickers() {
             volume: parseFloat(t.vv || 0),
             high24h: parseFloat(t.h || 0),
             low24h: parseFloat(t.l || 0),
+            openInterest: parseFloat(t.oi || 0),
           }
         })
         .sort((a, b) => b.volume - a.volume)

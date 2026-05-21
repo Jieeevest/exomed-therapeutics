@@ -4,7 +4,7 @@ import { Scan, X, TrendingUp, TrendingDown, Minus, RefreshCw, Clock, Filter } fr
 import type { Ticker, Exchange, MarketType } from '@/types'
 import { useBullishScanner, type ScanResult } from '@/hooks/useBullishScanner'
 import type { BullishLabel } from '@/lib/signals'
-import { cn } from '@/lib/utils'
+import { cn, formatNumber } from '@/lib/utils'
 
 interface Props {
   tickers: Ticker[]
@@ -50,14 +50,22 @@ function PctBar({ pct }: { pct: number }) {
 }
 
 // ── Single result row ─────────────────────────────────────────────────────
-function ResultRow({ result, rank, onClick }: {
+function ResultRow({ result, rank, onClick, marketType }: {
   result: ScanResult
   rank: number
   onClick: () => void
+  marketType: MarketType
 }) {
-  const { ticker, signal } = result
+  const { ticker, signal, rankingScore } = result
   const cfg = LABEL_CFG[signal.label]
   const pctColor = ticker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'
+  const isFutures = marketType === 'futures'
+  const fundingTone =
+    ticker.fundingRate == null
+      ? 'text-muted-foreground bg-muted/40'
+      : ticker.fundingRate <= 0
+        ? 'text-green-400 bg-green-500/10'
+        : 'text-orange-400 bg-orange-500/10'
 
   return (
     <motion.button
@@ -74,10 +82,13 @@ function ResultRow({ result, rank, onClick }: {
         <span className="text-[10px] text-muted-foreground w-4 shrink-0 font-mono">{rank}</span>
         <span className="font-bold text-xs text-foreground flex-1 truncate flex items-center gap-1">
           {ticker.baseAsset}
-          <span className="text-muted-foreground font-normal">/USDT</span>
+          <span className="text-muted-foreground font-normal">{isFutures ? '/PERP' : '/USDT'}</span>
           {signal.trend === 'Uptrend' && <TrendingUp className="h-3 w-3 text-green-400 ml-0.5" />}
           {signal.trend === 'Downtrend' && <TrendingDown className="h-3 w-3 text-red-400 ml-0.5" />}
         </span>
+        <div className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
+          {rankingScore.toFixed(1)}
+        </div>
         <div className={cn('flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded font-semibold', cfg.bg, cfg.color)}>
           {cfg.icon}
           {signal.label}
@@ -97,7 +108,24 @@ function ResultRow({ result, rank, onClick }: {
         </span>
       </div>
 
-      {/* Row 3: timeframe breakdown pills */}
+      {/* Row 3: futures context */}
+      {isFutures && (
+        <div className="flex gap-1 pl-6 flex-wrap">
+          <span className={cn('text-[9px] px-1.5 py-0.5 rounded', fundingTone)}>
+            Fund {ticker.fundingRate == null ? '—' : `${ticker.fundingRate >= 0 ? '+' : ''}${ticker.fundingRate.toFixed(4)}%`}
+          </span>
+          <span className="text-[9px] px-1.5 py-0.5 rounded text-sky-400 bg-sky-500/10">
+            Vol {formatNumber(ticker.volume)}
+          </span>
+          {ticker.openInterest ? (
+            <span className="text-[9px] px-1.5 py-0.5 rounded text-fuchsia-400 bg-fuchsia-500/10">
+              OI {formatNumber(ticker.openInterest)}
+            </span>
+          ) : null}
+        </div>
+      )}
+
+      {/* Row 4: timeframe breakdown pills */}
       <div className="flex gap-1 pl-6 flex-wrap">
         {(['15m', '30m', '1h', '4h'] as const).map((tf) => {
           const tfData = signal.breakdown[tf]
@@ -122,6 +150,7 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
   const [threshold, setThreshold] = useState(55)
   const { results, status, progress, scannedCount, totalCount, lastRunAt, runScan, cancelScan } =
     useBullishScanner(tickers, exchange, marketType)
+  const isFutures = marketType === 'futures'
 
   const filtered = useMemo(
     () => results.filter((r) => r.signal.bullishPct >= threshold),
@@ -142,7 +171,9 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
             <TrendingUp className="h-3.5 w-3.5 text-green-400" />
-            <span className="text-xs font-bold text-foreground">Bullish Scanner</span>
+            <span className="text-xs font-bold text-foreground">
+              {isFutures ? 'Futures Scanner' : 'Bullish Scanner'}
+            </span>
             {status === 'done' && (
               <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                 {filtered.length} hasil
@@ -209,7 +240,7 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
                        hover:bg-green-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {status === 'idle' ? (
-              <><Scan className="h-3 w-3" /> Mulai Scan ({Math.min(tickers.length, 80)} koin)</>
+              <><Scan className="h-3 w-3" /> Mulai Scan ({Math.min(tickers.length, 80)} {isFutures ? 'kontrak' : 'koin'})</>
             ) : (
               <><RefreshCw className="h-3 w-3" /> Scan Ulang</>
             )}
@@ -225,11 +256,13 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
               <TrendingUp className="h-5 w-5 text-green-400" />
             </div>
             <div>
-              <p className="text-xs font-medium text-foreground mb-1">Bullish Scanner MTF</p>
+              <p className="text-xs font-medium text-foreground mb-1">
+                {isFutures ? 'Futures Setup Scanner' : 'Bullish Scanner MTF'}
+              </p>
               <p className="text-[10px] leading-relaxed">
-                Klik "Mulai Scan" untuk menganalisis semua koin berdasarkan<br />
+                Klik "Mulai Scan" untuk menganalisis {isFutures ? 'kontrak futures' : 'semua koin'} berdasarkan<br />
                 Multi-Timeframe (15m, 30m, 1h, 4h)<br />
-                dengan kombinasi Classic & Weighted Signal.
+                dengan kombinasi Classic & Weighted Signal{isFutures ? ' + funding context.' : '.'}
               </p>
             </div>
           </div>
@@ -254,6 +287,7 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
               key={result.ticker.symbol}
               result={result}
               rank={i + 1}
+              marketType={marketType}
               onClick={() => onSelectCoin(result.ticker)}
             />
           ))}
@@ -270,4 +304,3 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
     </div>
   )
 }
-

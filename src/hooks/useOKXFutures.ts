@@ -34,6 +34,7 @@ export function useOKXFutureTickers() {
             volume: parseFloat(t.volCcy24h || 0),
             high24h: parseFloat(t.high24h || 0),
             low24h: parseFloat(t.low24h || 0),
+            openInterest: parseFloat(t.oiCcy || t.oi || 0),
             markPrice: parseFloat(t.markPx || 0),
           }
         })

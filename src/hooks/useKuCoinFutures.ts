@@ -27,6 +27,7 @@ export function useKuCoinFutureTickers() {
           high24h: parseFloat(t.highPrice || 0),
           low24h: parseFloat(t.lowPrice || 0),
           fundingRate: parseFloat(t.fundingFeeRate || 0) * 100,
+          openInterest: parseFloat(t.openInterest || t.openInterestValue || 0),
           markPrice: parseFloat(t.markPrice || 0),
         }))
         .sort((a, b) => b.volume - a.volume)
