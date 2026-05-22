@@ -1,34 +1,33 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
-import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan } from 'lucide-react'
+import { BookOpen, Zap, BarChart2, LayoutGrid, Square, Plus, Scan, CandlestickChart } from 'lucide-react'
 
 import { CoinList } from '@/components/CoinList'
 import { TradingChart } from '@/components/TradingChart'
 import { DashboardGrid } from '@/components/DashboardGrid'
 import { OrderBook } from '@/components/OrderBook'
-import { TradeHistory } from '@/components/TradeHistory'
 import { SignalPanel } from '@/components/SignalPanel'
-import { BacktestPanel } from '@/components/BacktestPanel'
 import { BullishWatchlist } from '@/components/BullishWatchlist'
+import { FuturesOpportunitiesPanel } from '@/components/FuturesOpportunitiesPanel'
 
 // Spot hooks
-import { useBinanceTickers, useBinanceOrderBook, useBinanceTrades, useBinancePrice } from '@/hooks/useBinance'
-import { useCryptoComTickers, useCryptoComOrderBook, useCryptoComTrades } from '@/hooks/useCryptoCom'
-import { useKuCoinTickers, useKuCoinOrderBook, useKuCoinTrades } from '@/hooks/useKuCoin'
-import { useOKXTickers, useOKXOrderBook, useOKXTrades } from '@/hooks/useOKX'
+import { useBinanceTickers, useBinanceOrderBook, useBinancePrice } from '@/hooks/useBinance'
+import { useCryptoComTickers, useCryptoComOrderBook } from '@/hooks/useCryptoCom'
+import { useKuCoinTickers, useKuCoinOrderBook } from '@/hooks/useKuCoin'
+import { useOKXTickers, useOKXOrderBook } from '@/hooks/useOKX'
 
 // Futures hooks
-import { useBinanceFutureTickers, useBinanceFutureOrderBook, useBinanceFutureTrades, useBinanceFuturePrice } from '@/hooks/useBinanceFutures'
-import { useCryptoComFutureTickers, useCryptoComFutureOrderBook, useCryptoComFutureTrades } from '@/hooks/useCryptoComFutures'
-import { useKuCoinFutureTickers, useKuCoinFutureOrderBook, useKuCoinFutureTrades } from '@/hooks/useKuCoinFutures'
-import { useOKXFutureTickers, useOKXFutureOrderBook, useOKXFutureTrades } from '@/hooks/useOKXFutures'
+import { useBinanceFutureTickers, useBinanceFutureOrderBook, useBinanceFuturePrice } from '@/hooks/useBinanceFutures'
+import { useCryptoComFutureTickers, useCryptoComFutureOrderBook } from '@/hooks/useCryptoComFutures'
+import { useKuCoinFutureTickers, useKuCoinFutureOrderBook } from '@/hooks/useKuCoinFutures'
+import { useOKXFutureTickers, useOKXFutureOrderBook } from '@/hooks/useOKXFutures'
 
 import type { Ticker, Exchange, MarketType } from '@/types'
 import { cn } from '@/lib/utils'
 import { getTVSources } from '@/lib/tvSymbol'
 
-type RightTab = 'orderbook' | 'trades' | 'signal' | 'backtest' | 'scanner'
+type RightTab = 'orderbook' | 'signal' | 'scanner' | 'opportunities'
 
 const EXCHANGES: { id: Exchange; label: string; color: string }[] = [
   { id: 'binance', label: 'Binance', color: '#F0B90B' },
@@ -65,38 +64,30 @@ export default function App() {
   // ── Spot data ──────────────────────────────────────────────
   const { tickers: binanceSpotTickers, loading: binanceSpotLoading } = useBinanceTickers()
   const binanceSpotOB = useBinanceOrderBook(exchange === 'binance' && marketType === 'spot' ? symbol : '')
-  const binanceSpotTrades = useBinanceTrades(exchange === 'binance' && marketType === 'spot' ? symbol : '')
   useBinancePrice(exchange === 'binance' && marketType === 'spot' ? symbol : '', setCurrentPrice)
 
   const { tickers: cryptoComSpotTickers, loading: cryptoComSpotLoading } = useCryptoComTickers()
   const cryptoComSpotOB = useCryptoComOrderBook(exchange === 'cryptocom' && marketType === 'spot' ? symbol : '')
-  const cryptoComSpotTrades = useCryptoComTrades(exchange === 'cryptocom' && marketType === 'spot' ? symbol : '')
 
   const { tickers: kucoinSpotTickers, loading: kucoinSpotLoading } = useKuCoinTickers()
   const kucoinSpotOB = useKuCoinOrderBook(exchange === 'kucoin' && marketType === 'spot' ? symbol : '')
-  const kucoinSpotTrades = useKuCoinTrades(exchange === 'kucoin' && marketType === 'spot' ? symbol : '')
 
   const { tickers: okxSpotTickers, loading: okxSpotLoading } = useOKXTickers()
   const okxSpotOB = useOKXOrderBook(exchange === 'okx' && marketType === 'spot' ? symbol : '')
-  const okxSpotTrades = useOKXTrades(exchange === 'okx' && marketType === 'spot' ? symbol : '')
 
   // ── Futures data ───────────────────────────────────────────
   const { tickers: binanceFutTickers, loading: binanceFutLoading } = useBinanceFutureTickers()
   const binanceFutOB = useBinanceFutureOrderBook(exchange === 'binance' && marketType === 'futures' ? symbol : '')
-  const binanceFutTrades = useBinanceFutureTrades(exchange === 'binance' && marketType === 'futures' ? symbol : '')
   useBinanceFuturePrice(exchange === 'binance' && marketType === 'futures' ? symbol : '', setCurrentPrice)
 
   const { tickers: cryptoComFutTickers, loading: cryptoComFutLoading } = useCryptoComFutureTickers()
   const cryptoComFutOB = useCryptoComFutureOrderBook(exchange === 'cryptocom' && marketType === 'futures' ? symbol : '')
-  const cryptoComFutTrades = useCryptoComFutureTrades(exchange === 'cryptocom' && marketType === 'futures' ? symbol : '')
 
   const { tickers: kucoinFutTickers, loading: kucoinFutLoading } = useKuCoinFutureTickers()
   const kucoinFutOB = useKuCoinFutureOrderBook(exchange === 'kucoin' && marketType === 'futures' ? symbol : '')
-  const kucoinFutTrades = useKuCoinFutureTrades(exchange === 'kucoin' && marketType === 'futures' ? symbol : '')
 
   const { tickers: okxFutTickers, loading: okxFutLoading } = useOKXFutureTickers()
   const okxFutOB = useOKXFutureOrderBook(exchange === 'okx' && marketType === 'futures' ? symbol : '')
-  const okxFutTrades = useOKXFutureTrades(exchange === 'okx' && marketType === 'futures' ? symbol : '')
 
   // ── Active data selectors ─────────────────────────────────
   const activeTickers = marketType === 'spot'
@@ -110,10 +101,6 @@ export default function App() {
   const activeOrderBook = marketType === 'spot'
     ? { binance: binanceSpotOB, cryptocom: cryptoComSpotOB, kucoin: kucoinSpotOB, okx: okxSpotOB }[exchange]
     : { binance: binanceFutOB, cryptocom: cryptoComFutOB, kucoin: kucoinFutOB, okx: okxFutOB }[exchange]
-
-  const activeTrades = marketType === 'spot'
-    ? { binance: binanceSpotTrades, cryptocom: cryptoComSpotTrades, kucoin: kucoinSpotTrades, okx: okxSpotTrades }[exchange]
-    : { binance: binanceFutTrades, cryptocom: cryptoComFutTrades, kucoin: kucoinFutTrades, okx: okxFutTrades }[exchange]
 
   // Sync price from ticker list for non-WS exchanges
   useEffect(() => {
@@ -411,10 +398,9 @@ export default function App() {
           <div className="flex border-b border-border">
             {([
               { id: 'orderbook', icon: <BookOpen className="h-3 w-3" />,      label: 'Book' },
-              { id: 'trades',    icon: <Clock className="h-3 w-3" />,          label: 'Trades' },
               { id: 'signal',    icon: <BarChart2 className="h-3 w-3" />,      label: 'Sinyal' },
-              { id: 'backtest',  icon: <FlaskConical className="h-3 w-3" />,   label: 'Backtest' },
               { id: 'scanner',   icon: <Scan className="h-3 w-3" />,           label: 'Scanner' },
+              { id: 'opportunities', icon: <CandlestickChart className="h-3 w-3" />, label: 'Long/Short' },
             ] as { id: RightTab; icon: React.ReactNode; label: string }[]).map((tab) => (
               <button
                 key={tab.id}
@@ -434,7 +420,7 @@ export default function App() {
             ))}
           </div>
 
-          {/* Signal / Backtest — takes full panel height */}
+          {/* Right panel content */}
           {rightTab === 'signal' ? (
             <div className="flex-1 overflow-hidden">
               <SignalPanel
@@ -443,10 +429,6 @@ export default function App() {
                 marketType={marketType}
                 currentPrice={currentPrice}
               />
-            </div>
-          ) : rightTab === 'backtest' ? (
-            <div className="flex-1 overflow-hidden">
-              <BacktestPanel ticker={selectedTicker} exchange={exchange} marketType={marketType} />
             </div>
           ) : rightTab === 'scanner' ? (
             <div className="flex-1 overflow-hidden">
@@ -457,22 +439,31 @@ export default function App() {
                 onSelectCoin={handleSelectCoin} 
               />
             </div>
+          ) : rightTab === 'opportunities' ? (
+            <div className="flex-1 overflow-hidden">
+              {isFutures ? (
+                <FuturesOpportunitiesPanel
+                  tickers={activeTickers}
+                  exchange={exchange}
+                  active={rightTab === 'opportunities'}
+                  onSelectCoin={handleSelectCoin}
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center px-4 text-center text-[11px] text-muted-foreground">
+                  Fitur ini khusus futures. Pindah ke mode futures untuk melihat daftar kandidat long dan short.
+                </div>
+              )}
+            </div>
           ) : (
             <div className="flex-1 overflow-hidden">
               <AnimatePresence mode="wait">
-                {rightTab === 'orderbook' ? (
-                  <motion.div key="ob" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
-                    <OrderBook
-                      orderBook={activeOrderBook}
-                      currentPrice={currentPrice}
-                      onPriceClick={() => {}}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div key="trades" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
-                    <TradeHistory trades={activeTrades} />
-                  </motion.div>
-                )}
+                <motion.div key="ob" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
+                  <OrderBook
+                    orderBook={activeOrderBook}
+                    currentPrice={currentPrice}
+                    onPriceClick={() => {}}
+                  />
+                </motion.div>
               </AnimatePresence>
             </div>
           )}

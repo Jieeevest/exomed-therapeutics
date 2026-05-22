@@ -3,13 +3,28 @@ import axios from 'axios'
 import type { Ticker, Exchange, MarketType } from '@/types'
 import type { Candle } from '@/lib/indicators'
 import { generateMTFSignal, type MTFSignalResult, type Timeframe } from '@/lib/signals'
+import { analyzeFuturesSetup, buildSpotRankingScore, type FuturesTradePlan } from '@/lib/futuresEngine'
 import { useFearGreed } from './useFearGreed'
+
+export type { FuturesTradePlan } from '@/lib/futuresEngine'
 
 export interface ScanResult {
   ticker: Ticker
   signal: MTFSignalResult
   scannedAt: number
   rankingScore: number
+  setupSide?: 'long' | 'short'
+  accuracyPct?: number
+  confidenceLabel?: 'High' | 'Medium' | 'Low'
+  riskLabel?: 'Low' | 'Medium' | 'High'
+  crowdednessLabel?: 'Low' | 'Moderate' | 'High'
+  contextLabel?: string
+  summary?: string
+  oneLiner?: string
+  driver?: string
+  invalidationReason?: string
+  primaryPlan?: FuturesTradePlan | null
+  tradePlans?: Partial<Record<Timeframe, FuturesTradePlan>>
 }
 
 export type ScanStatus = 'idle' | 'scanning' | 'done' | 'error'
@@ -112,44 +127,6 @@ const BATCH_SIZE = 3       // Kurangi batch size karena tiap koin request 4x
 const BATCH_DELAY_MS = 500 // Tambah delay jadi 500ms agar lebih aman dari rate limit
 const MAX_TICKERS = 80     // scan top 80 by volume
 
-function normalizeLogMetric(value: number | undefined, maxValue: number) {
-  if (!value || value <= 0 || maxValue <= 0) return 0
-  return Math.min(1, Math.log10(value + 1) / Math.log10(maxValue + 1))
-}
-
-function scoreFundingContext(fundingRate?: number) {
-  if (fundingRate == null) return 0.5
-  if (fundingRate <= -0.1) return 1
-  if (fundingRate < 0) return 0.8
-  if (fundingRate <= 0.03) return 0.6
-  if (fundingRate <= 0.08) return 0.35
-  return 0.15
-}
-
-function buildRankingScore(
-  signal: MTFSignalResult,
-  ticker: Ticker,
-  marketType: MarketType,
-  maxVolume: number,
-  maxOpenInterest: number
-) {
-  const liquidityScore = normalizeLogMetric(ticker.volume, maxVolume) * 100
-
-  if (marketType === 'spot') {
-    return (signal.bullishPct * 0.85) + (liquidityScore * 0.15)
-  }
-
-  const openInterestScore = normalizeLogMetric(ticker.openInterest, maxOpenInterest) * 100
-  const fundingScore = scoreFundingContext(ticker.fundingRate) * 100
-
-  return (
-    (signal.bullishPct * 0.7) +
-    (liquidityScore * 0.15) +
-    (fundingScore * 0.1) +
-    (openInterestScore * 0.05)
-  )
-}
-
 export function useBullishScanner(
   tickers: Ticker[],
   exchange: Exchange,
@@ -195,17 +172,34 @@ export function useBullishScanner(
           
           // Pastikan minimal ada data 1h dan cukup panjang
           if (!candlesMap['1h'] || candlesMap['1h'].length < 60) return null
-          
+
           const signal = generateMTFSignal(candlesMap, fgData?.value ?? null, ticker.fundingRate ?? null)
           if (!signal) return null
 
-          const rankingScore = buildRankingScore(signal, ticker, marketType, maxVolume, maxOpenInterest)
+          const futuresSetup = marketType === 'futures'
+            ? analyzeFuturesSetup(ticker, signal, candlesMap, maxVolume, maxOpenInterest)
+            : null
+          const rankingScore = futuresSetup
+            ? futuresSetup.longScore
+            : buildSpotRankingScore(signal.bullishPct, ticker.volume, maxVolume)
           
           return {
             ticker,
             signal,
             scannedAt: Date.now(),
             rankingScore,
+            setupSide: futuresSetup?.side,
+            accuracyPct: futuresSetup?.accuracyPct,
+            confidenceLabel: futuresSetup?.confidenceLabel,
+            riskLabel: futuresSetup?.riskLabel,
+            crowdednessLabel: futuresSetup?.crowdednessLabel,
+            contextLabel: futuresSetup?.contextLabel,
+            summary: futuresSetup?.summary,
+            oneLiner: futuresSetup?.oneLiner,
+            driver: futuresSetup?.driver,
+            invalidationReason: futuresSetup?.invalidationReason,
+            primaryPlan: futuresSetup?.primaryPlan,
+            tradePlans: futuresSetup?.tradePlans,
           } as ScanResult
         })
       )

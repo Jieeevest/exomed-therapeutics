@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Scan, X, TrendingUp, TrendingDown, Minus, RefreshCw, Clock, Filter } from 'lucide-react'
+import { Scan, X, TrendingUp, TrendingDown, Minus, RefreshCw, Clock, Filter, Info } from 'lucide-react'
 import type { Ticker, Exchange, MarketType } from '@/types'
-import { useBullishScanner, type ScanResult } from '@/hooks/useBullishScanner'
-import type { BullishLabel } from '@/lib/signals'
-import { cn, formatNumber } from '@/lib/utils'
+import { useBullishScanner, type ScanResult, type FuturesTradePlan } from '@/hooks/useBullishScanner'
+import type { BullishLabel, Timeframe } from '@/lib/signals'
+import { cn, formatNumber, formatPrice } from '@/lib/utils'
 
 interface Props {
   tickers: Ticker[]
@@ -28,6 +28,160 @@ const THRESHOLD_OPTIONS = [
   { label: '≥ 60%',   value: 60  },
   { label: '≥ 65%',   value: 65  },
 ]
+
+function describeFunding(rate?: number) {
+  if (rate == null) {
+    return {
+      short: 'Funding belum tersedia',
+      detail: 'Data funding belum masuk, jadi baca hasil ini dengan konfirmasi harga dan volume.',
+    }
+  }
+
+  if (rate < 0) {
+    return {
+      short: 'Funding minus',
+      detail: 'Posisi long belum terlalu padat. Jika trend mulai naik, setup long biasanya lebih sehat.',
+    }
+  }
+
+  if (rate <= 0.03) {
+    return {
+      short: 'Funding masih wajar',
+      detail: 'Minat long ada, tapi belum terlalu ramai. Biasanya masih aman untuk dipantau.',
+    }
+  }
+
+  return {
+    short: 'Funding mulai panas',
+    detail: 'Posisi long sudah ramai. Risiko entry telat dan kena pullback jadi lebih tinggi.',
+  }
+}
+
+function describeOpenInterest(openInterest?: number) {
+  if (!openInterest) {
+    return 'Minat posisi terbuka belum menonjol.'
+  }
+  if (openInterest >= 1_000_000_000) {
+    return 'Banyak posisi masih terbuka, artinya market ini ramai dan diperhatikan.'
+  }
+  if (openInterest >= 100_000_000) {
+    return 'Open interest cukup besar, jadi ada minat trader yang lumayan kuat.'
+  }
+  return 'Open interest masih relatif kecil, jadi setup ini perlu konfirmasi ekstra.'
+}
+
+function buildFuturesQuickTake(result: ScanResult) {
+  const { signal, ticker, rankingScore } = result
+
+  if (signal.bullishPct >= 65 && (ticker.fundingRate ?? 0) <= 0) {
+    return 'Trend naik terlihat kuat dan posisi long belum terlalu ramai.'
+  }
+  if (signal.bullishPct >= 65 && (ticker.fundingRate ?? 0) > 0.03) {
+    return 'Trend naik kuat, tetapi trader long sudah mulai ramai. Hindari entry terlalu telat.'
+  }
+  if (rankingScore >= 60) {
+    return 'Setup masih menarik, tetapi perlu lihat candle masuk agar tidak membeli di pucuk.'
+  }
+  return 'Sinyal belum sekuat kandidat teratas. Lebih cocok dipantau dulu daripada langsung entry.'
+}
+
+function buildFuturesGuideItems() {
+  return [
+    {
+      label: 'Score',
+      text: 'Semakin tinggi, semakin rapi kombinasi trend, volume, funding, dan open interest.',
+    },
+    {
+      label: 'Funding',
+      text: 'Funding minus sering lebih nyaman untuk cari long. Funding terlalu positif artinya long sudah ramai.',
+    },
+    {
+      label: 'OI',
+      text: 'Open Interest menunjukkan banyaknya posisi terbuka. Tinggi = market ramai, tapi bukan sinyal buy sendirian.',
+    },
+    {
+      label: '15m-4h',
+      text: 'Semakin banyak timeframe yang searah, semakin mudah hasil scan dipercaya.',
+    },
+  ]
+}
+
+function tradePlanTone(plan: FuturesTradePlan) {
+  if (plan.riskReward >= 1.8) {
+    return { label: 'Siap long', className: 'text-green-400 bg-green-500/10' }
+  }
+  if (plan.riskReward >= 1.2) {
+    return { label: 'Tunggu pullback', className: 'text-yellow-400 bg-yellow-500/10' }
+  }
+  return { label: 'Risiko tinggi', className: 'text-orange-400 bg-orange-500/10' }
+}
+
+function infoTone(kind: 'context' | 'confidence' | 'risk' | 'crowdedness', value?: string) {
+  if (!value) return 'text-muted-foreground bg-muted/40'
+
+  if (kind === 'confidence') {
+    if (value === 'High') return 'text-green-400 bg-green-500/10'
+    if (value === 'Medium') return 'text-yellow-400 bg-yellow-500/10'
+    return 'text-orange-400 bg-orange-500/10'
+  }
+
+  if (kind === 'risk') {
+    if (value === 'Low') return 'text-green-400 bg-green-500/10'
+    if (value === 'Medium') return 'text-yellow-400 bg-yellow-500/10'
+    return 'text-orange-400 bg-orange-500/10'
+  }
+
+  if (kind === 'crowdedness') {
+    if (value === 'Low') return 'text-green-400 bg-green-500/10'
+    if (value === 'Moderate') return 'text-yellow-400 bg-yellow-500/10'
+    return 'text-orange-400 bg-orange-500/10'
+  }
+
+  if (value === 'Trend Continuation' || value === 'Breakdown Short') {
+    return 'text-green-400 bg-green-500/10'
+  }
+  if (value === 'Pullback Long' || value === 'Bounce Short') {
+    return 'text-yellow-400 bg-yellow-500/10'
+  }
+  return 'text-orange-400 bg-orange-500/10'
+}
+
+function timeframeLabel(tf: Timeframe) {
+  if (tf === '15m') return '15m'
+  if (tf === '30m') return '30m'
+  if (tf === '1h') return '1 jam'
+  return '4 jam'
+}
+
+function FuturesPlanCard({ timeframe, plan }: { timeframe: Timeframe; plan: FuturesTradePlan }) {
+  const tone = tradePlanTone(plan)
+
+  return (
+    <div className="rounded-md border border-border/60 bg-background/40 px-2 py-2">
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span className="text-[10px] font-semibold text-foreground">{timeframeLabel(timeframe)}</span>
+        <span className={cn('text-[9px] px-1.5 py-0.5 rounded font-medium', tone.className)}>
+          {tone.label}
+        </span>
+      </div>
+      <div className="space-y-1 text-[9px] leading-relaxed text-muted-foreground">
+        <p>
+          <span className="text-foreground font-medium">Open:</span> {formatPrice(plan.openLow)} - {formatPrice(plan.openHigh)}
+        </p>
+        <p>
+          <span className="text-foreground font-medium">Close rugi:</span> di bawah {formatPrice(plan.stopLoss)}
+        </p>
+        <p>
+          <span className="text-foreground font-medium">Close untung:</span> {formatPrice(plan.takeProfit1)} lalu {formatPrice(plan.takeProfit2)}
+        </p>
+        <p>
+          <span className="text-foreground font-medium">RR:</span> {plan.riskReward.toFixed(2)}x
+        </p>
+        <p>{plan.note}</p>
+      </div>
+    </div>
+  )
+}
 
 // ── Mini gauge bar ────────────────────────────────────────────────────────
 function PctBar({ pct }: { pct: number }) {
@@ -60,12 +214,15 @@ function ResultRow({ result, rank, onClick, marketType }: {
   const cfg = LABEL_CFG[signal.label]
   const pctColor = ticker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'
   const isFutures = marketType === 'futures'
+  const [showTradePlans, setShowTradePlans] = useState(false)
   const fundingTone =
     ticker.fundingRate == null
       ? 'text-muted-foreground bg-muted/40'
       : ticker.fundingRate <= 0
         ? 'text-green-400 bg-green-500/10'
         : 'text-orange-400 bg-orange-500/10'
+  const fundingCopy = describeFunding(ticker.fundingRate)
+  const quickTake = buildFuturesQuickTake(result)
 
   return (
     <motion.button
@@ -125,6 +282,65 @@ function ResultRow({ result, rank, onClick, marketType }: {
         </div>
       )}
 
+      {isFutures && (
+        <div className="pl-6 pr-1 text-[10px] leading-relaxed text-muted-foreground">
+          <span className="text-foreground font-medium">Bacaan cepat:</span> {result.summary ?? quickTake}
+          <br />
+          <span className="text-foreground font-medium">Ringkasan:</span> {result.oneLiner ?? result.driver ?? fundingCopy.detail}
+          <br />
+          <span className="text-foreground font-medium">Invalidation:</span> {result.invalidationReason ?? describeOpenInterest(ticker.openInterest)}
+        </div>
+      )}
+
+      {isFutures && (
+        <div className="flex gap-1 pl-6 flex-wrap">
+          {result.contextLabel ? (
+            <span className={cn('text-[9px] px-1.5 py-0.5 rounded', infoTone('context', result.contextLabel))}>
+              {result.contextLabel}
+            </span>
+          ) : null}
+          {result.confidenceLabel ? (
+            <span className={cn('text-[9px] px-1.5 py-0.5 rounded', infoTone('confidence', result.confidenceLabel))}>
+              Confidence {result.confidenceLabel}
+            </span>
+          ) : null}
+          {result.riskLabel ? (
+            <span className={cn('text-[9px] px-1.5 py-0.5 rounded', infoTone('risk', result.riskLabel))}>
+              Risk {result.riskLabel}
+            </span>
+          ) : null}
+          {result.crowdednessLabel ? (
+            <span className={cn('text-[9px] px-1.5 py-0.5 rounded', infoTone('crowdedness', result.crowdednessLabel))}>
+              Crowded {result.crowdednessLabel}
+            </span>
+          ) : null}
+        </div>
+      )}
+
+      {isFutures && result.tradePlans && (
+        <div className="pl-6 pr-1">
+          <button
+            onClick={(event) => {
+              event.stopPropagation()
+              setShowTradePlans((prev) => !prev)
+            }}
+            className="text-[10px] text-sky-300 hover:text-sky-200 transition-colors"
+          >
+            {showTradePlans ? 'Sembunyikan' : 'Lihat'} rekomendasi open/close per timeframe
+          </button>
+
+          {showTradePlans && (
+            <div className="mt-2 grid gap-2">
+              {(['15m', '30m', '1h', '4h'] as const).map((tf) => {
+                const plan = result.tradePlans?.[tf]
+                if (!plan) return null
+                return <FuturesPlanCard key={tf} timeframe={tf} plan={plan} />
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Row 4: timeframe breakdown pills */}
       <div className="flex gap-1 pl-6 flex-wrap">
         {(['15m', '30m', '1h', '4h'] as const).map((tf) => {
@@ -148,9 +364,11 @@ function ResultRow({ result, rank, onClick, marketType }: {
 // ── Main component ─────────────────────────────────────────────────────────
 export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }: Props) {
   const [threshold, setThreshold] = useState(55)
+  const [showFuturesGuide, setShowFuturesGuide] = useState(true)
   const { results, status, progress, scannedCount, totalCount, lastRunAt, runScan, cancelScan } =
     useBullishScanner(tickers, exchange, marketType)
   const isFutures = marketType === 'futures'
+  const futuresGuideItems = useMemo(() => buildFuturesGuideItems(), [])
 
   const filtered = useMemo(
     () => results.filter((r) => r.signal.bullishPct >= threshold),
@@ -207,6 +425,41 @@ export function BullishWatchlist({ tickers, exchange, marketType, onSelectCoin }
             ))}
           </div>
         </div>
+
+        {isFutures && (
+          <div className="mb-2 rounded-md border border-sky-500/20 bg-sky-500/5 px-2.5 py-2">
+            <button
+              onClick={() => setShowFuturesGuide((prev) => !prev)}
+              className="w-full flex items-center justify-between gap-2 text-left"
+            >
+              <span className="flex items-center gap-1.5 text-[10px] font-semibold text-sky-300">
+                <Info className="h-3 w-3" />
+                Cara baca hasil futures
+              </span>
+              <span className="text-[9px] text-muted-foreground">
+                {showFuturesGuide ? 'Sembunyikan' : 'Tampilkan'}
+              </span>
+            </button>
+
+            {showFuturesGuide && (
+              <div className="mt-2 space-y-1.5 text-[10px] leading-relaxed text-muted-foreground">
+                <p>
+                  Scanner ini membantu mencari kontrak futures yang sedang terlihat menarik. Hasil tinggi bukan berarti wajib buy,
+                  tetapi berarti setup-nya lebih layak dipantau.
+                </p>
+                {futuresGuideItems.map((item) => (
+                  <p key={item.label}>
+                    <span className="text-foreground font-medium">{item.label}:</span> {item.text}
+                  </p>
+                ))}
+                <p>
+                  <span className="text-foreground font-medium">Open / Close:</span> Anggap sebagai zona rencana,
+                  bukan harga pasti. Open adalah area masuk, close rugi adalah batas batal, dan close untung adalah area ambil profit.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Scan button / progress */}
         {status === 'scanning' ? (
