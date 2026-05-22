@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import {
   Zap, TrendingUp, Shield, Activity, BarChart2, ArrowRight,
-  ChevronRight, Check, Star, Globe, Lock, Cpu, Layers,
+  ChevronRight, Check, Star, Globe, Lock, Cpu,
   Twitter, Github, Send, Menu, X, Clock, Database, Eye
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'

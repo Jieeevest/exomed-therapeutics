@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
-import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, Settings, ShieldAlert, User, Crown } from 'lucide-react'
+import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown } from 'lucide-react'
 
 import { useAuth } from '@/store/useAuth'
 import { ProGate } from '@/components/ProGate'
@@ -55,7 +55,7 @@ const DEFAULT_FUTURES_SYMBOLS: Record<Exchange, string> = {
 }
 
 export default function Dashboard() {
-  const { user, logout, accessToken } = useAuth()
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
   
   const [exchange, setExchange] = useState<Exchange>('binance')

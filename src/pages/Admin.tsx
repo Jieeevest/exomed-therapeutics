@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Users, CreditCard, Activity, ShieldAlert, ArrowLeft, Trash2, Shield, User as UserIcon } from 'lucide-react'
+import { Users, Activity, ShieldAlert, ArrowLeft, Trash2, User as UserIcon } from 'lucide-react'
 import { useAuth, User } from '@/store/useAuth'
-import { motion } from 'framer-motion'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 

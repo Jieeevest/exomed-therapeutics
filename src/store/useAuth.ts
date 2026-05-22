@@ -7,6 +7,7 @@ export interface User {
   email: string
   role: string
   subscription_tier: string
+  created_at?: string
 }
 
 interface AuthState {
