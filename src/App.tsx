@@ -7,6 +7,7 @@ import Profile from '@/pages/Profile'
 import Support from '@/pages/Support'
 import Articles from '@/pages/Articles'
 import ArticleDetail from '@/pages/ArticleDetail'
+import StaticPage from '@/pages/StaticPage'
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
 
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/articles" element={<Articles />} />
         <Route path="/articles/:slug" element={<ArticleDetail />} />
+        <Route path="/page/:slug" element={<StaticPage />} />
 
         {/* Login */}
         <Route

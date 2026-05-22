@@ -172,6 +172,7 @@ function TickerBar() {
 
 // ── Main Landing Page ─────────────────────────────────────────────────────
 export default function Landing() {
+  const { isAuthenticated } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { scrollY } = useScroll()
   const navBg = useTransform(scrollY, [0, 80], ['rgba(0,0,0,0)', 'rgba(0,0,0,0.85)'])
@@ -195,24 +196,34 @@ export default function Landing() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-8">
-              {['Fitur', 'Cara Kerja', 'Harga', 'Blog'].map(item => (
-                <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`}
-                  className="text-sm text-slate-400 hover:text-white transition-colors">
-                  {item}
-                </a>
-              ))}
+              <a href="#fitur" className="text-sm text-slate-400 hover:text-white transition-colors">Fitur</a>
+              <a href="#cara-kerja" className="text-sm text-slate-400 hover:text-white transition-colors">Cara Kerja</a>
+              <a href="#harga" className="text-sm text-slate-400 hover:text-white transition-colors">Harga</a>
+              <Link to="/articles" className="text-sm text-slate-400 hover:text-white transition-colors">Artikel & Berita</Link>
+              <Link to="/support" className="text-sm text-slate-400 hover:text-white transition-colors">Support CS</Link>
             </div>
 
             <div className="hidden md:flex items-center gap-3">
-              <Link to="/login" className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors">
-                Login
-              </Link>
-              <Link
-                to="/login"
-                className="text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95"
-              >
-                Coba Gratis
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  to="/app"
+                  className="flex items-center gap-2 text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95"
+                >
+                  Dashboard <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors">
+                    Login
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95"
+                  >
+                    Coba Gratis
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile menu btn */}
@@ -235,16 +246,22 @@ export default function Landing() {
               className="md:hidden border-t border-white/[0.06] bg-black/90 backdrop-blur-xl overflow-hidden"
             >
               <div className="px-6 py-4 space-y-3">
-                {['Fitur', 'Cara Kerja', 'Harga', 'Blog'].map(item => (
-                  <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenuOpen(false)}
-                    className="block text-sm text-slate-300 py-2">
-                    {item}
-                  </a>
-                ))}
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">
-                  Mulai Gratis
-                </Link>
+                <a href="#fitur" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Fitur</a>
+                <a href="#cara-kerja" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Cara Kerja</a>
+                <a href="#harga" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Harga</a>
+                <Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Artikel & Berita</Link>
+                <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Support CS</Link>
+                {isAuthenticated ? (
+                  <Link to="/app" onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">
+                    Dashboard
+                  </Link>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">
+                    Mulai Gratis
+                  </Link>
+                )}
               </div>
             </motion.div>
           )}
@@ -312,10 +329,10 @@ export default function Landing() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link
-              to="/login"
+              to={isAuthenticated ? "/app" : "/login"}
               className="group w-full sm:w-auto bg-white text-black font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] text-base"
             >
-              Mulai Gratis Sekarang
+              {isAuthenticated ? 'Buka Dashboard' : 'Mulai Gratis Sekarang'}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
@@ -598,18 +615,29 @@ export default function Landing() {
             Bergabunglah dengan 1.200+ trader yang sudah menggunakan CryptoEx untuk menemukan peluang pasar lebih cepat.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/login"
-              className="group bg-white text-black font-bold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15)] text-base"
-            >
-              Buat Akun Gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              to="/login"
-              className="bg-white/[0.06] border border-white/[0.12] text-white font-semibold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/[0.1] transition-all text-base"
-            >
-              <Shield className="w-4 h-4" /> Masuk ke Terminal
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/app"
+                className="group bg-white text-black font-bold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15)] text-base"
+              >
+                Buka Dashboard Terminal <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="group bg-white text-black font-bold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15)] text-base"
+                >
+                  Buat Akun Gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  to="/login"
+                  className="bg-white/[0.06] border border-white/[0.12] text-white font-semibold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/[0.1] transition-all text-base"
+                >
+                  <Shield className="w-4 h-4" /> Masuk ke Terminal
+                </Link>
+              </>
+            )}
           </div>
         </motion.div>
       </section>
@@ -637,15 +665,35 @@ export default function Landing() {
               </div>
             </div>
             {[
-              { title: 'Produk', links: ['Fitur', 'Harga', 'Changelog', 'Roadmap'] },
-              { title: 'Support', links: ['Dokumentasi', 'FAQ', 'Status', 'Kontak'] },
-              { title: 'Legal', links: ['Syarat & Ketentuan', 'Kebijakan Privasi', 'Disclaimer'] },
+              { title: 'Produk', links: [
+                { name: 'Fitur', url: '/#fitur' }, 
+                { name: 'Harga', url: '/#harga' }, 
+                { name: 'Changelog', url: '/page/changelog' }, 
+                { name: 'Roadmap', url: '/page/roadmap' }
+              ]},
+              { title: 'Support', links: [
+                { name: 'Dokumentasi', url: '/page/dokumentasi' }, 
+                { name: 'FAQ', url: '/page/faq' }, 
+                { name: 'Status', url: '/page/status' }, 
+                { name: 'Kontak', url: '/support' }
+              ]},
+              { title: 'Legal', links: [
+                { name: 'Syarat & Ketentuan', url: '/page/terms' }, 
+                { name: 'Kebijakan Privasi', url: '/page/privacy' }, 
+                { name: 'Disclaimer', url: '/page/disclaimer' }
+              ]},
             ].map(col => (
               <div key={col.title}>
                 <h4 className="text-xs font-bold tracking-widest uppercase text-slate-500 mb-4">{col.title}</h4>
                 <ul className="space-y-2.5">
                   {col.links.map(l => (
-                    <li key={l}><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{l}</a></li>
+                    <li key={l.name}>
+                      {l.url.startsWith('/#') ? (
+                        <a href={l.url} className="text-sm text-slate-400 hover:text-white transition-colors">{l.name}</a>
+                      ) : (
+                        <Link to={l.url} className="text-sm text-slate-400 hover:text-white transition-colors">{l.name}</Link>
+                      )}
+                    </li>
                   ))}
                 </ul>
               </div>

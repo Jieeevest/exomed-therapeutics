@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { BookOpen, Search, ArrowRight, Clock, } from 'lucide-react'
+import { Link, } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { BookOpen, Search, ArrowRight, Clock, Zap, Menu, X, Shield, LayoutGrid } from 'lucide-react'
+import { useAuth } from '@/store/useAuth'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -21,7 +22,10 @@ const CAT_COLORS: Record<string, string> = {
 }
 
 export default function Articles() {
-    const [articles, setArticles] = useState<any[]>([])
+  const { isAuthenticated } = useAuth()
+    
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [articles, setArticles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -47,92 +51,193 @@ export default function Articles() {
   }
 
   return (
-    <div className="min-h-screen bg-[#030303] text-white">
-      {/* Hero */}
-      <div className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-blue-500/5" />
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="relative max-w-4xl mx-auto px-6 py-16 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-6">
-            <BookOpen className="w-3.5 h-3.5" /> KNOWLEDGE BASE
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-4">Artikel & Panduan</h1>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto mb-8">Tutorial, analisis pasar, dan update terbaru dari tim CryptoEx untuk para trader profesional.</p>
+    <div className="min-h-screen bg-[#030303] text-white font-sans selection:bg-primary/30 selection:text-white">
+      
+      {/* ── NAVBAR ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/[0.05] transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.5)]">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-black tracking-tight">CryptoEx</span>
+            </Link>
 
-          {/* Search */}
-          <form onSubmit={handleSearch} className="flex gap-2 max-w-lg mx-auto">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari artikel..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:border-primary/50 transition-colors" />
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/" className="text-sm text-slate-400 hover:text-white transition-colors">Beranda</Link>
+              <Link to="/articles" className="text-sm text-primary font-bold shadow-[0_4px_0_0_rgba(56,189,248,0.2)]">Artikel & Berita</Link>
             </div>
-            <button type="submit" className="px-5 py-2.5 bg-primary text-black font-bold rounded-xl text-sm hover:opacity-90 transition-opacity">Cari</button>
-          </form>
+
+            <div className="hidden md:flex items-center gap-3">
+              {isAuthenticated ? (
+                <Link to="/app" className="flex items-center gap-2 text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                  <LayoutGrid className="w-4 h-4" /> Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors">Login</Link>
+                  <Link to="/login" className="text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95">Mulai Gratis</Link>
+                </>
+              )}
+            </div>
+
+            <button onClick={() => setMobileMenuOpen(v => !v)} className="md:hidden text-slate-400 hover:text-white p-2">
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-2xl overflow-hidden"
+            >
+              <div className="px-6 py-4 space-y-3">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Beranda</Link>
+                <Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-primary font-bold py-2">Artikel & Berita</Link>
+                {isAuthenticated ? (
+                  <Link to="/app" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Dashboard</Link>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Mulai Gratis</Link>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {/* ── HERO ── */}
+      <div className="relative overflow-hidden pt-16 border-b border-white/[0.02]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(120,80,255,0.15),transparent)]" />
+        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        
+        <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.1] text-slate-300 text-xs font-bold px-4 py-1.5 rounded-full mb-6 backdrop-blur-sm">
+              <Shield className="w-3.5 h-3.5 text-primary" /> CryptoEx Intelligence
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+              Insight Pasar <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">Pro</span>
+            </h1>
+            <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+              Analisis mendalam, tutorial teknikal, dan update market real-time langsung dari meja trader institusional kami.
+            </p>
+
+            <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mx-auto relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
+              <div className="relative flex w-full">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input 
+                  value={search} onChange={e => setSearch(e.target.value)} 
+                  placeholder="Cari analisis, token, atau tutorial..."
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-l-xl pl-12 pr-4 py-4 text-sm focus:outline-none focus:border-primary/50 transition-colors text-white placeholder:text-slate-600" 
+                />
+                <button type="submit" className="px-8 py-4 bg-white text-black font-bold rounded-r-xl text-sm hover:bg-slate-200 transition-colors">
+                  Cari
+                </button>
+              </div>
+            </form>
+          </motion.div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        
         {/* Category Filter */}
-        <div className="flex gap-2 flex-wrap mb-8">
-          {CATEGORIES.map(c => (
-            <button key={c.value} onClick={() => setCategory(c.value)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${category === c.value ? 'bg-primary/20 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'}`}>
+        <div className="flex gap-3 flex-wrap mb-12 justify-center">
+          {CATEGORIES.map((c, i) => (
+            <motion.button 
+              key={c.value} 
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              onClick={() => setCategory(c.value)}
+              className={`px-6 py-2 rounded-full text-sm font-bold border transition-all duration-300 ${
+                category === c.value 
+                  ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' 
+                  : 'bg-white/[0.02] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
               {c.label}
-            </button>
+            </motion.button>
           ))}
         </div>
 
         {/* Articles Grid */}
         {loading ? (
-          <div className="py-20 flex justify-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+          <div className="py-32 flex justify-center">
+            <div className="w-10 h-10 border-4 border-white/10 border-t-primary rounded-full animate-spin" />
+          </div>
         ) : articles.length === 0 ? (
-          <div className="py-20 text-center border border-white/5 rounded-2xl bg-white/[0.02]">
-            <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500">Belum ada artikel yang tersedia.</p>
+          <div className="py-32 text-center border border-white/5 rounded-3xl bg-white/[0.01]">
+            <BookOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+            <p className="text-slate-500 text-lg">Belum ada intelijen pasar untuk kategori ini.</p>
           </div>
         ) : (
-          <div className="grid gap-5">
-            {/* Featured first */}
+          <div className="grid gap-6">
+            {/* Featured Article */}
             {articles[0] && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <Link to={`/articles/${articles[0].slug}`}
-                  className="group block bg-gradient-to-br from-primary/10 to-blue-900/10 border border-primary/20 rounded-2xl p-6 hover:border-primary/40 transition-colors">
-                  <div className="flex items-start justify-between mb-4">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${CAT_COLORS[articles[0].category] || ''}`}>
-                      {CATEGORIES.find(c => c.value === articles[0].category)?.label}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Clock className="w-3 h-3" />
-                      {new Date(articles[0].published_at || articles[0].created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  className="group relative block rounded-3xl overflow-hidden border border-white/10 bg-[#0a0a0a] hover:border-white/30 transition-all duration-500"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="md:flex">
+                    {articles[0].cover_url && (
+                      <div className="md:w-1/2 h-64 md:h-auto overflow-hidden relative">
+                        <img src={articles[0].cover_url} alt={articles[0].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+                      </div>
+                    )}
+                    <div className="p-8 md:p-12 md:w-1/2 flex flex-col justify-center relative z-10">
+                      <div className="flex items-center gap-3 mb-6">
+                        <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${CAT_COLORS[articles[0].category] || 'bg-white/10 border-white/20'}`}>
+                          {CATEGORIES.find(c => c.value === articles[0].category)?.label}
+                        </span>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                          <Clock className="w-3.5 h-3.5" />
+                          {new Date(articles[0].published_at || articles[0].created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </div>
+                      </div>
+                      <h2 className="text-3xl font-black text-white group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/50 group-hover:bg-clip-text group-hover:text-transparent transition-all mb-4">
+                        {articles[0].title}
+                      </h2>
+                      {articles[0].excerpt && <p className="text-slate-400 text-sm md:text-base line-clamp-3 mb-8 leading-relaxed">{articles[0].excerpt}</p>}
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">BY <span className="text-white">{articles[0].author}</span></span>
+                        <span className="flex items-center gap-2 text-white font-bold group-hover:text-primary transition-colors">
+                          BACA SELENGKAPNYA <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <h2 className="text-xl font-black text-white group-hover:text-primary transition-colors mb-2">{articles[0].title}</h2>
-                  {articles[0].excerpt && <p className="text-slate-400 text-sm line-clamp-2 mb-4">{articles[0].excerpt}</p>}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-500">oleh <span className="text-slate-300">{articles[0].author}</span></span>
-                    <span className="flex items-center gap-1 text-primary text-sm font-semibold group-hover:gap-2 transition-all">Baca <ArrowRight className="w-4 h-4" /></span>
                   </div>
                 </Link>
               </motion.div>
             )}
 
-            {/* Rest in grid */}
-            <div className="grid md:grid-cols-2 gap-4">
+            {/* Grid Articles */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {articles.slice(1).map((a, i) => (
-                <motion.div key={a.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + (i * 0.05) }}>
                   <Link to={`/articles/${a.slug}`}
-                    className="group block bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 hover:border-white/20 rounded-2xl p-5 transition-colors h-full">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${CAT_COLORS[a.category] || ''}`}>
+                    className="group block h-full bg-[#0a0a0a] border border-white/10 hover:border-white/30 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <div className="flex items-center justify-between mb-5">
+                      <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${CAT_COLORS[a.category] || 'bg-white/10 border-white/20'}`}>
                         {CATEGORIES.find(c => c.value === a.category)?.label}
                       </span>
-                      <span className="text-[10px] text-slate-600">
-                        {new Date(a.published_at || a.created_at).toLocaleDateString('id-ID')}
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-white mb-3 line-clamp-3 group-hover:text-primary transition-colors">{a.title}</h3>
+                    {a.excerpt && <p className="text-slate-500 text-sm line-clamp-2 mb-6 leading-relaxed">{a.excerpt}</p>}
+                    
+                    <div className="mt-auto pt-6 border-t border-white/5 flex flex-col gap-1">
+                      <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                        {new Date(a.published_at || a.created_at).toLocaleDateString('id-ID')} &bull; {a.author}
                       </span>
                     </div>
-                    <h3 className="font-bold text-white group-hover:text-primary transition-colors mb-2 line-clamp-2">{a.title}</h3>
-                    {a.excerpt && <p className="text-slate-500 text-xs line-clamp-2">{a.excerpt}</p>}
-                    <div className="mt-3 text-xs text-slate-600">oleh {a.author}</div>
                   </Link>
                 </motion.div>
               ))}

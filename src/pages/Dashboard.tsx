@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
-import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown } from 'lucide-react'
+import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown, Ticket } from 'lucide-react'
 
 import { useAuth } from '@/store/useAuth'
 import { ProGate } from '@/components/ProGate'
@@ -279,10 +279,17 @@ export default function Dashboard() {
           {isFutures ? 'PERPETUAL' : 'SPOT'}
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-4">
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground mr-4">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
           Live
         </div>
+
+        <button 
+          onClick={() => navigate('/support')}
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors rounded-md border border-primary/20 mr-2"
+        >
+          <Ticket className="w-3.5 h-3.5" /> Support CS
+        </button>
 
         <div className="w-px h-4 bg-border mr-2" />
 
@@ -326,6 +333,14 @@ export default function Dashboard() {
                     <ShieldAlert className="w-4 h-4" /> Admin Panel
                   </button>
                 )}
+                
+                <button onClick={() => navigate('/articles')} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                  <BookOpen className="w-4 h-4" /> Artikel & Berita
+                </button>
+
+                <button onClick={() => navigate('/support')} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                  <Ticket className="w-4 h-4" /> Support Tickets
+                </button>
                 
                 <button onClick={() => navigate('/profile')} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
                   <User className="w-4 h-4" /> Subscription Info

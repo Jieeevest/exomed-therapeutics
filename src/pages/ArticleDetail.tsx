@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowLeft, Clock, User, BookOpen } from 'lucide-react'
+import { useParams, Link, } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, Clock, BookOpen, Zap, Menu, X, LayoutGrid } from 'lucide-react'
+import { useAuth } from '@/store/useAuth'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -17,12 +18,15 @@ const CAT_LABELS: Record<string, string> = {
 
 export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>()
-  const navigate = useNavigate()
+    const { isAuthenticated } = useAuth()
+  
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [article, setArticle] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
+    setLoading(true)
     fetch(`${API_URL}/api/articles/${slug}`)
       .then(r => r.json())
       .then(data => {
@@ -35,77 +39,154 @@ export default function ArticleDetail() {
 
   if (loading) return (
     <div className="min-h-screen bg-[#030303] flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="w-12 h-12 border-4 border-white/10 border-t-primary rounded-full animate-spin" />
     </div>
   )
 
   if (notFound || !article) return (
-    <div className="min-h-screen bg-[#030303] text-white flex flex-col items-center justify-center gap-4">
-      <BookOpen className="w-16 h-16 text-slate-700" />
-      <h1 className="text-2xl font-black">Artikel Tidak Ditemukan</h1>
-      <Link to="/articles" className="text-primary hover:underline text-sm">Kembali ke Daftar Artikel</Link>
+    <div className="min-h-screen bg-[#030303] text-white flex flex-col items-center justify-center gap-6 px-4 text-center">
+      <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center mb-4">
+        <BookOpen className="w-10 h-10 text-slate-600" />
+      </div>
+      <h1 className="text-4xl font-black tracking-tight">Artikel Tidak Ditemukan</h1>
+      <p className="text-slate-500 max-w-sm">Mungkin artikel ini telah dihapus atau URL yang Anda masukkan salah.</p>
+      <Link to="/articles" className="bg-primary text-black font-bold px-8 py-3 rounded-xl hover:opacity-90 transition-all shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+        Kembali ke Daftar Artikel
+      </Link>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-[#030303] text-white">
-      {/* Top Nav */}
-      <div className="border-b border-white/5 bg-black/40 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex items-center gap-4">
-          <button onClick={() => navigate('/articles')} className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 text-sm">
+    <div className="min-h-screen bg-[#030303] text-white font-sans selection:bg-primary/30 selection:text-white">
+      
+      {/* ── NAVBAR ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/[0.05] transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.5)]">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-black tracking-tight">CryptoEx</span>
+            </Link>
+
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/" className="text-sm text-slate-400 hover:text-white transition-colors">Beranda</Link>
+              <Link to="/articles" className="text-sm text-primary font-bold shadow-[0_4px_0_0_rgba(56,189,248,0.2)]">Artikel & Berita</Link>
+            </div>
+
+            <div className="hidden md:flex items-center gap-3">
+              {isAuthenticated ? (
+                <Link to="/app" className="flex items-center gap-2 text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                  <LayoutGrid className="w-4 h-4" /> Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors">Login</Link>
+                  <Link to="/login" className="text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95">Mulai Gratis</Link>
+                </>
+              )}
+            </div>
+
+            <button onClick={() => setMobileMenuOpen(v => !v)} className="md:hidden text-slate-400 hover:text-white p-2">
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-2xl overflow-hidden"
+            >
+              <div className="px-6 py-4 space-y-3">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Beranda</Link>
+                <Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-primary font-bold py-2">Artikel & Berita</Link>
+                {isAuthenticated ? (
+                  <Link to="/app" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Dashboard</Link>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Mulai Gratis</Link>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {/* ── BREADCRUMB ── */}
+      <div className="pt-24 pb-6 border-b border-white/5">
+        <div className="max-w-4xl mx-auto px-6 flex items-center gap-4 text-sm font-semibold">
+          <Link to="/articles" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" /> Kembali
-          </button>
-          <div className="w-px h-4 bg-white/10" />
-          <span className="text-slate-400 text-sm truncate">{article.title}</span>
+          </Link>
+          <div className="w-1 h-1 rounded-full bg-white/20" />
+          <span className="text-slate-500 truncate">{article.title}</span>
         </div>
       </div>
 
+      {/* ── ARTICLE CONTENT ── */}
       <motion.article
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl mx-auto px-6 py-12"
+        className="max-w-4xl mx-auto px-6 py-12 lg:py-20"
       >
-        {/* Category Badge */}
-        <div className="flex items-center gap-3 mb-6">
-          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${CAT_COLORS[article.category] || ''}`}>
-            {CAT_LABELS[article.category] || article.category}
-          </span>
-        </div>
+        <header className="mb-12">
+          {/* Category Badge */}
+          <div className="flex items-center gap-3 mb-6">
+            <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full border ${CAT_COLORS[article.category] || 'bg-white/10 border-white/20 text-white'}`}>
+              {CAT_LABELS[article.category] || article.category}
+            </span>
+          </div>
 
-        {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-black leading-tight mb-4">{article.title}</h1>
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight mb-8">
+            {article.title}
+          </h1>
 
-        {/* Meta */}
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 mb-8 pb-8 border-b border-white/5">
-          <span className="flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5" /> {article.author}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            {new Date(article.published_at || article.created_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          </span>
-        </div>
+          {/* Meta Info */}
+          <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
+            <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white font-bold text-[10px]">
+                {article.author[0].toUpperCase()}
+              </div>
+              <span className="font-bold text-white">{article.author}</span>
+            </div>
+            <span className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-500" />
+              {new Date(article.published_at || article.created_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+        </header>
 
         {/* Cover Image */}
         {article.cover_url && (
-          <img src={article.cover_url} alt={article.title} className="w-full rounded-2xl mb-8 border border-white/5" />
+          <div className="relative mb-16 rounded-[32px] overflow-hidden border border-white/10 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#030303]/50 pointer-events-none" />
+            <img src={article.cover_url} alt={article.title} className="w-full aspect-video object-cover" />
+          </div>
         )}
 
-        {/* Excerpt */}
+        {/* Excerpt Summary */}
         {article.excerpt && (
-          <p className="text-lg text-slate-300 leading-relaxed mb-8 pl-4 border-l-2 border-primary/50">{article.excerpt}</p>
+          <div className="bg-gradient-to-r from-primary/10 to-transparent border-l-4 border-primary p-6 md:p-8 rounded-r-3xl mb-12">
+            <p className="text-lg md:text-xl text-white font-medium leading-relaxed">{article.excerpt}</p>
+          </div>
         )}
 
-        {/* Content — rendered as plain text with whitespace preserved */}
-        <div className="prose prose-invert max-w-none text-slate-300 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
+        {/* Content Body */}
+        <div className="prose prose-invert prose-lg md:prose-xl max-w-none text-slate-300 leading-relaxed whitespace-pre-wrap selection:bg-primary/30 selection:text-white">
           {article.content}
         </div>
 
         {/* Footer */}
-        <div className="mt-12 pt-8 border-t border-white/5 flex items-center justify-between">
-          <Link to="/articles" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Semua Artikel
+        <div className="mt-20 pt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <Link to="/articles" className="flex items-center gap-3 bg-white/5 border border-white/10 hover:bg-white/10 px-6 py-3 rounded-xl font-semibold transition-colors w-full sm:w-auto justify-center">
+            <ArrowLeft className="w-4 h-4" /> Baca Artikel Lainnya
           </Link>
-          <Link to="/support" className="text-sm text-primary hover:underline">Ada pertanyaan? Hubungi CS →</Link>
+          <div className="bg-primary/10 border border-primary/20 p-4 rounded-2xl w-full sm:w-auto text-center sm:text-left">
+            <p className="text-sm text-slate-300 mb-1">Ada pertanyaan tentang fitur ini?</p>
+            <Link to="/support" className="text-primary font-bold hover:underline">Hubungi Tim Support Kami →</Link>
+          </div>
         </div>
       </motion.article>
     </div>
