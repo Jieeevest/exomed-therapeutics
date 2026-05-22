@@ -4,6 +4,9 @@ import Login from '@/pages/Login'
 import Landing from '@/pages/Landing'
 import Admin from '@/pages/Admin'
 import Profile from '@/pages/Profile'
+import Support from '@/pages/Support'
+import Articles from '@/pages/Articles'
+import ArticleDetail from '@/pages/ArticleDetail'
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
 
@@ -13,22 +16,25 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Landing page — public */}
+        {/* Public */}
         <Route path="/" element={<Landing />} />
+        <Route path="/articles" element={<Articles />} />
+        <Route path="/articles/:slug" element={<ArticleDetail />} />
 
-        {/* Login — redirect to /app if already logged in */}
+        {/* Login */}
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/app" replace /> : <Login />}
         />
 
-        {/* Protected dashboard and profile */}
+        {/* Protected */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/app" element={<Dashboard />} />
+          <Route path="/app"     element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/support" element={<Support />} />
         </Route>
 
-        {/* Admin Dashboard */}
+        {/* Admin */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
         </Route>
