@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft, Plus, Clock, CheckCircle2,
-  XCircle, Send, ChevronRight, Ticket, RefreshCw, Zap, Menu, X, LayoutGrid, MessageSquare
+  XCircle, Send, ChevronRight, Ticket, RefreshCw, MessageSquare
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
+import { Navbar } from '@/components/Navbar'
+import { useSessionGuard } from '@/hooks/useSessionGuard'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -26,8 +28,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 export default function Support() {
   const { isAuthenticated, accessToken } = useAuth()
   const navigate = useNavigate()
+  useSessionGuard()
   
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [view, setView] = useState<'list' | 'create' | 'detail'>('list')
   const [tickets, setTickets] = useState<any[]>([])
   const [selected, setSelected] = useState<any>(null)
@@ -104,51 +106,7 @@ export default function Support() {
   return (
     <div className="min-h-screen bg-[#030303] text-white font-sans selection:bg-primary/30 selection:text-white">
       
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/[0.05] transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.5)]">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-black tracking-tight">CryptoEx</span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              <Link to="/" className="text-sm text-slate-400 hover:text-white transition-colors">Beranda</Link>
-              <Link to="/articles" className="text-sm text-slate-400 hover:text-white transition-colors">Artikel & Berita</Link>
-              <span className="text-sm text-primary font-bold shadow-[0_4px_0_0_rgba(56,189,248,0.2)]">Support</span>
-            </div>
-
-            <div className="hidden md:flex items-center gap-3">
-              <Link to="/app" className="flex items-center gap-2 text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                <LayoutGrid className="w-4 h-4" /> Dashboard
-              </Link>
-            </div>
-
-            <button onClick={() => setMobileMenuOpen(v => !v)} className="md:hidden text-slate-400 hover:text-white p-2">
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-2xl overflow-hidden"
-            >
-              <div className="px-6 py-4 space-y-3">
-                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Beranda</Link>
-                <Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Artikel & Berita</Link>
-                <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-primary font-bold py-2">Support</Link>
-                <Link to="/app" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Dashboard</Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+      <Navbar />
 
       {/* ── MAIN CONTENT ── */}
       <div className="pt-24 pb-20 px-4 min-h-screen relative overflow-hidden">

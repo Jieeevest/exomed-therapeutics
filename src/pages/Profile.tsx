@@ -6,6 +6,7 @@ import {
   CreditCard, Calendar, RefreshCw, Shield, ChevronRight
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
+import { useSessionGuard } from '@/hooks/useSessionGuard'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -14,6 +15,7 @@ type Tab = 'profile' | 'subscription'
 export default function Profile() {
   const { user, accessToken, login, refreshToken } = useAuth()
   const navigate = useNavigate()
+  useSessionGuard()
   const [tab, setTab] = useState<Tab>('profile')
 
   // Profile form

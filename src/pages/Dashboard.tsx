@@ -30,6 +30,7 @@ import { useOKXFutureTickers, useOKXFutureOrderBook, useOKXFutureTrades } from '
 import type { Ticker, Exchange, MarketType } from '@/types'
 import { cn } from '@/lib/utils'
 import { getTVSources } from '@/lib/tvSymbol'
+import { useSessionGuard } from '@/hooks/useSessionGuard'
 
 type RightTab = 'orderbook' | 'trades' | 'signal' | 'backtest' | 'scanner'
 
@@ -57,6 +58,7 @@ const DEFAULT_FUTURES_SYMBOLS: Record<Exchange, string> = {
 export default function Dashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  useSessionGuard()
   
   const [exchange, setExchange] = useState<Exchange>('binance')
   const [marketType, setMarketType] = useState<MarketType>('spot')

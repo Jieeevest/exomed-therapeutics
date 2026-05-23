@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Zap, Menu, X, LayoutGrid, FileText, ChevronRight, ShieldCheck, Scale, HelpCircle, Activity, Map, ListChecks } from 'lucide-react'
-import { useAuth } from '@/store/useAuth'
+import { motion } from 'framer-motion'
+import { ArrowLeft, FileText, ChevronRight, ShieldCheck, Scale, HelpCircle, Activity, Map, ListChecks } from 'lucide-react'
+import { Navbar } from '@/components/Navbar'
 
 // Icon mapping for sidebar
 const ICON_MAP: Record<string, any> = {
@@ -216,8 +216,6 @@ const SimpleMarkdown = ({ content }: { content: string }) => {
 
 export default function StaticPage() {
   const { slug } = useParams<{ slug: string }>()
-  const { isAuthenticated } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Scroll to top on slug change
   useMemo(() => {
@@ -244,62 +242,7 @@ export default function StaticPage() {
   return (
     <div className="min-h-screen bg-[#030303] text-white font-sans selection:bg-primary/30 selection:text-white">
       
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/[0.05] transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.5)]">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-black tracking-tight">CryptoEx</span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              <Link to="/" className="text-sm text-slate-400 hover:text-white transition-colors">Beranda</Link>
-              <Link to="/articles" className="text-sm text-slate-400 hover:text-white transition-colors">Artikel & Berita</Link>
-              <Link to="/support" className="text-sm text-slate-400 hover:text-white transition-colors">Support CS</Link>
-            </div>
-
-            <div className="hidden md:flex items-center gap-3">
-              {isAuthenticated ? (
-                <Link to="/app" className="flex items-center gap-2 text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                  <LayoutGrid className="w-4 h-4" /> Dashboard
-                </Link>
-              ) : (
-                <>
-                  <Link to="/login" className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors">Login</Link>
-                  <Link to="/login" className="text-sm font-semibold bg-white text-black px-5 py-2 rounded-xl hover:bg-white/90 transition-all active:scale-95">Mulai Gratis</Link>
-                </>
-              )}
-            </div>
-
-            <button onClick={() => setMobileMenuOpen(v => !v)} className="md:hidden text-slate-400 hover:text-white p-2">
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-2xl overflow-hidden"
-            >
-              <div className="px-6 py-4 space-y-3">
-                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Beranda</Link>
-                <Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Artikel & Berita</Link>
-                <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Support CS</Link>
-                {isAuthenticated ? (
-                  <Link to="/app" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Dashboard</Link>
-                ) : (
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-white text-black text-sm font-bold py-3 rounded-xl mt-2">Mulai Gratis</Link>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+      <Navbar />
 
       {/* ── HEADER BREADCRUMB ── */}
       <div className="pt-24 pb-6 border-b border-white/5 bg-black/20">

@@ -5,6 +5,7 @@ import {
   CreditCard, Ticket, BookOpen, ChevronRight
 } from 'lucide-react'
 import { useAuth, User } from '@/store/useAuth'
+import { useSessionGuard } from '@/hooks/useSessionGuard'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -13,6 +14,7 @@ type Tab = 'users' | 'payments' | 'tickets' | 'articles'
 export default function Admin() {
   const { user, accessToken } = useAuth()
   const navigate = useNavigate()
+  useSessionGuard()
   const [activeTab, setActiveTab] = useState<Tab>('users')
 
   const [stats, setStats] = useState<any>(null)
