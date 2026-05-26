@@ -213,7 +213,7 @@ export default function Support() {
               <motion.div key="create" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                 <div className="max-w-2xl mx-auto">
                   <div className="mb-10 text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-blue-500/20 border border-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                       <MessageSquare className="w-8 h-8 text-primary" />
                     </div>
                     <h1 className="text-3xl md:text-4xl font-black mb-3">Buat Laporan Baru</h1>

@@ -4,21 +4,21 @@
 
 @layer base {
   :root {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 98%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 355 100% 97%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 142 76% 36%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 98%;
+    --primary: 45 93% 47%; /* Gold */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 45 10% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 45 93% 47%;
+    --accent-foreground: 0 0% 0%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 45 93% 47%;
     --radius: 0.5rem;
   }
 }
@@ -26,10 +26,38 @@
 @layer base {
   * {
     @apply border-border;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+  html {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .bg-gold-gradient {
+    background: linear-gradient(
+      135deg,
+      #F4D06F 0%,
+      #D4A63A 40%,
+      #A87412 70%,
+      #7A5200 100%
+    );
+  }
+  .text-gold-gradient {
+    background: linear-gradient(
+      135deg,
+      #F4D06F 0%,
+      #D4A63A 40%,
+      #A87412 70%,
+      #7A5200 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 

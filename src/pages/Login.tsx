@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Lock, User, ArrowRight, AlertCircle, TrendingUp, ShieldCheck, Activity, Mail } from 'lucide-react'
+import { Activity, TrendingUp, ShieldCheck, Mail, Lock, User, AlertCircle, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
+import { Logo } from '@/components/Logo'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -74,11 +75,8 @@ export default function Login() {
           transition={{ type: 'spring', damping: 50, stiffness: 50 }}
         />
         <div className="relative z-10 p-12 max-w-2xl">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} className="flex items-center gap-3 mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(var(--primary),0.3)] border border-white/10">
-              <Zap className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-5xl font-black tracking-tight text-white">CryptoEx</h1>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} className="flex items-center gap-4 mb-8">
+            <Logo variant="horizontal" className="h-16 w-auto" />
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-4xl font-light text-muted-foreground leading-tight mb-8">
             Terminal trading institusional dengan <br />
@@ -106,13 +104,10 @@ export default function Login() {
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full max-w-[420px]">
           <div className="bg-black/60 backdrop-blur-2xl border border-white/10 p-8 sm:p-10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden group">
             
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-yellow-500/5 via-transparent to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
             <div className="mb-10 lg:hidden flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.3)]">
-                <Zap className="h-5 w-5 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-white">CryptoEx</h1>
+              <Logo variant="horizontal" className="h-10 w-auto" />
             </div>
 
             <div className="mb-8">

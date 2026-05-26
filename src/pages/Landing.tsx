@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import {
-  Zap, TrendingUp, Shield, Activity, BarChart2, ArrowRight,
-  ChevronRight, Check, Star, Globe, Lock, Cpu,
+  TrendingUp, Shield, Activity, BarChart2, ArrowRight,
+  ChevronRight, Check, Star, Globe, Cpu,
   Twitter, Github, Send, Menu, X, Clock, Database, Eye
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
+import { Logo } from '@/components/Logo'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -115,7 +116,7 @@ function PricingCard({ plan, price, features, highlight, badge }: {
       ? 'bg-white text-black border-white shadow-[0_0_80px_rgba(255,255,255,0.15)]'
       : 'bg-white/[0.03] border-white/[0.1] text-white'}`}>
       {badge && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-500 to-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-gradient text-white text-xs font-bold px-4 py-1 rounded-full">
           {badge}
         </div>
       )}
@@ -187,11 +188,9 @@ export default function Landing() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-black tracking-tight">CryptoEx</span>
+            <Link to="/" className="flex items-center gap-3">
+              <Logo className="w-15 h-12" variant='horizontal'/>
+              {/* <span className="text-xl font-black tracking-tight">CryptoEx</span> */}
             </Link>
 
             {/* Desktop Nav */}
@@ -278,8 +277,8 @@ export default function Landing() {
           style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '44px 44px' }}
         />
         {/* Floating orbs */}
-        <div className="absolute top-1/4 left-[10%] w-72 h-72 bg-violet-600/20 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-[10%] w-72 h-72 bg-blue-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:1s]" />
+        <div className="absolute top-1/4 left-[10%] w-72 h-72 bg-yellow-600/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-[10%] w-72 h-72 bg-amber-600/20 rounded-full blur-[100px] animate-pulse [animation-delay:1s]" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 text-center pt-20 pb-10">
 
@@ -306,7 +305,7 @@ export default function Landing() {
               Trading Kripto
             </span>
             <br />
-            <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="text-gold-gradient">
               Level Institusional
             </span>
           </motion.h1>
@@ -428,7 +427,7 @@ export default function Landing() {
             </div>
           </div>
           {/* Glow under preview */}
-          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-violet-500/20 blur-[60px] rounded-full" />
+          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-yellow-500/20 blur-[60px] rounded-full" />
         </motion.div>
       </section>
 
@@ -453,9 +452,9 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-violet-400 mb-4"
+            className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-yellow-400 mb-4"
           >
-            <Zap className="w-3 h-3" /> Fitur Utama
+            <Logo className="w-3 h-3" /> Fitur Utama
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -472,9 +471,9 @@ export default function Landing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { icon: <Activity className="w-5 h-5 text-emerald-400" />, title: 'Bullish Scanner MTF', desc: 'Scan hingga 80 koin sekaligus menggunakan 4 timeframe (15m, 30m, 1h, 4h). Gabungan sinyal classic & weighted untuk akurasi maksimal.', delay: 0 },
-            { icon: <BarChart2 className="w-5 h-5 text-blue-400" />, title: 'Chart Real-Time', desc: 'Tampilan candlestick profesional dengan indikator EMA, MACD, RSI, Bollinger Bands langsung dari sumber data exchange.', delay: 0.1 },
-            { icon: <TrendingUp className="w-5 h-5 text-violet-400" />, title: 'Sinyal Kuantitatif', desc: 'Algoritma pembobotan PRICE(30%) + VOLUME(20%) + TECHNICAL(35%) + SENTIMENT(15%) yang telah diuji secara backtesting.', delay: 0.2 },
-            { icon: <Globe className="w-5 h-5 text-cyan-400" />, title: 'Multi-Exchange', desc: 'Terhubung langsung ke Binance, KuCoin, OKX, dan Crypto.com — spot dan futures — tanpa perlu API key.', delay: 0.3 },
+            { icon: <BarChart2 className="w-5 h-5 text-yellow-400" />, title: 'Chart Real-Time', desc: 'Tampilan candlestick profesional dengan indikator EMA, MACD, RSI, Bollinger Bands langsung dari sumber data exchange.', delay: 0.1 },
+            { icon: <TrendingUp className="w-5 h-5 text-amber-400" />, title: 'Sinyal Kuantitatif', desc: 'Algoritma pembobotan PRICE(30%) + VOLUME(20%) + TECHNICAL(35%) + SENTIMENT(15%) yang telah diuji secara backtesting.', delay: 0.2 },
+            { icon: <Globe className="w-5 h-5 text-orange-400" />, title: 'Multi-Exchange', desc: 'Terhubung langsung ke Binance, KuCoin, OKX, dan Crypto.com — spot dan futures — tanpa perlu API key.', delay: 0.3 },
             { icon: <Cpu className="w-5 h-5 text-orange-400" />, title: 'Fear & Greed Index', desc: 'Integrasi sentiment pasar dari Fear & Greed Index dan Funding Rate real-time sebagai faktor tambahan dalam kalkulasi sinyal.', delay: 0.4 },
             { icon: <Database className="w-5 h-5 text-pink-400" />, title: 'Session Encrypted', desc: 'Sesi trading Anda terproteksi. Tidak ada data sensitif yang tersimpan di server pihak ketiga — semua kalkulasi lokal.', delay: 0.5 },
           ].map(f => <FeatureCard key={f.title} {...f} />)}
@@ -485,7 +484,7 @@ export default function Landing() {
       <section id="cara-kerja" className="py-28 border-y border-white/[0.06] bg-white/[0.01]">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-blue-400 mb-4">
+            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-yellow-400 mb-4">
               <Clock className="w-3 h-3" /> Cara Kerja
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white">
@@ -497,8 +496,8 @@ export default function Landing() {
           <div className="grid md:grid-cols-3 gap-8 relative">
             <div className="hidden md:block absolute top-10 left-1/3 right-1/3 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             {[
-              { n: '01', title: 'Pilih Exchange & Market', desc: 'Pilih Binance, KuCoin, OKX, atau Crypto.com — baik pasar spot maupun futures perpetual.', icon: <Globe className="w-6 h-6 text-blue-400" /> },
-              { n: '02', title: 'Scanner Menganalisis', desc: 'CryptoEx menarik data 4 timeframe untuk setiap koin, menjalankan 20+ indikator teknikal, dan menghitung skor gabungan.', icon: <Cpu className="w-6 h-6 text-violet-400" /> },
+              { n: '01', title: 'Pilih Exchange & Market', desc: 'Pilih Binance, KuCoin, OKX, atau Crypto.com — baik pasar spot maupun futures perpetual.', icon: <Globe className="w-6 h-6 text-yellow-400" /> },
+              { n: '02', title: 'Scanner Menganalisis', desc: 'CryptoEx menarik data 4 timeframe untuk setiap koin, menjalankan 20+ indikator teknikal, dan menghitung skor gabungan.', icon: <Cpu className="w-6 h-6 text-amber-400" /> },
               { n: '03', title: 'Ambil Keputusan', desc: 'Lihat ranking koin dari yang paling bullish. Klik untuk membuka chart lengkap dan analisis mendalam sebelum entry.', icon: <TrendingUp className="w-6 h-6 text-emerald-400" /> },
             ].map((s, i) => (
               <motion.div
@@ -579,7 +578,7 @@ export default function Landing() {
                 </div>
                 <p className="text-slate-300 text-sm leading-relaxed mb-5">"{t.text}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center font-bold text-sm">
+                  <div className="w-9 h-9 rounded-full bg-gold-gradient flex items-center justify-center font-bold text-sm">
                     {t.name[0]}
                   </div>
                   <div>
@@ -602,12 +601,12 @@ export default function Landing() {
           viewport={{ once: true }}
           className="relative z-10 max-w-3xl mx-auto px-4 text-center"
         >
-          <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 mb-8">
-            <Lock className="w-3 h-3" /> Tanpa kartu kredit
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-white text-xs font-bold px-4 py-1.5 rounded-full mb-8">
+            <Logo className="w-4 h-4" /> Fitur Utama
           </div>
           <h2 className="text-5xl md:text-6xl font-black text-white leading-tight mb-6">
             Mulai Trading<br />
-            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="text-gold-gradient">
               Lebih Cerdas Hari Ini
             </span>
           </h2>
@@ -647,12 +646,9 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-black text-lg">CryptoEx</span>
-              </div>
+              <Link to="/" className="flex items-center gap-3 mb-6">
+                <Logo variant="horizontal" className="h-8 w-auto" />
+              </Link>
               <p className="text-slate-500 text-sm leading-relaxed mb-5">
                 Terminal trading kripto berbasis analisis kuantitatif multi-timeframe.
               </p>

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { Zap, Menu, X, LayoutGrid, ArrowRight } from 'lucide-react'
+import { Menu, X, LayoutGrid, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
+import { Logo } from '@/components/Logo'
 
 export function Navbar() {
   const { isAuthenticated } = useAuth()
@@ -49,10 +50,7 @@ export function Navbar() {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_18px_rgba(139,92,246,0.55)]">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-black tracking-tight text-white">CryptoEx</span>
+            <Logo variant="horizontal" className="h-8 w-auto" />
           </Link>
 
           {/* Desktop links */}
@@ -64,7 +62,7 @@ export function Navbar() {
                 {isActive(l.to) && (
                   <motion.div
                     layoutId="navbar-underline"
-                    className="absolute -bottom-[21px] left-0 right-0 h-[2px] bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full"
+                    className="absolute -bottom-[21px] left-0 right-0 h-[2px] bg-gold-gradient rounded-full"
                   />
                 )}
               </div>

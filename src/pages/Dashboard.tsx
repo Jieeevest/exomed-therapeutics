@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
-import { BookOpen, Clock, Zap, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown, Ticket } from 'lucide-react'
+import { BookOpen, Clock, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown, Ticket } from 'lucide-react'
 
 import { useAuth } from '@/store/useAuth'
 import { ProGate } from '@/components/ProGate'
@@ -27,9 +27,7 @@ import { useCryptoComFutureTickers, useCryptoComFutureOrderBook, useCryptoComFut
 import { useKuCoinFutureTickers, useKuCoinFutureOrderBook, useKuCoinFutureTrades } from '@/hooks/useKuCoinFutures'
 import { useOKXFutureTickers, useOKXFutureOrderBook, useOKXFutureTrades } from '@/hooks/useOKXFutures'
 
-// 1. Tambah import di bagian atas
 import { FuturesOpportunitiesPanel } from '@/components/FuturesOpportunitiesPanel'
-import { CandlestickChart } from 'lucide-react'
 
 // 2. Ubah type RightTab
 type RightTab = 'orderbook' | 'trades' | 'signal' | 'backtest' | 'scanner' | 'opportunities'
@@ -38,6 +36,7 @@ import type { Ticker, Exchange, MarketType } from '@/types'
 import { cn } from '@/lib/utils'
 import { getTVSources } from '@/lib/tvSymbol'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
+import { Logo } from '@/components/Logo'
 
 
 const EXCHANGES: { id: Exchange; label: string; color: string }[] = [
@@ -170,10 +169,6 @@ const handleMarketTypeChange = (mt: MarketType) => {
   setSelectedTicker(null)
   setCurrentPrice(0)
   setTvSourceIdx(0)
-  // Reset tab opportunities kalau balik ke spot
-  if (mt === 'spot' && rightTab === 'opportunities') {
-    setRightTab('orderbook')
-  }
 }
   const handleSelectCoin = (ticker: Ticker) => {
     setSelectedTicker(ticker)
@@ -195,8 +190,8 @@ const handleMarketTypeChange = (mt: MarketType) => {
       {/* Navbar */}
       <header className="flex items-center gap-3 px-4 py-2 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2 mr-1">
-          <Zap className="h-5 w-5 text-primary" />
-          <span className="font-bold text-foreground text-sm">CryptoEx</span>
+          <Logo className="h-8 w-auto" variant='horizontal'/>
+          {/* <span className="font-bold text-foreground text-sm">CryptoEx</span> */}
         </div>
 
         {/* Spot / Futures toggle */}
@@ -311,7 +306,7 @@ const handleMarketTypeChange = (mt: MarketType) => {
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-2 hover:bg-white/5 p-1 pr-3 rounded-full transition-colors border border-transparent hover:border-white/10"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-inner">
+            <div className="w-7 h-7 rounded-full bg-gold-gradient flex items-center justify-center text-xs font-bold text-white shadow-inner">
               {user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="hidden md:flex flex-col items-start leading-none">
@@ -521,15 +516,12 @@ const handleMarketTypeChange = (mt: MarketType) => {
           {/* Tabs */}
           <div className="flex border-b border-border">
            {([
-  { id: 'orderbook',     icon: <BookOpen className="h-3 w-3" />,         label: 'Book',      pro: false, futuresOnly: false },
-  { id: 'trades',        icon: <Clock className="h-3 w-3" />,            label: 'Trades',    pro: false, futuresOnly: false },
-  { id: 'signal',        icon: <BarChart2 className="h-3 w-3" />,        label: 'Sinyal',    pro: true,  futuresOnly: false },
-  { id: 'backtest',      icon: <FlaskConical className="h-3 w-3" />,     label: 'Backtest',  pro: true,  futuresOnly: false },
-  { id: 'scanner',       icon: <Scan className="h-3 w-3" />,             label: 'Scanner',   pro: true,  futuresOnly: false },
-  { id: 'opportunities', icon: <CandlestickChart className="h-3 w-3" />, label: 'Long/Short',pro: true,  futuresOnly: true  },
-] as { id: RightTab; icon: React.ReactNode; label: string; pro: boolean; futuresOnly: boolean }[])
-  // Sembunyikan tab futures-only ketika mode spot
-  .filter(tab => !tab.futuresOnly || isFutures)
+  { id: 'orderbook', icon: <BookOpen className="h-3 w-3" />,        label: 'Book',     pro: false },
+  { id: 'trades',    icon: <Clock className="h-3 w-3" />,           label: 'Trades',   pro: false },
+  { id: 'signal',    icon: <BarChart2 className="h-3 w-3" />,       label: 'Analisa',  pro: true },
+  { id: 'backtest',  icon: <FlaskConical className="h-3 w-3" />,    label: 'Backtest', pro: true },
+  { id: 'scanner',   icon: <Scan className="h-3 w-3" />,            label: 'Scanner',  pro: true },
+] as { id: RightTab; icon: React.ReactNode; label: string; pro: boolean }[])
   .map((tab) => (
     <button
       key={tab.id}
@@ -538,10 +530,8 @@ const handleMarketTypeChange = (mt: MarketType) => {
         'flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors relative',
         rightTab === tab.id
           ? tab.id === 'signal'
-            ? 'text-purple-400 border-b-2 border-purple-400'
-            : tab.id === 'opportunities'
-              ? 'text-yellow-400 border-b-2 border-yellow-400'
-              : 'text-foreground border-b-2 border-primary'
+            ? 'text-primary border-b-2 border-primary'
+            : 'text-foreground border-b-2 border-primary'
           : 'text-muted-foreground hover:text-foreground'
       )}
     >
@@ -557,32 +547,24 @@ const handleMarketTypeChange = (mt: MarketType) => {
           {/* Signal / Backtest / Scanner — PRO only */}
           {rightTab === 'signal' ? (
             <div className="flex-1 overflow-hidden">
-              <ProGate feature="Panel Sinyal Trading">
-                <SignalPanel
-                  ticker={selectedTicker}
-                  exchange={exchange}
-                  marketType={marketType}
-                  currentPrice={currentPrice}
-                />
+              <ProGate feature={isFutures ? "Futures Long/Short Opportunities" : "Panel Sinyal Trading"}>
+                {isFutures ? (
+                  <FuturesOpportunitiesPanel
+                    tickers={activeTickers}
+                    exchange={exchange}
+                    active={rightTab === 'signal'}
+                    onSelectCoin={handleSelectCoin}
+                  />
+                ) : (
+                  <SignalPanel
+                    ticker={selectedTicker}
+                    exchange={exchange}
+                    marketType={marketType}
+                    currentPrice={currentPrice}
+                  />
+                )}
               </ProGate>
             </div>
-            ) : rightTab === 'opportunities' ? (
-  <div className="flex-1 overflow-hidden">
-    <ProGate feature="Futures Long/Short Opportunities">
-      {isFutures ? (
-        <FuturesOpportunitiesPanel
-          tickers={activeTickers}
-          exchange={exchange}
-          active={rightTab === 'opportunities'}
-          onSelectCoin={handleSelectCoin}
-        />
-      ) : (
-        <div className="h-full flex items-center justify-center px-4 text-center text-[11px] text-muted-foreground">
-          Fitur ini khusus futures.
-        </div>
-      )}
-    </ProGate>
-  </div>
           ) : rightTab === 'backtest' ? (
             <div className="flex-1 overflow-hidden">
               <ProGate feature="Backtest Strategi">

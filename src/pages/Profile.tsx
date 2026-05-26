@@ -164,7 +164,7 @@ export default function Profile() {
       <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
         {/* Avatar */}
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-2xl font-black text-white shadow-xl">
+          <div className="w-16 h-16 rounded-2xl bg-gold-gradient flex items-center justify-center text-2xl font-black text-white shadow-xl">
             {user?.username?.[0]?.toUpperCase()}
           </div>
           <div>

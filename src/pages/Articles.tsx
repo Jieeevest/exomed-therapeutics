@@ -72,7 +72,7 @@ export default function Articles() {
             </p>
 
             <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mx-auto relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
+              <div className="absolute -inset-0.5 bg-gold-gradient rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
               <div className="relative flex w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input 
@@ -127,7 +127,7 @@ export default function Articles() {
                 <Link to={`/articles/${articles[0].slug}`}
                   className="group relative block rounded-3xl overflow-hidden border border-white/10 bg-[#0a0a0a] hover:border-white/30 transition-all duration-500"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="md:flex">
                     {articles[0].cover_url && (
                       <div className="md:w-1/2 h-64 md:h-auto overflow-hidden relative">
@@ -168,7 +168,7 @@ export default function Articles() {
                   <Link to={`/articles/${a.slug}`}
                     className="group block h-full bg-[#0a0a0a] border border-white/10 hover:border-white/30 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
                   >
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gold-gradient opacity-0 group-hover:opacity-100 transition-opacity" />
                     
                     <div className="flex items-center justify-between mb-5">
                       <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${CAT_COLORS[a.category] || 'bg-white/10 border-white/20'}`}>

@@ -93,7 +93,7 @@ export default function ArticleDetail() {
           {/* Meta Info */}
           <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
             <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white font-bold text-[10px]">
+              <div className="w-6 h-6 rounded-full bg-gold-gradient flex items-center justify-center text-white font-bold text-[10px]">
                 {article.author[0].toUpperCase()}
               </div>
               <span className="font-bold text-white">{article.author}</span>
