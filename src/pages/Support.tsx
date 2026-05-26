@@ -111,7 +111,7 @@ export default function Support() {
       {/* ── MAIN CONTENT ── */}
       <div className="pt-24 pb-20 px-4 min-h-screen relative overflow-hidden">
         {/* Background Effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[500px] bg-amber-600/15 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="max-w-4xl mx-auto relative z-10">
           
@@ -128,7 +128,7 @@ export default function Support() {
             {view === 'list' && (
               <button 
                 onClick={() => setView('create')}
-                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-black rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors shadow-[0_0_20px_rgba(56,189,248,0.2)]"
+                className="flex items-center gap-2 px-6 py-2.5 bg-gold-gradient text-black rounded-xl text-sm font-bold hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(245,166,35,0.2)]"
               >
                 <Plus className="w-4 h-4" /> Buat Laporan Baru
               </button>
@@ -147,7 +147,7 @@ export default function Support() {
 
                 {loading ? (
                   <div className="py-20 flex justify-center">
-                    <div className="w-10 h-10 border-4 border-white/10 border-t-primary rounded-full animate-spin" />
+                    <div className="w-10 h-10 border-4 border-white/10 border-t-amber-500 rounded-full animate-spin" />
                   </div>
                 ) : tickets.length === 0 ? (
                   <div className="py-24 text-center border border-white/5 rounded-[32px] bg-[#0a0a0a]">
@@ -169,7 +169,7 @@ export default function Support() {
                         <motion.div key={t.id} whileHover={{ scale: 1.01 }} className="group">
                           <button 
                             onClick={() => fetchTicket(t.id)}
-                            className={`w-full text-left bg-[#0a0a0a] border border-white/10 hover:border-primary/50 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center gap-5 transition-all duration-300 shadow-lg ${
+                            className={`w-full text-left bg-[#0a0a0a] border border-white/10 hover:border-amber-500/50 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center gap-5 transition-all duration-300 shadow-lg ${
                               t.status === 'resolved' ? 'opacity-70 hover:opacity-100' : ''
                             }`}
                           >
@@ -186,7 +186,7 @@ export default function Support() {
                                   {CATEGORIES.find(c => c.value === t.category)?.label}
                                 </span>
                               </div>
-                              <h3 className="text-lg font-bold text-white truncate mb-1 group-hover:text-primary transition-colors">
+                              <h3 className="text-lg font-bold text-white truncate mb-1 group-hover:text-amber-400 transition-colors">
                                 {t.subject}
                               </h3>
                               <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
@@ -196,8 +196,8 @@ export default function Support() {
                               </div>
                             </div>
                             
-                            <div className="hidden md:flex w-10 h-10 rounded-full bg-white/5 items-center justify-center group-hover:bg-primary/20 transition-colors">
-                              <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
+                            <div className="hidden md:flex w-10 h-10 rounded-full bg-white/5 items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+                              <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-amber-400 transition-colors" />
                             </div>
                           </button>
                         </motion.div>
@@ -213,22 +213,22 @@ export default function Support() {
               <motion.div key="create" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                 <div className="max-w-2xl mx-auto">
                   <div className="mb-10 text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <MessageSquare className="w-8 h-8 text-primary" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <MessageSquare className="w-8 h-8 text-amber-400" />
                     </div>
                     <h1 className="text-3xl md:text-4xl font-black mb-3">Buat Laporan Baru</h1>
                     <p className="text-slate-400 text-lg">Ceritakan kendala Anda dengan jelas agar tim kami dapat membantu dengan cepat.</p>
                   </div>
 
                   <form onSubmit={handleCreate} className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px]" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-[80px]" />
                     
                     <div className="space-y-6 relative z-10">
                       <div>
                         <label className="text-sm font-bold text-slate-300 block mb-2">Pilih Kategori Topik</label>
                         <select 
                           value={category} onChange={e => setCategory(e.target.value)}
-                          className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-white cursor-pointer"
+                          className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-white cursor-pointer"
                         >
                           {CATEGORIES.map(c => <option key={c.value} value={c.value} className="bg-[#0a0a0a]">{c.label}</option>)}
                         </select>
@@ -239,7 +239,7 @@ export default function Support() {
                         <input 
                           required value={subject} onChange={e => setSubject(e.target.value)} 
                           placeholder="Misal: Deposit via QRIS belum masuk..."
-                          className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-white placeholder:text-slate-600" 
+                          className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-white placeholder:text-slate-600" 
                         />
                       </div>
                       
@@ -248,7 +248,7 @@ export default function Support() {
                         <textarea 
                           required rows={6} value={message} onChange={e => setMessage(e.target.value)} 
                           placeholder="Jelaskan secara detail masalah yang Anda alami..."
-                          className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-white placeholder:text-slate-600 resize-none font-sans" 
+                          className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-white placeholder:text-slate-600 resize-none font-sans" 
                         />
                       </div>
 
@@ -256,7 +256,7 @@ export default function Support() {
                         <button type="button" onClick={() => setView('list')} className="px-6 py-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors sm:w-1/3">
                           Batal
                         </button>
-                        <button type="submit" disabled={creating} className="px-6 py-3.5 bg-primary text-black font-bold rounded-xl text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 sm:w-2/3 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                        <button type="submit" disabled={creating} className="px-6 py-3.5 bg-gold-gradient text-black font-bold rounded-xl text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 sm:w-2/3 shadow-[0_0_20px_rgba(245,166,35,0.2)]">
                           <Send className="w-4 h-4" />{creating ? 'Memproses Laporan...' : 'Kirim Laporan Sekarang'}
                         </button>
                       </div>

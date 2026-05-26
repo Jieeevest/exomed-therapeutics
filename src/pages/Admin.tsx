@@ -256,7 +256,7 @@ export default function Admin() {
                   <Users className="w-4 h-4 text-primary" />
                   <span className="text-xs font-bold uppercase tracking-wider">Total Users</span>
                 </div>
-                <div className="text-4xl font-black">{stats.total}</div>
+                <div className="text-4xl font-black">{stats.total_active}</div>
               </div>
               <div className="bg-[#0a0a0a] border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-[100px] -z-10 group-hover:bg-purple-500/10 transition-colors" />
@@ -264,15 +264,15 @@ export default function Admin() {
                   <Activity className="w-4 h-4 text-purple-400" />
                   <span className="text-xs font-bold uppercase tracking-wider">Active Pro</span>
                 </div>
-                <div className="text-4xl font-black">{stats.pro}</div>
+                <div className="text-4xl font-black">{stats.total_pro}</div>
               </div>
               <div className="bg-[#0a0a0a] border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-[100px] -z-10 group-hover:bg-blue-500/10 transition-colors" />
                 <div className="flex items-center gap-3 text-slate-400 mb-2">
                   <UserIcon className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Admin</span>
+                  <span className="text-xs font-bold uppercase tracking-wider">Starter</span>
                 </div>
-                <div className="text-4xl font-black">{stats.admin}</div>
+                <div className="text-4xl font-black">{stats.total_starter}</div>
               </div>
             </div>
           )}
