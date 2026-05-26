@@ -2,7 +2,7 @@ export function Logo({ className = "w-8 h-8", variant = "icon" }: { className?: 
   if (variant === "horizontal") {
     return (
       <img 
-        src="/src/public/LOGO ORIGINAL FULL HORIZONTAL TRANSPARENT.png" 
+        src="/LOGO ORIGINAL FULL HORIZONTAL TRANSPARENT.png" 
         alt="CryptoEx Logo" 
         className={className} 
       />
