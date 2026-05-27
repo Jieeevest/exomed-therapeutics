@@ -12,39 +12,43 @@ export function useBinanceFutureTickers() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [{ data: tickerData }, { data: premiumData }] = await Promise.all([
-        axios.get(`${BASE}/ticker/24hr`),
-        axios.get(`${BASE}/premiumIndex`),
-      ])
+      try {
+        const [{ data: tickerData }, { data: premiumData }] = await Promise.all([
+          axios.get(`${BASE}/ticker/24hr`),
+          axios.get(`${BASE}/premiumIndex`),
+        ])
 
-      const fundingMap: Record<string, number> = {}
-      const markMap: Record<string, number> = {}
-      for (const item of premiumData as any[]) {
-        fundingMap[item.symbol] = parseFloat(item.lastFundingRate) * 100
-        markMap[item.symbol] = parseFloat(item.markPrice)
+        const fundingMap: Record<string, number> = {}
+        const markMap: Record<string, number> = {}
+        for (const item of premiumData as any[]) {
+          fundingMap[item.symbol] = parseFloat(item.lastFundingRate) * 100
+          markMap[item.symbol] = parseFloat(item.markPrice)
+        }
+
+        const usdt = (tickerData as any[])
+          .filter((t: any) => t.symbol.endsWith('USDT'))
+          .map((t: any) => ({
+            symbol: t.symbol,
+            baseAsset: t.symbol.replace('USDT', ''),
+            quoteAsset: 'USDT',
+            price: parseFloat(t.lastPrice),
+            priceChange: parseFloat(t.priceChange),
+            priceChangePercent: parseFloat(t.priceChangePercent),
+            volume: parseFloat(t.quoteVolume),
+            high24h: parseFloat(t.highPrice),
+            low24h: parseFloat(t.lowPrice),
+            fundingRate: fundingMap[t.symbol] ?? 0,
+            openInterest: parseFloat(t.openInterest || 0),
+            markPrice: markMap[t.symbol] ?? 0,
+          }))
+          .sort((a, b) => b.volume - a.volume)
+
+        setTickers(usdt)
+      } catch {
+        // silent — keep last known data, retry on next interval
+      } finally {
+        setLoading(false)
       }
-
-      const usdt = (tickerData as any[])
-        .filter((t: any) => t.symbol.endsWith('USDT'))
-        .map((t: any) => ({
-          symbol: t.symbol,
-          baseAsset: t.symbol.replace('USDT', ''),
-          quoteAsset: 'USDT',
-          price: parseFloat(t.lastPrice),
-          priceChange: parseFloat(t.priceChange),
-          priceChangePercent: parseFloat(t.priceChangePercent),
-          volume: parseFloat(t.quoteVolume),
-          high24h: parseFloat(t.highPrice),
-          low24h: parseFloat(t.lowPrice),
-          fundingRate: fundingMap[t.symbol] ?? 0,
-          openInterest: parseFloat(t.openInterest || 0),
-          markPrice: markMap[t.symbol] ?? 0,
-        }))
-        .sort((a, b) => b.volume - a.volume)
-        
-
-      setTickers(usdt)
-      setLoading(false)
     }
     fetch()
     const id = setInterval(fetch, 10000)
@@ -112,7 +116,7 @@ export function useBinanceFutureTrades(symbol: string) {
 
 export function useBinanceFuturePrice(symbol: string, onPrice: (p: number) => void) {
   const wsRef = useRef<WebSocket | null>(null)
-  const cb = useCallback(onPrice, [])
+  const cb = useCallback(onPrice, [onPrice])
 
   useEffect(() => {
     if (!symbol) return

@@ -32,20 +32,18 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
 
       const refreshData = await refreshRes.json()
       if (refreshData.success && refreshData.data.accessToken) {
-        // Update store with new tokens
         login(refreshData.data.accessToken, refreshData.data.refreshToken, user!)
-        
-        // Retry original request with new token
         headers.set('Authorization', `Bearer ${refreshData.data.accessToken}`)
         res = await fetch(url, { ...options, headers })
       } else {
-        // Refresh failed (e.g. revoked or expired refresh token)
         logout()
         window.location.href = '/login'
+        return res
       }
     } catch {
       logout()
       window.location.href = '/login'
+      return res
     }
   }
 

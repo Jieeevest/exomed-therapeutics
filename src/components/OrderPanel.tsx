@@ -56,6 +56,7 @@ export function OrderPanel({ ticker, currentPrice, marketType, prefillPrice }: P
     : null
 
   const handlePct = (p: number) => {
+    if (currentPrice <= 0) return
     setPct(p)
     const balance = side === 'buy' ? 1000 : 0.5
     if (orderType === 'market' || !price) {

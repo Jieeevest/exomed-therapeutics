@@ -12,24 +12,28 @@ export function useBinanceTickers() {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await axios.get(`${BASE}/ticker/24hr`)
-      const usdt = (data as any[])
-        .filter((t: any) => t.symbol.endsWith('USDT'))
-        .map((t: any) => ({
-          symbol: t.symbol,
-          baseAsset: t.symbol.replace('USDT', ''),
-          quoteAsset: 'USDT',
-          price: parseFloat(t.lastPrice),
-          priceChange: parseFloat(t.priceChange),
-          priceChangePercent: parseFloat(t.priceChangePercent),
-          volume: parseFloat(t.quoteVolume),
-          high24h: parseFloat(t.highPrice),
-          low24h: parseFloat(t.lowPrice),
-        }))
-        .sort((a, b) => b.volume - a.volume)
-        
-      setTickers(usdt)
-      setLoading(false)
+      try {
+        const { data } = await axios.get(`${BASE}/ticker/24hr`)
+        const usdt = (data as any[])
+          .filter((t: any) => t.symbol.endsWith('USDT'))
+          .map((t: any) => ({
+            symbol: t.symbol,
+            baseAsset: t.symbol.replace('USDT', ''),
+            quoteAsset: 'USDT',
+            price: parseFloat(t.lastPrice),
+            priceChange: parseFloat(t.priceChange),
+            priceChangePercent: parseFloat(t.priceChangePercent),
+            volume: parseFloat(t.quoteVolume),
+            high24h: parseFloat(t.highPrice),
+            low24h: parseFloat(t.lowPrice),
+          }))
+          .sort((a, b) => b.volume - a.volume)
+        setTickers(usdt)
+      } catch {
+        // silent — keep last known data, retry on next interval
+      } finally {
+        setLoading(false)
+      }
     }
     fetch()
     const id = setInterval(fetch, 10000)
@@ -97,7 +101,7 @@ export function useBinanceTrades(symbol: string) {
 
 export function useBinancePrice(symbol: string, onPrice: (p: number) => void) {
   const wsRef = useRef<WebSocket | null>(null)
-  const cb = useCallback(onPrice, [])
+  const cb = useCallback(onPrice, [onPrice])
 
   useEffect(() => {
     if (!symbol) return

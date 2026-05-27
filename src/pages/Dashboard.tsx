@@ -151,7 +151,7 @@ export default function Dashboard() {
       const updated = activeTickers.find((t) => t.symbol === selectedTicker.symbol)
       if (updated) setCurrentPrice(updated.price)
     }
-  }, [activeTickers])
+  }, [activeTickers, exchange, marketType, selectedTicker])
 
   const handleExchangeChange = (ex: Exchange) => {
     setExchange(ex)

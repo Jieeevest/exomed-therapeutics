@@ -113,8 +113,9 @@ export function generateSignal(candles: Candle[]): SignalResult | null {
   // ── Stoch RSI (max 2) ────────────────────────────────────────
   let stochScore = 0
   let stochLabel = ''
-  const stochCrossUp   = prevSk !== undefined && sk > sd && prevSk <= stochD[stochD.length - 2]
-  const stochCrossDown = prevSk !== undefined && sk < sd && prevSk >= stochD[stochD.length - 2]
+  const prevSd = stochD[stochD.length - 2]
+  const stochCrossUp   = prevSk !== undefined && prevSd !== undefined && sk > sd && prevSk <= prevSd
+  const stochCrossDown = prevSk !== undefined && prevSd !== undefined && sk < sd && prevSk >= prevSd
 
   if (sk < 20)          { stochScore = 2;  stochLabel = `Oversold (${sk.toFixed(0)}) — rebound` }
   else if (sk > 80)     { stochScore = -2; stochLabel = `Overbought (${sk.toFixed(0)}) — koreksi` }
