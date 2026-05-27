@@ -7,8 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+import { fetchWithAuth } from '@/lib/api'
 
 type Tab = 'profile' | 'subscription'
 
@@ -45,12 +44,8 @@ export default function Profile() {
     setLoadingSub(true)
     try {
       const [subRes, histRes] = await Promise.all([
-        fetch(API_URL + '/api/users/me/subscription', {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        }),
-        fetch(API_URL + '/api/payment/history', {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        })
+        fetchWithAuth('/api/users/me/subscription'),
+        fetchWithAuth('/api/payment/history')
       ])
       const subData  = await subRes.json()
       const histData = await histRes.json()
@@ -65,9 +60,9 @@ export default function Profile() {
     setLoadingProfile(true)
     setProfileMsg(null)
     try {
-      const res = await fetch(API_URL + '/api/users/profile', {
+      const res = await fetchWithAuth('/api/users/profile', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email })
       })
       const data = await res.json()
@@ -98,9 +93,9 @@ export default function Profile() {
     setLoadingPassword(true)
     setPasswordMsg(null)
     try {
-      const res = await fetch(API_URL + '/api/auth/me/password', {
+      const res = await fetchWithAuth('/api/auth/me/password', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ oldPassword, newPassword })
       })
       const data = await res.json()
@@ -120,9 +115,8 @@ export default function Profile() {
   const handleSubscribe = async () => {
     setLoadingSubscribe(true)
     try {
-      const res = await fetch(API_URL + '/api/payment/subscribe', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` }
+      const res = await fetchWithAuth('/api/payment/subscribe', {
+        method: 'POST'
       })
       const data = await res.json()
       if (data.success && data.data.paymentUrl) {
@@ -330,7 +324,7 @@ export default function Profile() {
                     </div>
                     <p className="text-slate-400 text-sm mb-5">Dapatkan akses penuh ke semua fitur analisis profesional.</p>
                     <div className="flex items-end gap-2 mb-6">
-                      <span className="text-4xl font-black text-white">Rp 149K</span>
+                      <span className="text-4xl font-black text-white">Rp 89K</span>
                       <span className="text-slate-400 text-sm pb-1">/bulan</span>
                     </div>
                     <button
@@ -339,7 +333,7 @@ export default function Profile() {
                       className="w-full py-3.5 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-lg shadow-yellow-500/20 disabled:opacity-50"
                     >
                       <Crown className="w-5 h-5" />
-                      {loadingSubscribe ? 'Memproses...' : 'Upgrade Sekarang — Rp 149K/bln'}
+                      {loadingSubscribe ? 'Memproses...' : 'Upgrade Sekarang — Rp 89K/bln'}
                       {!loadingSubscribe && <ChevronRight className="w-4 h-4" />}
                     </button>
                     <p className="text-center text-xs text-slate-600 mt-3">Pembayaran aman via iPaymu • Transfer, QRIS, VA, dll.</p>

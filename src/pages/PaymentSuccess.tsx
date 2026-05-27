@@ -4,7 +4,7 @@ import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
 import { Logo } from '@/components/Logo'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { fetchWithAuth } from '@/lib/api'
 
 export default function PaymentSuccess() {
   const navigate = useNavigate()
@@ -23,11 +23,7 @@ export default function PaymentSuccess() {
     const checkStatus = async () => {
       try {
         // Fetch current user from DB to see if subscription_tier is updated
-        const res = await fetch(`${API_URL}/api/auth/me`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        })
+        const res = await fetchWithAuth('/api/auth/me')
         const data = await res.json()
 
         if (data.success) {

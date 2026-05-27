@@ -637,7 +637,7 @@ export default function Landing() {
           />
           <PricingCard
             plan="Pro"
-            price="Rp 149K"
+            price="Rp 89K"
             badge="Paling Populer"
             cta="Berlangganan Pro"
             highlight

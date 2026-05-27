@@ -43,7 +43,7 @@ export function ProGate({ children, feature = 'fitur ini' }: ProGateProps) {
             className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-lg shadow-yellow-500/20"
           >
             <Crown className="w-4 h-4" />
-            Upgrade ke PRO — Rp 149K/bln
+            Upgrade ke PRO — Rp 89K/bln
           </Link>
           <p className="text-slate-600 text-xs">
             <Lock className="w-3 h-3 inline mr-1" />
