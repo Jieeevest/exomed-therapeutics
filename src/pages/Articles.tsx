@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Search, ArrowRight, Clock, Shield, AlertTriangle, Twitter, Github, Send } from 'lucide-react'
+import { BookOpen, Search, ArrowRight, Clock, Shield, AlertTriangle, Twitter, Github, Send, MapPin, Mail, Phone } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Logo } from '@/components/Logo'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
@@ -199,6 +199,25 @@ export default function Articles() {
               <p className="text-slate-500 text-sm leading-relaxed mb-5 max-w-xs">
                 Platform scanner sinyal kripto multi-timeframe untuk trader Indonesia. Analisis lebih terstruktur, bukan prediksi harga.
               </p>
+              {/* Contact Info */}
+              <div className="space-y-2.5 mb-5">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-slate-500 text-xs leading-relaxed">
+                    Jl. H. Sarmili Rt 004/02 No.1,<br />
+                    Kel. Jurang Mangu Timur, Kec. Pondok Aren,<br />
+                    Tangerang Selatan 15222
+                  </p>
+                </div>
+                <a href="mailto:support@cryptoex.id" className="flex items-center gap-2.5 group">
+                  <Mail className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">support@cryptoex.id</span>
+                </a>
+                <a href="tel:+62087883391664" className="flex items-center gap-2.5 group">
+                  <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">0878-8339-1664</span>
+                </a>
+              </div>
               <div className="flex gap-3">
                 {[Twitter, Github, Send].map((Icon, i) => (
                   <a key={i} href="#" className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all">

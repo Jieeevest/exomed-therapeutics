@@ -5,7 +5,7 @@ import {
   TrendingUp, Shield, Activity, BarChart2, ArrowRight,
   ChevronRight, Check, Star, Globe, Cpu,
   Twitter, Github, Send, Menu, X, Clock, Eye,
-  AlertTriangle, Users, Zap, Lock
+  AlertTriangle, Users, Zap, Lock, MapPin, Mail, Phone
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
 import { Logo } from '@/components/Logo'
@@ -397,7 +397,7 @@ export default function Landing() {
               <div className="w-3 h-3 rounded-full bg-red-500/70" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
               <div className="w-3 h-3 rounded-full bg-green-500/70" />
-              <span className="text-xs text-slate-600 ml-2 font-mono">cryptoex.app/terminal</span>
+              <span className="text-xs text-slate-600 ml-2 font-mono">cryptoex.id/terminal</span>
               <div className="ml-auto flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
                 LIVE
@@ -718,7 +718,7 @@ export default function Landing() {
       </section>
 
       {/* ── TIM ── */}
-      <section className="py-24 border-b border-white/[0.06]">
+      {/* <section className="py-24 border-b border-white/[0.06]">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4">
@@ -752,7 +752,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── FINAL CTA ── */}
       <section className="py-32 relative overflow-hidden">
@@ -820,6 +820,27 @@ export default function Landing() {
               <p className="text-slate-500 text-sm leading-relaxed mb-5 max-w-xs">
                 Platform scanner sinyal kripto multi-timeframe untuk trader Indonesia. Analisis lebih terstruktur, bukan prediksi harga.
               </p>
+
+              {/* Contact Info */}
+              <div className="space-y-2.5 mb-5">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-slate-500 text-xs leading-relaxed">
+                    Jl. H. Sarmili Rt 004/02 No.1,<br />
+                    Kel. Jurang Mangu Timur, Kec. Pondok Aren,<br />
+                    Tangerang Selatan 15222
+                  </p>
+                </div>
+                <a href="mailto:support@cryptoex.id" className="flex items-center gap-2.5 group">
+                  <Mail className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">support@cryptoex.id</span>
+                </a>
+                <a href="tel:+62087883391664" className="flex items-center gap-2.5 group">
+                  <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">0878-8339-1664</span>
+                </a>
+              </div>
+
               <div className="flex gap-3">
                 {[Twitter, Github, Send].map((Icon, i) => (
                   <a key={i} href="#" className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all">

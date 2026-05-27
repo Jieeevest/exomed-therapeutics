@@ -8,6 +8,8 @@ import Support from '@/pages/Support'
 import Articles from '@/pages/Articles'
 import ArticleDetail from '@/pages/ArticleDetail'
 import StaticPage from '@/pages/StaticPage'
+import PaymentSuccess from '@/pages/PaymentSuccess'
+import PaymentCancel from '@/pages/PaymentCancel'
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
 
@@ -22,6 +24,8 @@ export default function App() {
         <Route path="/articles" element={<Articles />} />
         <Route path="/articles/:slug" element={<ArticleDetail />} />
         <Route path="/page/:slug" element={<StaticPage />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/cancel" element={<PaymentCancel />} />
 
         {/* Login */}
         <Route

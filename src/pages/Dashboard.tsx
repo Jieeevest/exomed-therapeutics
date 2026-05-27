@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
-import { BookOpen, Clock, BarChart2, FlaskConical, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown, Ticket } from 'lucide-react'
+import { BookOpen, Clock, BarChart2, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown, Ticket } from 'lucide-react'
 
 import { useAuth } from '@/store/useAuth'
 import { ProGate } from '@/components/ProGate'
@@ -12,7 +12,7 @@ import { DashboardGrid } from '@/components/DashboardGrid'
 import { OrderBook } from '@/components/OrderBook'
 import { TradeHistory } from '@/components/TradeHistory'
 import { SignalPanel } from '@/components/SignalPanel'
-import { BacktestPanel } from '@/components/BacktestPanel'
+// import { BacktestPanel } from '@/components/BacktestPanel'
 import { BullishWatchlist } from '@/components/BullishWatchlist'
 
 // Spot hooks
@@ -519,7 +519,7 @@ const handleMarketTypeChange = (mt: MarketType) => {
   { id: 'orderbook', icon: <BookOpen className="h-3 w-3" />,        label: 'Book',     pro: false },
   { id: 'trades',    icon: <Clock className="h-3 w-3" />,           label: 'Trades',   pro: false },
   { id: 'signal',    icon: <BarChart2 className="h-3 w-3" />,       label: 'Analisa',  pro: true },
-  { id: 'backtest',  icon: <FlaskConical className="h-3 w-3" />,    label: 'Backtest', pro: true },
+  // { id: 'backtest',  icon: <FlaskConical className="h-3 w-3" />,    label: 'Backtest', pro: true },
   { id: 'scanner',   icon: <Scan className="h-3 w-3" />,            label: 'Scanner',  pro: true },
 ] as { id: RightTab; icon: React.ReactNode; label: string; pro: boolean }[])
   .map((tab) => (
@@ -565,12 +565,12 @@ const handleMarketTypeChange = (mt: MarketType) => {
                 )}
               </ProGate>
             </div>
-          ) : rightTab === 'backtest' ? (
-            <div className="flex-1 overflow-hidden">
-              <ProGate feature="Backtest Strategi">
-                <BacktestPanel ticker={selectedTicker} exchange={exchange} marketType={marketType} />
-              </ProGate>
-            </div>
+          // ) : rightTab === 'backtest' ? (
+          //   <div className="flex-1 overflow-hidden">
+          //     <ProGate feature="Backtest Strategi">
+          //       <BacktestPanel ticker={selectedTicker} exchange={exchange} marketType={marketType} />
+          //     </ProGate>
+          //   </div>
           ) : rightTab === 'scanner' ? (
             <div className="flex-1 overflow-hidden">
               <ProGate feature="Bullish Scanner">

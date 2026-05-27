@@ -17,6 +17,7 @@ interface AuthState {
   user: User | null
   login: (accessToken: string, refreshToken: string, user: User) => void
   logout: () => void
+  updateUser: (user: User) => void
 }
 
 export const useAuth = create<AuthState>()(
@@ -28,6 +29,7 @@ export const useAuth = create<AuthState>()(
       user: null,
       login: (accessToken, refreshToken, user) => set({ isAuthenticated: true, accessToken, refreshToken, user }),
       logout: () => set({ isAuthenticated: false, accessToken: null, refreshToken: null, user: null }),
+      updateUser: (user) => set({ user }),
     }),
     {
       name: 'cryptoex-auth-storage',
