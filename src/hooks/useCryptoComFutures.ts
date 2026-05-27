@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import type { Ticker, OrderBook, Trade } from '@/types'
+import { API_URLS } from '@/constants/apiUrls'
 
-const BASE = 'https://api.crypto.com/exchange/v1/public'
+const BASE = API_URLS.cryptoCom.public
 
 export function useCryptoComFutureTickers() {
   const [tickers, setTickers] = useState<Ticker[]>([])

@@ -5,6 +5,7 @@ import type { Candle } from '@/lib/indicators'
 import { generateMTFSignal, type MTFSignalResult, type Timeframe } from '@/lib/signals'
 import { analyzeFuturesSetup, buildSpotRankingScore, type FuturesTradePlan } from '@/lib/futuresEngine'
 import { useFearGreed } from './useFearGreed'
+import { API_URLS } from '@/constants/apiUrls'
 
 export type { FuturesTradePlan } from '@/lib/futuresEngine'
 
@@ -42,8 +43,8 @@ async function fetchCandleTf(
     switch (exchange) {
       case 'binance': {
         const base = marketType === 'futures'
-          ? 'https://fapi.binance.com/fapi/v1'
-          : 'https://api.binance.com/api/v3'
+          ? API_URLS.binance.futures
+          : API_URLS.binance.spot
         const { data } = await axios.get(`${base}/klines`, {
           params: { symbol, interval: tf, limit: 150 },
           timeout: 8000,
@@ -58,7 +59,7 @@ async function fetchCandleTf(
           const granMap: Record<string, number> = { '15m': 15, '30m': 30, '1h': 60, '4h': 240 }
           const to = Date.now()
           const from = to - 60 * 1000 * granMap[tf] * 150
-          const { data } = await axios.get('https://api-futures.kucoin.com/api/v1/kline/query', {
+          const { data } = await axios.get(`${API_URLS.kucoin.futures}/kline/query`, {
             params: { symbol, granularity: granMap[tf], from, to },
             timeout: 8000,
           })
@@ -68,7 +69,7 @@ async function fetchCandleTf(
           }))
         } else {
           const typeMap: Record<string, string> = { '15m': '15min', '30m': '30min', '1h': '1hour', '4h': '4hour' }
-          const { data } = await axios.get('https://api.kucoin.com/api/v1/market/candles', {
+          const { data } = await axios.get(`${API_URLS.kucoin.spot}/market/candles`, {
             params: { symbol, type: typeMap[tf] },
             timeout: 8000,
           })
@@ -80,7 +81,7 @@ async function fetchCandleTf(
       }
       case 'okx': {
         const barMap: Record<string, string> = { '15m': '15m', '30m': '30m', '1h': '1H', '4h': '4H' }
-        const { data } = await axios.get('https://www.okx.com/api/v5/market/candles', {
+        const { data } = await axios.get(`${API_URLS.okx.market}/candles`, {
           params: { instId: symbol, bar: barMap[tf], limit: 150 },
           timeout: 8000,
         })
@@ -91,7 +92,7 @@ async function fetchCandleTf(
       }
       case 'cryptocom': {
         const { data } = await axios.get(
-          'https://api.crypto.com/exchange/v1/public/get-candlestick',
+          `${API_URLS.cryptoCom.public}/get-candlestick`,
           { params: { instrument_name: symbol, timeframe: tf, count: 150 }, timeout: 8000 }
         )
         return ((data?.result?.data ?? []) as any[]).reverse().map((d: any) => ({

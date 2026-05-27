@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import axios from 'axios'
 import type { Ticker, OrderBook, Trade } from '@/types'
+import { API_URLS } from '@/constants/apiUrls'
 
-const BASE = 'https://api.binance.com/api/v3'
-const WS_BASE = 'wss://stream.binance.com:9443/ws'
+const BASE = API_URLS.binance.spot
+const WS_BASE = API_URLS.binance.ws
 
 export function useBinanceTickers() {
   const [tickers, setTickers] = useState<Ticker[]>([])

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import axios from 'axios'
 import type { Ticker, OrderBook, Trade } from '@/types'
+import { API_URLS } from '@/constants/apiUrls'
 
-const BASE = 'https://fapi.binance.com/fapi/v1'
-const WS_BASE = 'wss://fstream.binance.com/ws'
+const BASE = API_URLS.binance.futures
+const WS_BASE = API_URLS.binance.wsFutures
 
 export function useBinanceFutureTickers() {
   const [tickers, setTickers] = useState<Ticker[]>([])

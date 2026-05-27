@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import type { Ticker, OrderBook, Trade } from '@/types'
+import { API_URLS } from '@/constants/apiUrls'
 
-const BASE = 'https://api.kucoin.com/api/v1'
+const BASE = API_URLS.kucoin.spot
 
 export function useKuCoinTickers() {
   const [tickers, setTickers] = useState<Ticker[]>([])

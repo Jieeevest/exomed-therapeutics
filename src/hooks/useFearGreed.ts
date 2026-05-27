@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { API_URLS } from '@/constants/apiUrls'
 
-const FG_URL = 'https://api.alternative.me/fng/?limit=1&format=json'
+const FG_URL = API_URLS.fearGreed
 const CACHE_KEY = 'cryptoex_fg_cache'
 const CACHE_TTL_MS = 60 * 60 * 1000 // 1 jam
 

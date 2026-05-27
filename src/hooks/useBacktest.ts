@@ -4,6 +4,7 @@ import type { Exchange, MarketType } from '@/types'
 import type { Candle } from '@/lib/indicators'
 import { generateSignal, type Direction } from '@/lib/signals'
 import type { SignalTimeframe } from './useSignalData'
+import { API_URLS } from '@/constants/apiUrls'
 
 export interface BtTrade {
   index: number
@@ -57,8 +58,8 @@ async function fetchHistorical(
     switch (exchange) {
       case 'binance': {
         const base = marketType === 'futures'
-          ? 'https://fapi.binance.com/fapi/v1'
-          : 'https://api.binance.com/api/v3'
+          ? API_URLS.binance.futures
+          : API_URLS.binance.spot
         const { data } = await axios.get(`${base}/klines`, { params: { symbol, interval, limit: LIMIT } })
         return (data as any[]).map((d) => ({
           time: d[0], open: +d[1], high: +d[2], low: +d[3], close: +d[4], volume: +d[5],
@@ -69,7 +70,7 @@ async function fetchHistorical(
           const gran = ({ '5m': 5, '15m': 15, '30m': 30, '1h': 60, '4h': 240 } as Record<string, number>)[interval]!
           const to = Date.now()
           const from = to - gran * 60_000 * LIMIT
-          const { data } = await axios.get('https://api-futures.kucoin.com/api/v1/kline/query', {
+          const { data } = await axios.get(`${API_URLS.kucoin.futures}/kline/query`, {
             params: { symbol, granularity: gran, from, to },
           })
           return ((data?.data ?? []) as any[]).map((d: any) => ({
@@ -77,7 +78,7 @@ async function fetchHistorical(
           }))
         } else {
           const type = ({ '5m': '5min', '15m': '15min', '30m': '30min', '1h': '1hour', '4h': '4hour' } as Record<string, string>)[interval]!
-          const { data } = await axios.get('https://api.kucoin.com/api/v1/market/candles', {
+          const { data } = await axios.get(`${API_URLS.kucoin.spot}/market/candles`, {
             params: { symbol, type },
           })
           return ((data?.data ?? []) as any[]).reverse().map((d: any) => ({
@@ -87,7 +88,7 @@ async function fetchHistorical(
       }
       case 'okx': {
         const bar = ({ '5m': '5m', '15m': '15m', '30m': '30m', '1h': '1H', '4h': '4H' } as Record<string, string>)[interval]!
-        const { data } = await axios.get('https://www.okx.com/api/v5/market/candles', {
+        const { data } = await axios.get(`${API_URLS.okx.market}/candles`, {
           params: { instId: symbol, bar, limit: LIMIT },
         })
         return ((data?.data ?? []) as any[]).reverse().map((d: any) => ({
@@ -95,7 +96,7 @@ async function fetchHistorical(
         }))
       }
       case 'cryptocom': {
-        const { data } = await axios.get('https://api.crypto.com/exchange/v1/public/get-candlestick', {
+        const { data } = await axios.get(`${API_URLS.cryptoCom.public}/get-candlestick`, {
           params: { instrument_name: symbol, timeframe: interval, count: LIMIT },
         })
         return ((data?.result?.data ?? []) as any[]).reverse().map((d: any) => ({

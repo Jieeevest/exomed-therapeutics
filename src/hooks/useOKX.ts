@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import type { Ticker, OrderBook, Trade } from '@/types'
+import { API_URLS } from '@/constants/apiUrls'
 
-const BASE = 'https://www.okx.com/api/v5/market'
+const BASE = API_URLS.okx.market
 
 export function useOKXTickers() {
   const [tickers, setTickers] = useState<Ticker[]>([])

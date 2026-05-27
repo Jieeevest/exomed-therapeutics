@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import type { Exchange, MarketType } from '@/types'
+import { API_URLS } from '@/constants/apiUrls'
 
 const BATCH = 20
 
@@ -14,8 +15,8 @@ async function fetchOnePercent(
     switch (exchange) {
       case 'binance': {
         const base = marketType === 'futures'
-          ? 'https://fapi.binance.com/fapi/v1'
-          : 'https://api.binance.com/api/v3'
+          ? API_URLS.binance.futures
+          : API_URLS.binance.spot
         const { data } = await axios.get(`${base}/klines`, {
           params: { symbol, interval, limit: 1 },
         })
@@ -32,7 +33,7 @@ async function fetchOnePercent(
           const to = Date.now()
           const from = to - gran * 60 * 1000
           const { data } = await axios.get(
-            'https://api-futures.kucoin.com/api/v1/kline/query',
+            `${API_URLS.kucoin.futures}/kline/query`,
             { params: { symbol, granularity: gran, from, to } }
           )
           const candles = data?.data as any[]
@@ -42,7 +43,7 @@ async function fetchOnePercent(
           return ((close - open) / open) * 100
         } else {
           const typeMap: Record<string, string> = { '5m': '5min', '15m': '15min', '1h': '1hour', '4h': '4hour' }
-          const { data } = await axios.get('https://api.kucoin.com/api/v1/market/candles', {
+          const { data } = await axios.get(`${API_URLS.kucoin.spot}/market/candles`, {
             params: { symbol, type: typeMap[interval] },
           })
           const candles = data?.data as string[][]
@@ -55,7 +56,7 @@ async function fetchOnePercent(
 
       case 'okx': {
         const barMap: Record<string, string> = { '5m': '5m', '15m': '15m', '1h': '1H', '4h': '4H' }
-        const { data } = await axios.get('https://www.okx.com/api/v5/market/candles', {
+        const { data } = await axios.get(`${API_URLS.okx.market}/candles`, {
           params: { instId: symbol, bar: barMap[interval], limit: 1 },
         })
         const candles = data?.data as string[][]
@@ -67,7 +68,7 @@ async function fetchOnePercent(
 
       case 'cryptocom': {
         const { data } = await axios.get(
-          'https://api.crypto.com/exchange/v1/public/get-candlestick',
+          `${API_URLS.cryptoCom.public}/get-candlestick`,
           { params: { instrument_name: symbol, timeframe: interval, count: 1 } }
         )
         const candles = data?.result?.data as any[]
