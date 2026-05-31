@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Search, ArrowRight, Clock, Shield, AlertTriangle, Twitter, Github, Send, MapPin, Mail, Phone } from 'lucide-react'
+import { BookOpen, Search, ArrowRight, Clock, Shield, Twitter, Github, Send, MapPin, Mail, Phone } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Logo } from '@/components/Logo'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
@@ -23,19 +23,6 @@ const CAT_COLORS: Record<string, string> = {
   update:   'text-amber-400 bg-amber-500/10 border-amber-500/20',
 }
 
-// ── Risk Disclaimer Banner ─────────────────────────────────────────────────
-function DisclaimerBanner() {
-  return (
-    <div className="flex items-start gap-2 bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3 text-xs text-amber-200/70 leading-relaxed max-w-4xl mx-auto my-12">
-      <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" />
-      <span>
-        <strong className="text-amber-400">Disclaimer Risiko:</strong> Trading aset kripto mengandung risiko tinggi kehilangan modal.
-        Sinyal yang disediakan <strong>bukan merupakan rekomendasi investasi</strong>.
-        Hasil masa lalu tidak menjamin hasil masa depan. Gunakan dengan bijak.
-      </span>
-    </div>
-  )
-}
 
 export default function Articles() {
   useSessionGuard()
@@ -77,23 +64,23 @@ export default function Articles() {
         <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.1] text-slate-300 text-xs font-bold px-4 py-1.5 rounded-full mb-6 backdrop-blur-sm">
-              <Shield className="w-3.5 h-3.5 text-amber-400" /> CryptoEx Intelligence
+              <Shield className="w-3.5 h-3.5 text-amber-400" /> YourApp Content
             </div>
             <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
-              Insight Pasar <span className="text-gold-gradient">Institusional</span>
+              Artikel & <span className="text-gold-gradient">Konten</span>
             </h1>
             <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-              Analisis mendalam, pemahaman fundamental, dan riset teknikal komprehensif langsung dari meja kuantitatif kami.
+              Temukan artikel, tutorial, dan update terbaru dari tim kami. Semua konten dikurasi untuk membantu Anda memaksimalkan platform.
             </p>
 
             <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mx-auto relative group">
               <div className="absolute -inset-0.5 bg-gold-gradient rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
               <div className="relative flex w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <input 
-                  value={search} onChange={e => setSearch(e.target.value)} 
-                  placeholder="Cari riset token, metodologi, atau tutorial..."
-                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-l-xl pl-12 pr-4 py-4 text-sm focus:outline-none focus:border-amber-500/50 transition-colors text-white placeholder:text-slate-600" 
+                <input
+                  value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="Cari artikel, tutorial, atau update..."
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-l-xl pl-12 pr-4 py-4 text-sm focus:outline-none focus:border-amber-500/50 transition-colors text-white placeholder:text-slate-600"
                 />
                 <button type="submit" className="px-8 py-4 bg-gold-gradient text-black font-bold rounded-r-xl text-sm hover:opacity-90 transition-opacity">
                   Cari
@@ -177,7 +164,7 @@ export default function Articles() {
                   </p>
                   
                   <Link to={`/articles/${a.slug}`} className="inline-flex items-center gap-2 text-sm font-bold text-amber-500 hover:text-amber-400 transition-colors mt-auto group/btn">
-                    Baca Analisis <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    Baca Artikel <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Link>
                 </div>
               </motion.div>
@@ -185,7 +172,6 @@ export default function Articles() {
           </div>
         )}
         
-        {!loading && <DisclaimerBanner />}
       </div>
 
       {/* ── FOOTER ── */}
@@ -197,25 +183,23 @@ export default function Articles() {
                 <Logo variant="horizontal" className="h-9 w-auto" />
               </Link>
               <p className="text-slate-500 text-sm leading-relaxed mb-5 max-w-xs">
-                Platform scanner sinyal kripto multi-timeframe untuk trader Indonesia. Analisis lebih terstruktur, bukan prediksi harga.
+                Boilerplate aplikasi SaaS modern dengan design system premium, autentikasi lengkap, dan admin panel siap pakai.
               </p>
-              {/* Contact Info */}
               <div className="space-y-2.5 mb-5">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                   <p className="text-slate-500 text-xs leading-relaxed">
-                    Jl. H. Sarmili Rt 004/02 No.1,<br />
-                    Kel. Jurang Mangu Timur, Kec. Pondok Aren,<br />
-                    Tangerang Selatan 15222
+                    Alamat perusahaan Anda,<br />
+                    Kota, Provinsi, Kode Pos
                   </p>
                 </div>
-                <a href="mailto:support@cryptoex.id" className="flex items-center gap-2.5 group">
+                <a href="mailto:hello@yourapp.id" className="flex items-center gap-2.5 group">
                   <Mail className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">support@cryptoex.id</span>
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">hello@yourapp.id</span>
                 </a>
-                <a href="tel:+62087883391664" className="flex items-center gap-2.5 group">
+                <a href="tel:+6200000000000" className="flex items-center gap-2.5 group">
                   <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">0878-8339-1664</span>
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">+62 000-0000-0000</span>
                 </a>
               </div>
               <div className="flex gap-3">
@@ -263,20 +247,8 @@ export default function Articles() {
             ))}
           </div>
 
-          <div className="border border-amber-900/40 bg-amber-950/20 rounded-xl p-5 mb-8">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-amber-400 font-bold text-xs mb-1.5">Disclaimer Risiko Investasi Penting</p>
-                <p className="text-amber-200/60 text-xs leading-relaxed">
-                  Trading aset kripto mengandung risiko tinggi kehilangan seluruh modal yang diinvestasikan. Sinyal, skor, dan analisis yang disediakan oleh CryptoEx merupakan output analisis teknikal otomatis dan <strong>bukan merupakan rekomendasi investasi, saran keuangan, atau ajakan membeli/menjual aset</strong>. Seluruh keputusan trading sepenuhnya merupakan tanggung jawab pengguna. Hasil masa lalu tidak menjamin hasil masa depan. Pastikan Anda memahami risiko sebelum berdagang.
-                </p>
-              </div>
-            </div>
-          </div>
-
           <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-600">© 2025 CryptoEx. Seluruh hak cipta dilindungi undang-undang.</p>
+            <p className="text-xs text-slate-600">© {new Date().getFullYear()} YourApp. Seluruh hak cipta dilindungi undang-undang.</p>
             <div className="flex gap-4">
               <Link to="/page/terms" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Terms of Service</Link>
               <Link to="/page/privacy" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Privacy Policy</Link>

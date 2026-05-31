@@ -5,7 +5,7 @@ import {
   TrendingUp, Shield, Activity, BarChart2, ArrowRight,
   ChevronRight, Check, Star, Globe, Cpu,
   Twitter, Github, Send, Menu, X, Clock, Eye,
-  AlertTriangle, Users, Zap, Lock, MapPin, Mail, Phone
+  Users, Zap, Lock, MapPin, Mail, Phone, Layers, Database
 } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
 import { Logo } from '@/components/Logo'
@@ -80,7 +80,7 @@ function PricingCard({ plan, price, priceNote, features, highlight, badge, cta }
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubscribe = async () => {
-    if (plan === 'Institutional') {
+    if (plan === 'Enterprise') {
       navigate('/support')
       return
     }
@@ -147,40 +147,33 @@ function PricingCard({ plan, price, priceNote, features, highlight, badge, cta }
   )
 }
 
-// ── Marquee Ticker ────────────────────────────────────────────────────────
-const TICKERS = [
-  { sym: 'BTC', pct: '+4.21', bull: true }, { sym: 'ETH', pct: '+2.87', bull: true },
-  { sym: 'SOL', pct: '+7.54', bull: true }, { sym: 'BNB', pct: '-1.12', bull: false },
-  { sym: 'ARB', pct: '+12.3', bull: true }, { sym: 'OP', pct: '+9.8', bull: true },
-  { sym: 'AVAX', pct: '+3.4', bull: true }, { sym: 'INJ', pct: '-0.6', bull: false },
-  { sym: 'SUI', pct: '+18.2', bull: true }, { sym: 'PEPE', pct: '+31.7', bull: true },
+// ── Feature Marquee ───────────────────────────────────────────────────────
+const FEATURES_MARQUEE = [
+  { label: 'Authentication',   dot: true  },
+  { label: 'Role Management',  dot: false },
+  { label: 'Subscription',     dot: true  },
+  { label: 'Admin Dashboard',  dot: false },
+  { label: 'Article CMS',      dot: true  },
+  { label: 'Support Tickets',  dot: false },
+  { label: 'Payment Gateway',  dot: true  },
+  { label: 'Real-time Data',   dot: false },
+  { label: 'Session Guard',    dot: true  },
+  { label: 'Dark Mode UI',     dot: false },
 ]
 
-function TickerBar() {
+function FeatureMarquee() {
   return (
     <div className="relative flex overflow-hidden border-y border-white/[0.06] bg-black/40 py-3">
       <div className="flex gap-8 animate-[marquee_25s_linear_infinite] whitespace-nowrap pr-8">
-        {[...TICKERS, ...TICKERS].map((t, i) => (
+        {[...FEATURES_MARQUEE, ...FEATURES_MARQUEE].map((f, i) => (
           <span key={i} className="flex items-center gap-2 text-xs font-mono">
-            <span className="text-slate-400">{t.sym}/USDT</span>
-            <span className={t.bull ? 'text-emerald-400' : 'text-red-400'}>{t.pct}%</span>
+            {f.dot
+              ? <span className="text-emerald-400">✦</span>
+              : <span className="text-amber-400">◆</span>}
+            <span className="text-slate-300">{f.label}</span>
           </span>
         ))}
       </div>
-    </div>
-  )
-}
-
-// ── Risk Disclaimer Banner ─────────────────────────────────────────────────
-function DisclaimerBanner() {
-  return (
-    <div className="flex items-start gap-2 bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3 text-xs text-amber-200/70 leading-relaxed">
-      <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" />
-      <span>
-        <strong className="text-amber-400">Disclaimer Risiko:</strong> Trading aset kripto mengandung risiko tinggi kehilangan modal.
-        Sinyal yang disediakan <strong>bukan merupakan rekomendasi investasi</strong>.
-        Hasil masa lalu tidak menjamin hasil masa depan. Gunakan dengan bijak.
-      </span>
     </div>
   )
 }
@@ -198,7 +191,6 @@ export default function Landing() {
       <style>{`
         @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
         @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-        @keyframes pulse-glow{0%,100%{opacity:0.4}50%{opacity:0.8}}
         .float-anim{animation:float 6s ease-in-out infinite}
         .float-anim-slow{animation:float 8s ease-in-out infinite}
       `}</style>
@@ -291,20 +283,19 @@ export default function Landing() {
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden">
 
-        {/* Background elements */}
+        {/* Background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(180,120,30,0.18),transparent)]" />
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '44px 44px' }}
         />
-        {/* Floating orbs */}
         <div className="absolute top-1/4 left-[8%] w-80 h-80 bg-amber-600/15 rounded-full blur-[120px] float-anim" />
         <div className="absolute bottom-1/3 right-[8%] w-80 h-80 bg-yellow-600/15 rounded-full blur-[120px] float-anim-slow" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-900/10 rounded-full blur-[150px]" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 text-center pt-20 pb-10">
 
-          {/* Live badge */}
+          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -312,7 +303,7 @@ export default function Landing() {
             className="inline-flex items-center gap-2 bg-white/[0.06] border border-amber-500/20 px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 mb-8"
           >
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            Live — Binance · KuCoin · OKX · Crypto.com
+            React · TypeScript · Tailwind · Zustand · Framer Motion
             <ChevronRight className="w-3 h-3 text-slate-500" />
           </motion.div>
 
@@ -324,11 +315,11 @@ export default function Landing() {
             className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.05] mb-6"
           >
             <span className="bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
-              Scanner Sinyal MTF
+              Boilerplate SaaS
             </span>
             <br />
             <span className="text-gold-gradient">
-              untuk Trader Kripto
+              Modern & Siap Pakai
             </span>
           </motion.h1>
 
@@ -339,7 +330,7 @@ export default function Landing() {
             transition={{ duration: 0.8, delay: 0.25 }}
             className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10"
           >
-            Temukan koin berpotensi naik lebih cepat — dengan <strong className="text-white font-semibold">Bullish Scanner MTF</strong> yang menggabungkan sinyal classic & weighted dari 4 timeframe secara simultan, langsung dari 4 exchange terbesar.
+            Template aplikasi web lengkap dengan <strong className="text-white font-semibold">autentikasi, manajemen langganan, admin panel, CMS artikel</strong>, dan sistem tiket support — siap dikustomisasi untuk produk Anda.
           </motion.p>
 
           {/* CTAs */}
@@ -350,7 +341,7 @@ export default function Landing() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4"
           >
             <Link
-              to={isAuthenticated ? "/app" : "/login"}
+              to={isAuthenticated ? '/app' : '/login'}
               className="group w-full sm:w-auto bg-gold-gradient text-black font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_30px_rgba(212,166,58,0.3)] text-base"
             >
               {isAuthenticated ? 'Buka Dashboard' : 'Mulai Gratis — Tanpa Kartu Kredit'}
@@ -360,7 +351,7 @@ export default function Landing() {
               href="#cara-kerja"
               className="w-full sm:w-auto bg-white/[0.06] border border-white/[0.12] text-white font-semibold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/[0.1] hover:border-white/20 transition-all text-base"
             >
-              <Eye className="w-4 h-4" /> Lihat Demo Live
+              <Eye className="w-4 h-4" /> Lihat Fitur
             </a>
           </motion.div>
 
@@ -372,19 +363,9 @@ export default function Landing() {
           >
             Tidak perlu kartu kredit · Setup dalam 2 menit · Gratis selamanya untuk akun Starter
           </motion.p>
-
-          {/* Disclaimer mini */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="max-w-2xl mx-auto"
-          >
-            <DisclaimerBanner />
-          </motion.div>
         </div>
 
-        {/* Hero Dashboard Preview — BIGGER */}
+        {/* Hero App Preview */}
         <motion.div
           initial={{ opacity: 0, y: 60, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -397,108 +378,106 @@ export default function Landing() {
               <div className="w-3 h-3 rounded-full bg-red-500/70" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
               <div className="w-3 h-3 rounded-full bg-green-500/70" />
-              <span className="text-xs text-slate-600 ml-2 font-mono">cryptoex.id/terminal</span>
+              <span className="text-xs text-slate-600 ml-2 font-mono">yourapp.id/app</span>
               <div className="ml-auto flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
                 LIVE
               </div>
             </div>
-            {/* Mock terminal UI */}
+            {/* Mock dashboard UI */}
             <div className="grid grid-cols-12 min-h-[420px] text-xs font-mono">
               {/* Sidebar */}
               <div className="col-span-2 bg-[#0a0a0a] border-r border-white/[0.06] p-3 hidden md:block">
-                <div className="text-slate-600 text-[10px] font-bold uppercase mb-3 tracking-wider">Top Coins</div>
-                {['BTC','ETH','SOL','ARB','OP','INJ','SUI'].map((s, i) => (
-                  <div key={s} className={`py-1.5 px-2 rounded text-[10px] mb-0.5 flex justify-between items-center ${i === 0 ? 'bg-amber-500/10 text-white border border-amber-500/20' : 'text-slate-500 hover:text-slate-300'}`}>
-                    <span>{s}</span>
-                    <span className={i % 3 !== 1 ? 'text-emerald-400' : 'text-red-400'}>{i % 3 !== 1 ? '▲' : '▼'}</span>
+                <div className="text-slate-600 text-[10px] font-bold uppercase mb-3 tracking-wider">Menu</div>
+                {['Overview', 'Analytics', 'Users', 'Billing', 'Settings'].map((s, i) => (
+                  <div key={s} className={`py-1.5 px-2 rounded text-[10px] mb-0.5 ${i === 0 ? 'bg-amber-500/10 text-white border border-amber-500/20' : 'text-slate-500 hover:text-slate-300'}`}>
+                    {s}
                   </div>
                 ))}
               </div>
-              {/* Chart area */}
+              {/* Main area */}
               <div className="col-span-12 md:col-span-7 p-5 relative">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-white font-bold text-sm">BTC/USDT</span>
-                  <span className="text-emerald-400 text-xs bg-emerald-400/10 px-2 py-0.5 rounded">+4.21%</span>
-                  <span className="text-slate-500 text-xs">1H</span>
-                  {['15m','30m','1H','4H'].map(tf => (
-                    <span key={tf} className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer ${tf === '1H' ? 'bg-amber-500/20 text-amber-400' : 'text-slate-600 hover:text-slate-400'}`}>{tf}</span>
+                  <span className="text-white font-bold text-sm">Overview</span>
+                  <span className="text-emerald-400 text-xs bg-emerald-400/10 px-2 py-0.5 rounded">+12%</span>
+                </div>
+                {/* Stat cards */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {[
+                    { l: 'Users', v: '1,248', c: 'text-blue-400' },
+                    { l: 'Revenue', v: 'Rp 4.2M', c: 'text-amber-400' },
+                    { l: 'Active', v: '342', c: 'text-emerald-400' },
+                  ].map(s => (
+                    <div key={s.l} className="bg-white/[0.03] border border-white/[0.07] rounded-lg p-3">
+                      <div className="text-[9px] text-slate-600 mb-1">{s.l}</div>
+                      <div className={`text-sm font-bold ${s.c}`}>{s.v}</div>
+                    </div>
                   ))}
                 </div>
-                {/* Fake candlestick chart */}
-                <div className="flex items-end gap-[3px] h-56 px-2 mb-3">
+                {/* Chart placeholder */}
+                <div className="flex items-end gap-[3px] h-36 px-2 mb-3">
                   {[60,45,70,55,80,65,90,75,85,95,72,88,65,78,92,68,82,95,74,86,96,70,83,97,75,89,68,82,93,77,85,91,88,94,79,96,84,90,87,92].map((h, i) => (
                     <div key={i} className="flex flex-col items-center flex-1 gap-[1px]">
                       <div className="w-[1px] bg-slate-700" style={{ height: `${Math.abs(Math.sin(i)) * 10 + 3}%` }} />
                       <div
-                        className={`w-full rounded-[1px] ${i % 3 !== 1 ? 'bg-emerald-500/80' : 'bg-red-500/70'}`}
+                        className={`w-full rounded-[1px] ${i % 3 !== 1 ? 'bg-amber-500/70' : 'bg-amber-900/50'}`}
                         style={{ height: `${h * 0.45 + 8}%` }}
                       />
-                      <div className="w-[1px] bg-slate-700" style={{ height: `${Math.abs(Math.cos(i)) * 8 + 2}%` }} />
                     </div>
                   ))}
                 </div>
-                {/* Indicator row */}
                 <div className="flex gap-4 text-[9px] text-slate-600">
-                  <span>EMA20 <span className="text-amber-400">65,240</span></span>
-                  <span>RSI <span className="text-emerald-400">58.4</span></span>
-                  <span>MACD <span className="text-emerald-400">▲ 124</span></span>
-                  <span>Vol <span className="text-blue-400">2.4B</span></span>
+                  <span>Jan <span className="text-amber-400">2.4M</span></span>
+                  <span>Feb <span className="text-amber-400">3.1M</span></span>
+                  <span>Mar <span className="text-emerald-400">4.2M ▲</span></span>
                 </div>
               </div>
-              {/* Scanner panel */}
+              {/* Right panel */}
               <div className="col-span-3 bg-[#0a0a0a] border-l border-white/[0.06] p-4 hidden md:flex flex-col">
                 <div className="text-slate-600 text-[10px] font-bold uppercase mb-3 tracking-wider flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                  Bullish Scanner MTF
+                  Recent Activity
                 </div>
                 {[
-                  { sym: 'SUI', pct: '91.2', tf: '4H+1H+30m+15m' },
-                  { sym: 'SOL', pct: '84.7', tf: '4H+1H+30m' },
-                  { sym: 'ARB', pct: '77.3', tf: '1H+30m+15m' },
-                  { sym: 'ETH', pct: '72.1', tf: '4H+1H' },
-                  { sym: 'BTC', pct: '68.9', tf: '1H+4H' },
-                  { sym: 'INJ', pct: '61.4', tf: '30m+15m' },
+                  { user: 'Arif S.', action: 'Upgraded to Pro', time: '2m ago', dot: 'bg-amber-400' },
+                  { user: 'Bima R.', action: 'Opened ticket', time: '5m ago', dot: 'bg-blue-400' },
+                  { user: 'Citra N.', action: 'New signup', time: '8m ago', dot: 'bg-emerald-400' },
+                  { user: 'Dimas K.', action: 'Upgraded to Pro', time: '12m ago', dot: 'bg-amber-400' },
+                  { user: 'Eka P.', action: 'Password changed', time: '15m ago', dot: 'bg-purple-400' },
                 ].map((r, i) => (
-                  <div key={i} className={`mb-3 p-2 rounded-lg ${i === 0 ? 'bg-emerald-500/10 border border-emerald-500/20' : ''}`}>
-                    <div className="flex justify-between text-[10px] mb-1">
-                      <span className="text-slate-200 font-bold">{r.sym}</span>
-                      <span className="text-emerald-400 font-bold">{r.pct}%</span>
+                  <div key={i} className="mb-3 flex items-start gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full ${r.dot} mt-1 shrink-0`} />
+                    <div>
+                      <div className="text-[10px] text-slate-300 font-bold">{r.user}</div>
+                      <div className="text-[9px] text-slate-600">{r.action}</div>
+                      <div className="text-[8px] text-slate-700">{r.time}</div>
                     </div>
-                    <div className="w-full bg-white/[0.05] rounded-full h-[4px] mb-1">
-                      <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full transition-all" style={{ width: `${r.pct}%` }} />
-                    </div>
-                    <div className="text-[8px] text-slate-600">{r.tf}</div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          {/* Glow under preview */}
           <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-amber-500/15 blur-[60px] rounded-full" />
         </motion.div>
       </section>
 
-      {/* ── TICKER BAR ── */}
-      <TickerBar />
+      {/* ── FEATURE MARQUEE ── */}
+      <FeatureMarquee />
 
-      {/* ── PARTNER EXCHANGES ── */}
+      {/* ── TECH STACK ── */}
       <section className="py-16 border-b border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4">
-          <p className="text-center text-xs font-bold tracking-widest uppercase text-slate-600 mb-10">Terhubung Langsung ke Exchange Terbesar</p>
+          <p className="text-center text-xs font-bold tracking-widest uppercase text-slate-600 mb-10">Tech Stack yang Sudah Terintegrasi</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { name: 'Binance', color: 'text-yellow-400', bg: 'bg-yellow-400/8 border-yellow-400/20', symbol: 'B' },
-              { name: 'KuCoin', color: 'text-emerald-400', bg: 'bg-emerald-400/8 border-emerald-400/20', symbol: 'K' },
-              { name: 'OKX', color: 'text-blue-400', bg: 'bg-blue-400/8 border-blue-400/20', symbol: 'O' },
-              { name: 'Crypto.com', color: 'text-indigo-400', bg: 'bg-indigo-400/8 border-indigo-400/20', symbol: 'C' },
+              { name: 'React + TypeScript', color: 'text-blue-400', bg: 'bg-blue-400/8 border-blue-400/20', symbol: '⚛' },
+              { name: 'Tailwind CSS',       color: 'text-cyan-400',  bg: 'bg-cyan-400/8 border-cyan-400/20',  symbol: '🎨' },
+              { name: 'Zustand + Router',   color: 'text-emerald-400', bg: 'bg-emerald-400/8 border-emerald-400/20', symbol: '⚡' },
+              { name: 'Framer Motion',      color: 'text-purple-400', bg: 'bg-purple-400/8 border-purple-400/20', symbol: '✨' },
             ].map((ex) => (
               <div key={ex.name} className={`flex flex-col items-center gap-3 p-6 rounded-2xl border ${ex.bg} group hover:scale-105 transition-transform duration-300`}>
-                <div className={`w-14 h-14 rounded-2xl ${ex.bg} border ${ex.bg.split(' ')[1]} flex items-center justify-center`}>
-                  <span className={`text-2xl font-black ${ex.color}`}>{ex.symbol}</span>
-                </div>
-                <span className="text-white font-bold text-sm">{ex.name}</span>
-                <span className="text-slate-500 text-xs">Spot & Futures</span>
+                <div className="text-3xl">{ex.symbol}</div>
+                <span className={`text-sm font-bold ${ex.color} text-center`}>{ex.name}</span>
               </div>
             ))}
           </div>
@@ -508,14 +487,11 @@ export default function Landing() {
       {/* ── STATS ── */}
       <section className="py-24 border-b border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12">
-          <StatCounter value={850} suffix="K+" label="Sinyal Dianalisis" />
-          <StatCounter value={4} label="Timeframe Simultan (15m–4H)" />
-          <StatCounter value={80} suffix="+" label="Koin Dianalisis Sekaligus" />
-          <StatCounter value={1200} suffix="+" label="Trader Aktif" />
+          <StatCounter value={10} suffix="+" label="Halaman siap pakai" />
+          <StatCounter value={5} label="Pattern komponen utama" />
+          <StatCounter value={20} suffix="+" label="Custom hooks & utilities" />
+          <StatCounter value={100} suffix="%" label="TypeScript typed" />
         </div>
-        <p className="text-center text-xs text-slate-700 mt-8 max-w-lg mx-auto">
-          * Statistik berdasarkan data penggunaan platform sejak Januari 2024. Sinyal merupakan output analisis teknikal, bukan prediksi harga.
-        </p>
       </section>
 
       {/* ── FEATURES ── */}
@@ -527,7 +503,7 @@ export default function Landing() {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4"
           >
-            <Zap className="w-3.5 h-3.5" /> Fitur Platform
+            <Zap className="w-3.5 h-3.5" /> Fitur Boilerplate
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -536,8 +512,8 @@ export default function Landing() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-black text-white"
           >
-            Semua Alat yang Anda Butuhkan<br />
-            <span className="text-slate-500">dalam Satu Platform</span>
+            Semua yang Anda Butuhkan<br />
+            <span className="text-slate-500">Sudah Ada di Sini</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -546,18 +522,18 @@ export default function Landing() {
             transition={{ delay: 0.2 }}
             className="text-slate-400 mt-4 max-w-xl mx-auto text-sm leading-relaxed"
           >
-            Dari scanner sinyal hingga analisis mendalam — dirancang untuk membantu Anda membuat keputusan trading yang lebih terstruktur.
+            Dari autentikasi hingga manajemen langganan — semua infrastruktur sudah siap sehingga Anda bisa fokus membangun fitur produk utama.
           </motion.p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
-            { icon: <Activity className="w-5 h-5 text-emerald-400" />, title: 'Bullish Scanner MTF', desc: 'Scan hingga 80+ koin sekaligus menggunakan 4 timeframe (15m, 30m, 1H, 4H). Gabungan sinyal classic & weighted memberikan konfirmasi lebih komprehensif sebelum entry.', delay: 0 },
-            { icon: <BarChart2 className="w-5 h-5 text-amber-400" />, title: 'Chart Real-Time', desc: 'Tampilan candlestick profesional dengan overlay indikator EMA, MACD, RSI, dan Bollinger Bands — data langsung dari exchange tanpa delay tambahan.', delay: 0.08 },
-            { icon: <TrendingUp className="w-5 h-5 text-yellow-400" />, title: 'Sinyal Kuantitatif', desc: 'Algoritma pembobotan: Harga (30%) + Volume (20%) + Teknikal (35%) + Sentimen (15%). Metodologi transparan yang telah melalui proses backtesting historis.', delay: 0.16 },
-            { icon: <Globe className="w-5 h-5 text-orange-400" />, title: 'Multi-Exchange', desc: 'Terhubung langsung ke Binance, KuCoin, OKX, dan Crypto.com — pasar spot maupun futures perpetual — tanpa perlu memasukkan API key pribadi Anda.', delay: 0.24 },
-            { icon: <Cpu className="w-5 h-5 text-pink-400" />, title: 'Fear & Greed Index', desc: 'Integrasikan sentimen pasar dari Fear & Greed Index dan data Funding Rate real-time sebagai faktor konteks tambahan dalam interpretasi sinyal scanner.', delay: 0.32 },
-            { icon: <Lock className="w-5 h-5 text-blue-400" />, title: 'Session Terenkripsi', desc: 'Sesi trading Anda terproteksi penuh. Tidak ada data akun atau API key sensitif yang tersimpan di server kami — kalkulasi sinyal berjalan secara lokal.', delay: 0.40 },
+            { icon: <Lock className="w-5 h-5 text-blue-400" />, title: 'Auth & Session Guard', desc: 'Login, register, JWT access + refresh token, sesi berbasis sessionStorage, dan auto-redirect saat token kedaluwarsa. Zustand dengan middleware persist.', delay: 0 },
+            { icon: <Users className="w-5 h-5 text-amber-400" />, title: 'Role Management', desc: 'Sistem role user/admin dengan AdminRoute dan ProtectedRoute yang siap dipakai. Akses halaman admin otomatis terlindungi dari user biasa.', delay: 0.08 },
+            { icon: <BarChart2 className="w-5 h-5 text-emerald-400" />, title: 'Admin Dashboard', desc: 'Panel admin lengkap dengan manajemen user, histori transaksi, tiket support, dan CMS artikel — semuanya dalam satu tampilan sidebar yang rapi.', delay: 0.16 },
+            { icon: <Database className="w-5 h-5 text-orange-400" />, title: 'CMS Artikel', desc: 'Kelola artikel dan konten statis langsung dari admin panel. Mendukung publish/draft, kategori, excerpt, cover image, dan slug otomatis.', delay: 0.24 },
+            { icon: <Globe className="w-5 h-5 text-pink-400" />, title: 'Support Tickets', desc: 'Sistem tiket support dua arah antara user dan admin. User bisa buat tiket, admin bisa balas dan ubah status. Riwayat percakapan lengkap.', delay: 0.32 },
+            { icon: <Activity className="w-5 h-5 text-yellow-400" />, title: 'Payment & Subscription', desc: 'Integrasi pembayaran siap pakai dengan ProGate untuk membatasi akses fitur berdasarkan tier langganan. Riwayat pembayaran ditampilkan di profil.', delay: 0.40 },
           ].map(f => <FeatureCard key={f.title} {...f} />)}
         </div>
       </section>
@@ -570,21 +546,20 @@ export default function Landing() {
               <Clock className="w-3.5 h-3.5" /> Cara Kerja
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white">
-              Dari Data ke Insight<br />
-              <span className="text-slate-500">dalam Hitungan Detik</span>
+              Clone, Kustomisasi,<br />
+              <span className="text-slate-500">Langsung Deploy</span>
             </h2>
             <p className="text-slate-400 mt-4 max-w-xl mx-auto text-sm">
-              Proses analisis yang kompleks disederhanakan menjadi 3 langkah yang dapat langsung Anda gunakan.
+              Boilerplate ini dirancang agar Anda bisa fokus membangun fitur produk, bukan infrastruktur.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connector line */}
             <div className="hidden md:block absolute top-12 left-[calc(33%-2rem)] right-[calc(33%-2rem)] h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
             {[
-              { n: '01', title: 'Pilih Exchange & Market', desc: 'Pilih salah satu dari Binance, KuCoin, OKX, atau Crypto.com. Tentukan pasar spot atau futures perpetual sesuai strategi Anda. Tidak perlu koneksi API key.', icon: <Globe className="w-7 h-7 text-amber-400" /> },
-              { n: '02', title: 'Scanner Menganalisis Otomatis', desc: 'CryptoEx menarik data 4 timeframe untuk tiap koin, menjalankan 20+ indikator teknikal secara bersamaan, dan menghitung skor gabungan berdasarkan bobot yang terukur.', icon: <Cpu className="w-7 h-7 text-yellow-400" /> },
-              { n: '03', title: 'Baca Hasil & Buat Keputusan', desc: 'Lihat ranking koin dari skor tertinggi. Klik untuk membuka chart lengkap dengan semua indikator. Gunakan analisis ini sebagai salah satu referensi sebelum mengambil keputusan.', icon: <TrendingUp className="w-7 h-7 text-emerald-400" /> },
+              { n: '01', title: 'Clone & Install', desc: 'Clone repository, jalankan npm install, atur file .env dengan URL backend Anda. Semua dependency sudah dikonfigurasi — tidak perlu setup dari nol.', icon: <Layers className="w-7 h-7 text-amber-400" /> },
+              { n: '02', title: 'Ganti Branding', desc: 'Update nama aplikasi, logo, warna primary di CSS variables, dan teks konten. Design system berbasis Tailwind + CSS custom properties membuatnya mudah.', icon: <Globe className="w-7 h-7 text-yellow-400" /> },
+              { n: '03', title: 'Tambah Fitur', desc: 'Tambahkan route, komponen, dan hooks baru mengikuti pola yang sudah ada. Semua file sudah distrukturisasi dengan konvensi yang konsisten dan mudah diperluas.', icon: <TrendingUp className="w-7 h-7 text-emerald-400" /> },
             ].map((s, i) => (
               <motion.div
                 key={i}
@@ -594,7 +569,6 @@ export default function Landing() {
                 transition={{ delay: i * 0.18 }}
                 className="relative text-center group"
               >
-                {/* Step number badge */}
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center z-10">
                   <span className="text-[10px] font-black text-amber-400">{s.n}</span>
                 </div>
@@ -621,18 +595,18 @@ export default function Landing() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 items-start mb-10">
+        <div className="grid md:grid-cols-3 gap-6 items-start">
           <PricingCard
             plan="Starter"
             price="Gratis"
             priceNote="selamanya"
             cta="Mulai Sekarang"
             features={[
-              '3 Exchange (Binance, KuCoin, OKX)',
-              'Scanner 20 koin',
-              'Timeframe 1H saja',
-              'Chart dasar dengan EMA & RSI',
-              'Update sinyal setiap 5 menit',
+              'Akses dashboard dasar',
+              'Profil & manajemen akun',
+              'Baca artikel & konten',
+              'Buat tiket support',
+              'Update setiap 5 menit',
             ]}
           />
           <PricingCard
@@ -642,33 +616,31 @@ export default function Landing() {
             cta="Berlangganan Pro"
             highlight
             features={[
-              'Semua 4 Exchange termasuk Crypto.com',
-              'Scanner 80+ koin',
-              'MTF 4 timeframe (15m–4H)',
-              'Sinyal Classic + Weighted',
-              'Fear & Greed Index live',
-              'Futures & Perpetual support',
-              'Priority support via Telegram',
+              'Semua fitur Starter',
+              'Akses semua fitur Pro',
+              'Panel analitik lengkap',
+              'Ekspor data',
+              'Priority support',
+              'API access',
+              'Notifikasi real-time',
             ]}
           />
           <PricingCard
-            plan="Institutional"
+            plan="Enterprise"
             price="Custom"
             priceNote="hubungi tim kami"
             cta="Hubungi Kami"
             features={[
               'Semua fitur Pro',
-              'API access & webhook alert',
-              'Custom timeframe & parameter',
               'White-label option',
+              'Custom domain',
               'Dedicated account manager',
               'SLA uptime 99.9%',
-              'Laporan analisis bulanan',
+              'Integrasi custom',
+              'Laporan bulanan',
             ]}
           />
         </div>
-
-        <DisclaimerBanner />
       </section>
 
       {/* ── TESTIMONIALS ── */}
@@ -676,19 +648,19 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4">
-              <Users className="w-3.5 h-3.5" /> Ulasan Trader
+              <Users className="w-3.5 h-3.5" /> Ulasan Pengguna
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white">Dipercaya Trader Indonesia</h2>
-            <p className="text-slate-400 mt-4 text-sm max-w-lg mx-auto">Pengalaman nyata dari trader yang menggunakan CryptoEx dalam rutinitas analisis mereka sehari-hari.</p>
+            <h2 className="text-4xl md:text-5xl font-black text-white">Dipercaya Developer Indonesia</h2>
+            <p className="text-slate-400 mt-4 text-sm max-w-lg mx-auto">Pengalaman nyata dari developer dan tim produk yang menggunakan boilerplate ini untuk membangun aplikasi mereka.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { name: 'Rizky Aditya', role: 'Day Trader', city: 'Jakarta', initials: 'RA', color: 'from-amber-600 to-yellow-500', text: 'Scanner MTF ini menghemat waktu saya luar biasa. Dulu butuh 2–3 jam cek chart manual, sekarang cukup 10 menit dengan CryptoEx untuk dapat watchlist yang layak diperhatikan.' },
-              { name: 'Fadhil Nugraha', role: 'Swing Trader', city: 'Bandung', initials: 'FN', color: 'from-emerald-600 to-teal-500', text: 'Sinyal 4 timeframe sekaligus itu benar-benar bantu saya dapat konfirmasi lebih solid sebelum entry. Saya tidak bergantung 100% di sini, tapi ini jadi referensi utama watchlist saya.' },
-              { name: 'Siti Maulida', role: 'Crypto Analyst', city: 'Surabaya', initials: 'SM', color: 'from-pink-600 to-rose-500', text: 'Platform yang bersih, cepat, dan tidak berisik. Datanya relevan dan presentasinya jelas. Saya bisa langsung tahu koin mana yang layak untuk riset lebih lanjut.' },
-              { name: 'Bagas Pratama', role: 'Position Trader', city: 'Yogyakarta', initials: 'BP', color: 'from-blue-600 to-indigo-500', text: 'Fitur futures scanner-nya yang bikin saya upgrade ke Pro. Bisa lihat sinyal di pasar perp sekaligus spot — sangat membantu untuk hedging posisi dengan lebih terencana.' },
-              { name: 'Dinda Rahayu', role: 'Trader & Content Creator', city: 'Bali', initials: 'DR', color: 'from-violet-600 to-purple-500', text: 'Saya sering pakai hasil scanner ini sebagai bahan konten edukasi. Metodologinya transparan dan bisa dijelaskan ke follower — bukan black box seperti tools lain.' },
-              { name: 'Hendra Wijaya', role: 'Portfolio Manager', city: 'Medan', initials: 'HW', color: 'from-orange-600 to-amber-500', text: 'Untuk manage portofolio kripto klien, CryptoEx membantu screening awal yang jauh lebih efisien. Tentu tetap dikombinasi dengan analisis fundamental dan manajemen risiko sendiri.' },
+              { name: 'Rizky Aditya', role: 'Full Stack Developer', city: 'Jakarta', initials: 'RA', color: 'from-amber-600 to-yellow-500', text: 'Setup awal yang biasanya butuh 2–3 hari sekarang selesai dalam beberapa jam. Struktur kodenya bersih dan pola yang dipakai konsisten — mudah dipahami tim baru.' },
+              { name: 'Fadhil Nugraha', role: 'Product Engineer', city: 'Bandung', initials: 'FN', color: 'from-emerald-600 to-teal-500', text: 'Auth flow, role management, dan subscription gate sudah siap pakai. Kami tinggal fokus ke fitur bisnis utama tanpa repot bangun infrastruktur dari nol.' },
+              { name: 'Siti Maulida', role: 'Frontend Lead', city: 'Surabaya', initials: 'SM', color: 'from-pink-600 to-rose-500', text: 'Design system-nya solid. Dark theme, gold gradient, dan komponen yang ada terasa premium dan konsisten. Pelanggan kami langsung terpukau saat melihat UI-nya.' },
+              { name: 'Bagas Pratama', role: 'Indie Developer', city: 'Yogyakarta', initials: 'BP', color: 'from-blue-600 to-indigo-500', text: 'Admin panel-nya fitur lengkap tapi tidak over-engineered. Manajemen user, tiket, artikel, dan transaksi — semua yang dibutuhkan MVP sudah ada.' },
+              { name: 'Dinda Rahayu', role: 'Tech Co-Founder', city: 'Bali', initials: 'DR', color: 'from-violet-600 to-purple-500', text: 'Kami pakai ini sebagai basis tiga produk berbeda. Kustomisasi branding sangat mudah lewat CSS variables dan Tailwind config. Hemat waktu luar biasa.' },
+              { name: 'Hendra Wijaya', role: 'CTO Startup', city: 'Medan', initials: 'HW', color: 'from-orange-600 to-amber-500', text: 'TypeScript-nya ketat, pola hook dan komponen konsisten, dan tidak ada dependensi yang tidak perlu. Kualitas kode yang bisa langsung masuk production.' },
             ].map((t, i) => (
               <motion.div
                 key={i}
@@ -717,43 +689,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── TIM ── */}
-      {/* <section className="py-24 border-b border-white/[0.06]">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4">
-              <Users className="w-3.5 h-3.5" /> Tim Kami
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-white">Dibangun oleh Praktisi</h2>
-            <p className="text-slate-400 mt-4 text-sm max-w-md mx-auto">Tim gabungan dari engineer berpengalaman dan trader aktif yang memahami kebutuhan nyata di pasar kripto.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { name: 'Arif S.', role: 'CEO & Co-Founder', initials: 'AS', color: 'from-amber-600 to-yellow-500', desc: '8+ tahun di fintech & crypto trading' },
-              { name: 'Bima R.', role: 'Lead Engineer', initials: 'BR', color: 'from-blue-600 to-indigo-500', desc: 'Spesialis data pipeline & real-time systems' },
-              { name: 'Citra N.', role: 'Head of Product', initials: 'CN', color: 'from-emerald-600 to-teal-500', desc: 'UX specialist dengan background trading' },
-              { name: 'Dimas K.', role: 'Quant Analyst', initials: 'DK', color: 'from-violet-600 to-purple-500', desc: 'Pengembang model sinyal & backtesting' },
-            ].map((m, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center group"
-              >
-                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${m.color} flex items-center justify-center text-2xl font-black text-white mx-auto mb-4 group-hover:scale-105 transition-transform duration-300`}>
-                  {m.initials}
-                </div>
-                <div className="text-white font-bold text-sm">{m.name}</div>
-                <div className="text-amber-400/80 text-xs font-medium mt-1">{m.role}</div>
-                <div className="text-slate-500 text-xs mt-1.5 leading-relaxed">{m.desc}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
       {/* ── FINAL CTA ── */}
       <section className="py-32 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(180,120,30,0.12),transparent)]" />
@@ -769,11 +704,11 @@ export default function Landing() {
             <Zap className="w-3 h-3" /> Mulai Sekarang — Gratis
           </div>
           <h2 className="text-5xl md:text-6xl font-black text-white leading-tight mb-6">
-            Analisis Lebih Terstruktur,<br />
-            <span className="text-gold-gradient">Keputusan Lebih Terinformasi</span>
+            Bangun Lebih Cepat,<br />
+            <span className="text-gold-gradient">Ship Lebih Awal</span>
           </h2>
           <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-            Bergabunglah dengan 1.200+ trader yang menggunakan CryptoEx sebagai alat bantu analisis mereka. Mulai dengan akun Starter — gratis selamanya.
+            Fokus pada apa yang membuat produk Anda unik. Infrastruktur dasar sudah siap — mulai dengan akun Starter gratis selamanya.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -796,16 +731,13 @@ export default function Landing() {
                   to="/login"
                   className="bg-white/[0.06] border border-white/[0.12] text-white font-semibold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/[0.1] transition-all text-base"
                 >
-                  <Shield className="w-4 h-4" /> Masuk ke Terminal
+                  <Shield className="w-4 h-4" /> Masuk ke Dashboard
                 </Link>
               </>
             )}
           </div>
 
-          <p className="text-xs text-slate-600 mb-8">Tidak perlu kartu kredit · Setup 2 menit · Upgrade kapan saja</p>
-
-          {/* Disclaimer wajib di bawah CTA */}
-          <DisclaimerBanner />
+          <p className="text-xs text-slate-600">Tidak perlu kartu kredit · Setup 2 menit · Upgrade kapan saja</p>
         </motion.div>
       </section>
 
@@ -818,26 +750,24 @@ export default function Landing() {
                 <Logo variant="horizontal" className="h-9 w-auto" />
               </Link>
               <p className="text-slate-500 text-sm leading-relaxed mb-5 max-w-xs">
-                Platform scanner sinyal kripto multi-timeframe untuk trader Indonesia. Analisis lebih terstruktur, bukan prediksi harga.
+                Boilerplate aplikasi SaaS modern dengan design system premium, autentikasi lengkap, dan admin panel siap pakai.
               </p>
 
-              {/* Contact Info */}
               <div className="space-y-2.5 mb-5">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                   <p className="text-slate-500 text-xs leading-relaxed">
-                    Jl. H. Sarmili Rt 004/02 No.1,<br />
-                    Kel. Jurang Mangu Timur, Kec. Pondok Aren,<br />
-                    Tangerang Selatan 15222
+                    Alamat perusahaan Anda,<br />
+                    Kota, Provinsi, Kode Pos
                   </p>
                 </div>
-                <a href="mailto:support@cryptoex.id" className="flex items-center gap-2.5 group">
+                <a href="mailto:hello@yourapp.id" className="flex items-center gap-2.5 group">
                   <Mail className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">support@cryptoex.id</span>
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">hello@yourapp.id</span>
                 </a>
-                <a href="tel:+62087883391664" className="flex items-center gap-2.5 group">
+                <a href="tel:+6200000000000" className="flex items-center gap-2.5 group">
                   <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">0878-8339-1664</span>
+                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">+62 000-0000-0000</span>
                 </a>
               </div>
 
@@ -865,8 +795,7 @@ export default function Landing() {
               { title: 'Legal', links: [
                 { name: 'Syarat & Ketentuan', url: '/page/terms' },
                 { name: 'Kebijakan Privasi', url: '/page/privacy' },
-                { name: 'Disclaimer Risiko', url: '/page/disclaimer' },
-                // { name: 'Metodologi', url: '/page/methodology' }
+                { name: 'Disclaimer', url: '/page/disclaimer' },
               ]},
             ].map(col => (
               <div key={col.title}>
@@ -886,21 +815,8 @@ export default function Landing() {
             ))}
           </div>
 
-          {/* Full legal disclaimer in footer */}
-          <div className="border border-amber-900/40 bg-amber-950/20 rounded-xl p-5 mb-8">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-amber-400 font-bold text-xs mb-1.5">Disclaimer Risiko Investasi Penting</p>
-                <p className="text-amber-200/60 text-xs leading-relaxed">
-                  Trading aset kripto mengandung risiko tinggi kehilangan seluruh modal yang diinvestasikan. Sinyal, skor, dan analisis yang disediakan oleh CryptoEx merupakan output analisis teknikal otomatis dan <strong>bukan merupakan rekomendasi investasi, saran keuangan, atau ajakan membeli/menjual aset</strong>. Seluruh keputusan trading sepenuhnya merupakan tanggung jawab pengguna. Hasil masa lalu tidak menjamin hasil masa depan. Pastikan Anda memahami risiko sebelum berdagang.
-                </p>
-              </div>
-            </div>
-          </div>
-
           <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-600">© 2025 CryptoEx. Seluruh hak cipta dilindungi undang-undang.</p>
+            <p className="text-xs text-slate-600">© {new Date().getFullYear()} YourApp. Seluruh hak cipta dilindungi undang-undang.</p>
             <div className="flex gap-4">
               <Link to="/page/terms" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Terms of Service</Link>
               <Link to="/page/privacy" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Privacy Policy</Link>

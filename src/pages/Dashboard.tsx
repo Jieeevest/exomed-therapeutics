@@ -1,79 +1,27 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
-import { BookOpen, Clock, BarChart2, LayoutGrid, Square, Plus, Scan, LogOut, ShieldAlert, User, Crown, Ticket } from 'lucide-react'
+import {
+  LayoutDashboard, BarChart2, Settings, List,
+  LogOut, ShieldAlert, User, Crown, Ticket, Bell
+} from 'lucide-react'
 
 import { useAuth } from '@/store/useAuth'
-import { ProGate } from '@/components/ProGate'
-import { CoinList } from '@/components/CoinList'
-import { TradingChart } from '@/components/TradingChart'
-import { DashboardGrid } from '@/components/DashboardGrid'
-import { OrderBook } from '@/components/OrderBook'
-import { TradeHistory } from '@/components/TradeHistory'
-import { SignalPanel } from '@/components/SignalPanel'
-// import { BacktestPanel } from '@/components/BacktestPanel'
-import { BullishWatchlist } from '@/components/BullishWatchlist'
-
-// Spot hooks
-import { useBinanceTickers, useBinanceOrderBook, useBinanceTrades, useBinancePrice } from '@/hooks/useBinance'
-import { useCryptoComTickers, useCryptoComOrderBook, useCryptoComTrades } from '@/hooks/useCryptoCom'
-import { useKuCoinTickers, useKuCoinOrderBook, useKuCoinTrades } from '@/hooks/useKuCoin'
-import { useOKXTickers, useOKXOrderBook, useOKXTrades } from '@/hooks/useOKX'
-
-// Futures hooks
-import { useBinanceFutureTickers, useBinanceFutureOrderBook, useBinanceFutureTrades, useBinanceFuturePrice } from '@/hooks/useBinanceFutures'
-import { useCryptoComFutureTickers, useCryptoComFutureOrderBook, useCryptoComFutureTrades } from '@/hooks/useCryptoComFutures'
-import { useKuCoinFutureTickers, useKuCoinFutureOrderBook, useKuCoinFutureTrades } from '@/hooks/useKuCoinFutures'
-import { useOKXFutureTickers, useOKXFutureOrderBook, useOKXFutureTrades } from '@/hooks/useOKXFutures'
-
-import { FuturesOpportunitiesPanel } from '@/components/FuturesOpportunitiesPanel'
-
-// 2. Ubah type RightTab
-type RightTab = 'orderbook' | 'trades' | 'signal' | 'backtest' | 'scanner' | 'opportunities'
-
-import type { Ticker, Exchange, MarketType } from '@/types'
-import { cn } from '@/lib/utils'
-import { getTVSources } from '@/lib/tvSymbol'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { Logo } from '@/components/Logo'
+import { ProGate } from '@/components/ProGate'
+import { cn } from '@/lib/utils'
 
-
-const EXCHANGES: { id: Exchange; label: string; color: string }[] = [
-  { id: 'binance', label: 'Binance', color: '#F0B90B' },
-  { id: 'cryptocom', label: 'Crypto.com', color: '#1199FA' },
-  { id: 'kucoin', label: 'KuCoin', color: '#23AF91' },
-  { id: 'okx', label: 'OKX', color: '#A0A0A0' },
-]
-
-const DEFAULT_SPOT_SYMBOLS: Record<Exchange, string> = {
-  binance: 'BTCUSDT',
-  cryptocom: 'BTC_USDT',
-  kucoin: 'BTC-USDT',
-  okx: 'BTC-USDT',
-}
-
-const DEFAULT_FUTURES_SYMBOLS: Record<Exchange, string> = {
-  binance: 'BTCUSDT',
-  cryptocom: 'BTCUSD-PERP',
-  kucoin: 'XBTUSDTM',
-  okx: 'BTC-USDT-SWAP',
-}
+type RightTab = 'activity' | 'stats' | 'pro'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   useSessionGuard()
-  
-  const [exchange, setExchange] = useState<Exchange>('binance')
-  const [marketType, setMarketType] = useState<MarketType>('spot')
-  const [selectedTicker, setSelectedTicker] = useState<Ticker | null>(null)
-  const [symbol, setSymbol] = useState(DEFAULT_SPOT_SYMBOLS.binance)
-  const [currentPrice, setCurrentPrice] = useState(0)
-  const [rightTab, setRightTab] = useState<RightTab>('orderbook')
-  const [tvSourceIdx, setTvSourceIdx] = useState(0)
-  const [chartMode, setChartMode] = useState<'single' | 'grid'>('single')
-  const [gridSymbols, setGridSymbols] = useState<{ symbol: string; tvSymbol: string }[]>([])
+
+  const [activeNav, setActiveNav] = useState('overview')
+  const [rightTab, setRightTab] = useState<RightTab>('activity')
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
 
@@ -87,222 +35,46 @@ export default function Dashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
-  // ── Spot data ──────────────────────────────────────────────
-  const { tickers: binanceSpotTickers, loading: binanceSpotLoading } = useBinanceTickers()
-  const binanceSpotOB = useBinanceOrderBook(exchange === 'binance' && marketType === 'spot' ? symbol : '')
-  const binanceSpotTrades = useBinanceTrades(exchange === 'binance' && marketType === 'spot' ? symbol : '')
-  useBinancePrice(exchange === 'binance' && marketType === 'spot' ? symbol : '', setCurrentPrice)
-
-  const { tickers: cryptoComSpotTickers, loading: cryptoComSpotLoading } = useCryptoComTickers()
-  const cryptoComSpotOB = useCryptoComOrderBook(exchange === 'cryptocom' && marketType === 'spot' ? symbol : '')
-  const cryptoComSpotTrades = useCryptoComTrades(exchange === 'cryptocom' && marketType === 'spot' ? symbol : '')
-
-  const { tickers: kucoinSpotTickers, loading: kucoinSpotLoading } = useKuCoinTickers()
-  const kucoinSpotOB = useKuCoinOrderBook(exchange === 'kucoin' && marketType === 'spot' ? symbol : '')
-  const kucoinSpotTrades = useKuCoinTrades(exchange === 'kucoin' && marketType === 'spot' ? symbol : '')
-
-  const { tickers: okxSpotTickers, loading: okxSpotLoading } = useOKXTickers()
-  const okxSpotOB = useOKXOrderBook(exchange === 'okx' && marketType === 'spot' ? symbol : '')
-  const okxSpotTrades = useOKXTrades(exchange === 'okx' && marketType === 'spot' ? symbol : '')
-
-  // ── Futures data ───────────────────────────────────────────
-  const { tickers: binanceFutTickers, loading: binanceFutLoading } = useBinanceFutureTickers()
-  const binanceFutOB = useBinanceFutureOrderBook(exchange === 'binance' && marketType === 'futures' ? symbol : '')
-  const binanceFutTrades = useBinanceFutureTrades(exchange === 'binance' && marketType === 'futures' ? symbol : '')
-  useBinanceFuturePrice(exchange === 'binance' && marketType === 'futures' ? symbol : '', setCurrentPrice)
-
-  const { tickers: cryptoComFutTickers, loading: cryptoComFutLoading } = useCryptoComFutureTickers()
-  const cryptoComFutOB = useCryptoComFutureOrderBook(exchange === 'cryptocom' && marketType === 'futures' ? symbol : '')
-  const cryptoComFutTrades = useCryptoComFutureTrades(exchange === 'cryptocom' && marketType === 'futures' ? symbol : '')
-
-  const { tickers: kucoinFutTickers, loading: kucoinFutLoading } = useKuCoinFutureTickers()
-  const kucoinFutOB = useKuCoinFutureOrderBook(exchange === 'kucoin' && marketType === 'futures' ? symbol : '')
-  const kucoinFutTrades = useKuCoinFutureTrades(exchange === 'kucoin' && marketType === 'futures' ? symbol : '')
-
-  const { tickers: okxFutTickers, loading: okxFutLoading } = useOKXFutureTickers()
-  const okxFutOB = useOKXFutureOrderBook(exchange === 'okx' && marketType === 'futures' ? symbol : '')
-  const okxFutTrades = useOKXFutureTrades(exchange === 'okx' && marketType === 'futures' ? symbol : '')
-
-  // ── Active data selectors ─────────────────────────────────
-  const activeTickers = marketType === 'spot'
-    ? { binance: binanceSpotTickers, cryptocom: cryptoComSpotTickers, kucoin: kucoinSpotTickers, okx: okxSpotTickers }[exchange]
-    : { binance: binanceFutTickers, cryptocom: cryptoComFutTickers, kucoin: kucoinFutTickers, okx: okxFutTickers }[exchange]
-
-  const activeLoading = marketType === 'spot'
-    ? { binance: binanceSpotLoading, cryptocom: cryptoComSpotLoading, kucoin: kucoinSpotLoading, okx: okxSpotLoading }[exchange]
-    : { binance: binanceFutLoading, cryptocom: cryptoComFutLoading, kucoin: kucoinFutLoading, okx: okxFutLoading }[exchange]
-
-  const activeOrderBook = marketType === 'spot'
-    ? { binance: binanceSpotOB, cryptocom: cryptoComSpotOB, kucoin: kucoinSpotOB, okx: okxSpotOB }[exchange]
-    : { binance: binanceFutOB, cryptocom: cryptoComFutOB, kucoin: kucoinFutOB, okx: okxFutOB }[exchange]
-
-  const activeTrades = marketType === 'spot'
-    ? { binance: binanceSpotTrades, cryptocom: cryptoComSpotTrades, kucoin: kucoinSpotTrades, okx: okxSpotTrades }[exchange]
-    : { binance: binanceFutTrades, cryptocom: cryptoComFutTrades, kucoin: kucoinFutTrades, okx: okxFutTrades }[exchange]
-
-  // Sync price from ticker list for non-WS exchanges
-  useEffect(() => {
-    if ((exchange !== 'binance' || marketType !== 'spot') && selectedTicker) {
-      const updated = activeTickers.find((t) => t.symbol === selectedTicker.symbol)
-      if (updated) setCurrentPrice(updated.price)
-    }
-  }, [activeTickers, exchange, marketType, selectedTicker])
-
-  const handleExchangeChange = (ex: Exchange) => {
-    setExchange(ex)
-    const sym = marketType === 'spot' ? DEFAULT_SPOT_SYMBOLS[ex] : DEFAULT_FUTURES_SYMBOLS[ex]
-    setSymbol(sym)
-    setSelectedTicker(null)
-    setCurrentPrice(0)
-    setTvSourceIdx(0)
-  }
-
-const handleMarketTypeChange = (mt: MarketType) => {
-  setMarketType(mt)
-  const sym = mt === 'spot' ? DEFAULT_SPOT_SYMBOLS[exchange] : DEFAULT_FUTURES_SYMBOLS[exchange]
-  setSymbol(sym)
-  setSelectedTicker(null)
-  setCurrentPrice(0)
-  setTvSourceIdx(0)
-}
-  const handleSelectCoin = (ticker: Ticker) => {
-    setSelectedTicker(ticker)
-    setSymbol(ticker.symbol)
-    setCurrentPrice(ticker.price)
-    setTvSourceIdx(0)
-    setChartMode('single')
-  }
-
-
-  const activeExchangeInfo = EXCHANGES.find((e) => e.id === exchange)!
-  const isFutures = marketType === 'futures'
-
-  const tvSources = getTVSources(symbol, exchange, marketType)
-  const activeTvSource = tvSources[tvSourceIdx % tvSources.length]
+  const NAV_ITEMS = [
+    { id: 'overview',  label: 'Overview',  icon: LayoutDashboard },
+    { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+    { id: 'settings',  label: 'Settings',  icon: Settings },
+  ]
 
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
-      {/* Navbar */}
+      {/* Header */}
       <header className="flex items-center gap-3 px-4 py-2 border-b border-border bg-card shrink-0">
-        <div className="flex items-center gap-2 mr-1">
-          <Logo className="h-8 w-auto" variant='horizontal'/>
-          {/* <span className="font-bold text-foreground text-sm">CryptoEx</span> */}
-        </div>
-
-        {/* Spot / Futures toggle */}
-        <div className="flex rounded-md overflow-hidden border border-border">
-          {(['spot', 'futures'] as MarketType[]).map((mt) => (
-            <motion.button
-              key={mt}
-              onClick={() => handleMarketTypeChange(mt)}
-              className={cn(
-                'px-3 py-1.5 text-xs font-semibold transition-colors',
-                marketType === mt
-                  ? mt === 'spot'
-                    ? 'bg-blue-500/20 text-blue-400'
-                    : 'bg-yellow-500/20 text-yellow-400'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-              whileTap={{ scale: 0.96 }}
-            >
-              {mt === 'spot' ? 'Spot' : 'Futures'}
-            </motion.button>
-          ))}
+        <div className="flex items-center gap-2 mr-2">
+          <Logo className="h-8 w-auto" variant="horizontal" />
         </div>
 
         <div className="w-px h-4 bg-border" />
-
-        {/* Chart Mode toggle */}
-        <div className="flex rounded-md overflow-hidden border border-border">
-          <motion.button
-            onClick={() => setChartMode('single')}
-            className={cn(
-              'px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold transition-colors',
-              chartMode === 'single'
-                ? 'bg-primary/20 text-primary'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            )}
-            whileTap={{ scale: 0.96 }}
-          >
-            <Square className="h-3.5 w-3.5" />
-            Single
-          </motion.button>
-          <motion.button
-            onClick={() => user?.subscription_tier === 'pro' ? setChartMode('grid') : null}
-            className={cn(
-              'px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold transition-colors',
-              chartMode === 'grid'
-                ? 'bg-primary/20 text-primary'
-                : user?.subscription_tier === 'pro'
-                  ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  : 'text-muted-foreground/40 cursor-not-allowed'
-            )}
-            whileTap={{ scale: user?.subscription_tier === 'pro' ? 0.96 : 1 }}
-            title={user?.subscription_tier !== 'pro' ? 'Fitur PRO — Upgrade untuk Grid Mode' : undefined}
-          >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            Grid
-            {user?.subscription_tier !== 'pro' && <Crown className="h-2.5 w-2.5 text-yellow-500" />}
-          </motion.button>
-        </div>
-
-        <div className="w-px h-4 bg-border" />
-
-        {/* Exchange tabs */}
-        <div className="flex gap-1">
-          {EXCHANGES.map((ex) => (
-            <motion.button
-              key={ex.id}
-              onClick={() => handleExchangeChange(ex.id)}
-              className={cn(
-                'px-3 py-1.5 rounded-md text-xs font-medium transition-all',
-                exchange === ex.id
-                  ? 'bg-muted text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-              whileTap={{ scale: 0.96 }}
-            >
-              <span
-                className="inline-block w-2 h-2 rounded-full mr-1.5"
-                style={{ backgroundColor: ex.color, opacity: exchange === ex.id ? 1 : 0.5 }}
-              />
-              {ex.label}
-            </motion.button>
-          ))}
-        </div>
 
         <div className="flex-1" />
 
-        {/* Market type badge */}
-        <div className={cn(
-          'text-[10px] px-2 py-0.5 rounded font-semibold hidden md:block',
-          isFutures ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
-        )}>
-          {isFutures ? 'PERPETUAL' : 'SPOT'}
-        </div>
-
-        <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground mr-4">
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-          Live
+          Online
         </div>
 
-        <button 
+        <button
           onClick={() => navigate('/support')}
-          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors rounded-md border border-primary/20 mr-2"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors rounded-md border border-primary/20"
         >
-          <Ticket className="w-3.5 h-3.5" /> Support CS
+          <Ticket className="w-3.5 h-3.5" /> Support
         </button>
 
-        <div className="w-px h-4 bg-border mr-2" />
+        <div className="w-px h-4 bg-border mx-1" />
 
         {/* User Profile */}
         <div className="relative" ref={profileRef}>
-          <button 
+          <button
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-2 hover:bg-white/5 p-1 pr-3 rounded-full transition-colors border border-transparent hover:border-white/10"
           >
@@ -310,9 +82,9 @@ const handleMarketTypeChange = (mt: MarketType) => {
               {user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="hidden md:flex flex-col items-start leading-none">
-              <span className="text-xs font-bold text-white mb-0.5">{user?.username || 'Trader'}</span>
+              <span className="text-xs font-bold text-white mb-0.5">{user?.username || 'User'}</span>
               <span className={cn(
-                "text-[9px] font-bold tracking-wider uppercase",
+                'text-[9px] font-bold tracking-wider uppercase',
                 user?.subscription_tier === 'pro' ? 'text-purple-400' : 'text-slate-500'
               )}>
                 {user?.subscription_tier || 'STARTER'}
@@ -320,7 +92,6 @@ const handleMarketTypeChange = (mt: MarketType) => {
             </div>
           </button>
 
-          {/* Dropdown menu */}
           <AnimatePresence>
             {profileOpen && (
               <motion.div
@@ -340,21 +111,21 @@ const handleMarketTypeChange = (mt: MarketType) => {
                     <ShieldAlert className="w-4 h-4" /> Admin Panel
                   </button>
                 )}
-                
+
                 <button onClick={() => navigate('/articles')} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
-                  <BookOpen className="w-4 h-4" /> Artikel & Berita
+                  <List className="w-4 h-4" /> Articles
                 </button>
 
                 <button onClick={() => navigate('/support')} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
-                  <Ticket className="w-4 h-4" /> Support Tickets
+                  <Ticket className="w-4 h-4" /> Support
                 </button>
-                
+
                 <button onClick={() => navigate('/profile')} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
-                  <User className="w-4 h-4" /> Subscription Info
+                  <User className="w-4 h-4" /> Profile
                 </button>
-                
+
                 <div className="h-px bg-white/5 my-1" />
-                
+
                 <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors">
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
@@ -367,237 +138,164 @@ const handleMarketTypeChange = (mt: MarketType) => {
       {/* Main layout */}
       <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
 
-        {/* LEFT — Coin list */}
+        {/* LEFT — Sidebar nav */}
         <Panel defaultSize="20" minSize="15" maxSize="30" className="flex flex-col">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${exchange}-${marketType}`}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.18 }}
-              className="w-full h-full flex flex-col overflow-hidden"
-            >
-            <div
-              className="px-3 py-1.5 text-[10px] font-semibold border-b border-border flex items-center justify-between"
-            >
-              <span style={{ color: activeExchangeInfo.color }}>
-                {activeExchangeInfo.label}
-              </span>
-              <span className={cn(
-                'text-[9px] px-1.5 py-0.5 rounded',
-                isFutures ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
-              )}>
-                {isFutures ? 'Futures' : 'Spot'} · {activeTickers.length}
-              </span>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <CoinList
-                tickers={activeTickers}
-                loading={activeLoading}
-                selectedSymbol={symbol}
-                exchange={exchange}
-                marketType={marketType}
-                onSelect={handleSelectCoin}
-              />
-            </div>
-          </motion.div>
-          </AnimatePresence>
-        </Panel>
-
-        <PanelResizeHandle className="w-2 mx-[-1px] z-10 flex items-center justify-center cursor-col-resize group bg-transparent">
-          <div className="w-[1px] h-full bg-border group-hover:bg-primary transition-colors" />
-        </PanelResizeHandle>
-
-        {/* CENTER — Chart / Grid */}
-        <Panel defaultSize="55" minSize="30" className="flex flex-col overflow-hidden">
-          {chartMode === 'grid' ? (
-            <DashboardGrid 
-              items={gridSymbols} 
-              onRemove={(sym) => setGridSymbols(prev => prev.filter(p => p.symbol !== sym))} 
-            />
-          ) : (
-            <>
-              {/* Symbol bar */}
-              <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-foreground text-sm">
-                    {selectedTicker?.baseAsset ?? 'BTC'}/{isFutures ? 'PERP' : 'USDT'}
-                  </span>
-                  {isFutures && (
-                    <span className="text-[10px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded font-mono">
-                      {exchange === 'binance' ? 'PERP' : exchange === 'okx' ? 'SWAP' : 'PERP'}
-                    </span>
+          <div className="px-3 py-2 border-b border-border">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Menu</span>
+          </div>
+          <nav className="flex-1 p-2 space-y-1">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon
+              const isActive = activeNav === item.id
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveNav(item.id)}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                    isActive
+                      ? 'bg-primary/10 text-primary border border-primary/20'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent'
                   )}
-                  <span className="text-xs text-muted-foreground">{activeExchangeInfo.label}</span>
-                </div>
-                {selectedTicker && (
-                  <>
-                    <span className={cn(
-                      'text-sm font-bold font-mono',
-                      selectedTicker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'
-                    )}>
-                      {currentPrice.toLocaleString('en-US', { maximumFractionDigits: 8 })}
-                    </span>
-                    <span className={cn('text-xs', selectedTicker.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400')}>
-                      {selectedTicker.priceChangePercent >= 0 ? '+' : ''}{selectedTicker.priceChangePercent.toFixed(2)}%
-                    </span>
-                    
-                    <button
-                      onClick={() => {
-                        if (!gridSymbols.find(g => g.symbol === selectedTicker.symbol) && gridSymbols.length < 9) {
-                          setGridSymbols(prev => [...prev, { symbol: selectedTicker.symbol, tvSymbol: activeTvSource.symbol }])
-                        }
-                        setChartMode('grid')
-                      }}
-                      className="ml-2 px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded hover:bg-primary/20 transition-colors flex items-center gap-1"
-                      title="Tambahkan ke Dashboard Grid"
-                    >
-                      <Plus className="h-3 w-3" />
-                      Grid
-                    </button>
-
-                    <div className="flex gap-4 text-[10px] text-muted-foreground ml-auto">
-                      {isFutures && selectedTicker.markPrice && (
-                        <span>Mark: {selectedTicker.markPrice.toFixed(4)}</span>
-                      )}
-                      <span>H: {selectedTicker.high24h.toFixed(4)}</span>
-                      <span>L: {selectedTicker.low24h.toFixed(4)}</span>
-                      {isFutures && selectedTicker.fundingRate !== undefined ? (
-                        <span className={selectedTicker.fundingRate >= 0 ? 'text-green-400' : 'text-red-400'}>
-                          Fund: {selectedTicker.fundingRate >= 0 ? '+' : ''}{selectedTicker.fundingRate.toFixed(4)}%
-                        </span>
-                      ) : (
-                        <span>Vol: {(selectedTicker.volume / 1_000_000).toFixed(2)}M</span>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* TradingView source selector */}
-              <div className="flex items-center gap-2 px-3 py-1 border-b border-border bg-muted/30 shrink-0">
-                <span className="text-[10px] text-muted-foreground">Chart sumber:</span>
-                <div className="flex gap-1">
-                  {tvSources.map((src, i) => (
-                    <button
-                      key={src.symbol}
-                      onClick={() => setTvSourceIdx(i)}
-                      className={cn(
-                        'px-2 py-0.5 text-[10px] rounded transition-colors',
-                        i === tvSourceIdx % tvSources.length
-                          ? 'bg-primary/20 text-primary font-medium'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      )}
-                    >
-                      {src.label}
-                    </button>
-                  ))}
-                </div>
-                <span className="text-[10px] text-muted-foreground ml-auto font-mono opacity-60">
-                  {activeTvSource.symbol}
-                </span>
-              </div>
-
-              {/* TradingView chart */}
-              <div className="flex-1 overflow-hidden">
-                <TradingChart tvSymbol={activeTvSource.symbol} />
-              </div>
-            </>
-          )}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </button>
+              )
+            })}
+          </nav>
+          <div className="p-2 border-t border-border">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
         </Panel>
 
         <PanelResizeHandle className="w-2 mx-[-1px] z-10 flex items-center justify-center cursor-col-resize group bg-transparent">
           <div className="w-[1px] h-full bg-border group-hover:bg-primary transition-colors" />
         </PanelResizeHandle>
 
-        {/* RIGHT — Tabs + panels */}
-        <Panel defaultSize="25" minSize="20" maxSize="40" className="flex flex-col overflow-hidden">
-          {/* Tabs */}
-          <div className="flex border-b border-border">
-           {([
-  { id: 'orderbook', icon: <BookOpen className="h-3 w-3" />,        label: 'Book',     pro: false },
-  { id: 'trades',    icon: <Clock className="h-3 w-3" />,           label: 'Trades',   pro: false },
-  { id: 'signal',    icon: <BarChart2 className="h-3 w-3" />,       label: 'Analisa',  pro: true },
-  // { id: 'backtest',  icon: <FlaskConical className="h-3 w-3" />,    label: 'Backtest', pro: true },
-  { id: 'scanner',   icon: <Scan className="h-3 w-3" />,            label: 'Scanner',  pro: true },
-] as { id: RightTab; icon: React.ReactNode; label: string; pro: boolean }[])
-  .map((tab) => (
-    <button
-      key={tab.id}
-      onClick={() => setRightTab(tab.id)}
-      className={cn(
-        'flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors relative',
-        rightTab === tab.id
-          ? tab.id === 'signal'
-            ? 'text-primary border-b-2 border-primary'
-            : 'text-foreground border-b-2 border-primary'
-          : 'text-muted-foreground hover:text-foreground'
-      )}
-    >
-      {tab.icon}
-      {tab.label}
-      {tab.pro && user?.subscription_tier !== 'pro' && (
-        <Crown className="h-2 w-2 text-yellow-500 absolute top-1 right-1" />
-      )}
-    </button>
-  ))}
+        {/* CENTER — Main content */}
+        <Panel defaultSize="55" minSize="30" className="flex flex-col overflow-hidden">
+          <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card shrink-0">
+            <span className="font-bold text-foreground text-sm capitalize">{activeNav}</span>
+            <div className="flex-1" />
+            <span className="text-xs text-muted-foreground">
+              {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
           </div>
 
-          {/* Signal / Backtest / Scanner — PRO only */}
-          {rightTab === 'signal' ? (
-            <div className="flex-1 overflow-hidden">
-              <ProGate feature={isFutures ? "Futures Long/Short Opportunities" : "Panel Sinyal Trading"}>
-                {isFutures ? (
-                  <FuturesOpportunitiesPanel
-                    tickers={activeTickers}
-                    exchange={exchange}
-                    active={rightTab === 'signal'}
-                    onSelectCoin={handleSelectCoin}
-                  />
-                ) : (
-                  <SignalPanel
-                    ticker={selectedTicker}
-                    exchange={exchange}
-                    marketType={marketType}
-                    currentPrice={currentPrice}
-                  />
-                )}
-              </ProGate>
+          <div className="flex-1 overflow-auto p-6 space-y-5">
+            {/* Stat cards */}
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: 'Total Users',  value: '1,248', change: '+12%', up: true  },
+                { label: 'Revenue',      value: 'Rp 4.2M', change: '+8%', up: true  },
+                { label: 'Active Today', value: '342',   change: '-3%', up: false },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-card border border-border rounded-xl p-5 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">{stat.label}</div>
+                  <div className="text-3xl font-black text-foreground">{stat.value}</div>
+                  <div className={cn('text-xs font-semibold mt-1.5', stat.up ? 'text-green-400' : 'text-red-400')}>
+                    {stat.change} vs last month
+                  </div>
+                </div>
+              ))}
             </div>
-          // ) : rightTab === 'backtest' ? (
-          //   <div className="flex-1 overflow-hidden">
-          //     <ProGate feature="Backtest Strategi">
-          //       <BacktestPanel ticker={selectedTicker} exchange={exchange} marketType={marketType} />
-          //     </ProGate>
-          //   </div>
-          ) : rightTab === 'scanner' ? (
+
+            {/* Main content area — replace with your components */}
+            <div className="bg-card border border-border rounded-xl min-h-[300px] flex items-center justify-center">
+              <div className="text-center text-muted-foreground">
+                <BarChart2 className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <p className="text-sm font-medium">Main Content Area</p>
+                <p className="text-xs mt-1 opacity-60">Ganti dengan konten aplikasi Anda</p>
+              </div>
+            </div>
+          </div>
+        </Panel>
+
+        <PanelResizeHandle className="w-2 mx-[-1px] z-10 flex items-center justify-center cursor-col-resize group bg-transparent">
+          <div className="w-[1px] h-full bg-border group-hover:bg-primary transition-colors" />
+        </PanelResizeHandle>
+
+        {/* RIGHT — Tabbed side panel */}
+        <Panel defaultSize="25" minSize="20" maxSize="40" className="flex flex-col overflow-hidden">
+          <div className="flex border-b border-border">
+            {([
+              { id: 'activity', label: 'Activity', pro: false },
+              { id: 'stats',    label: 'Stats',    pro: false },
+              { id: 'pro',      label: 'Pro',      pro: true  },
+            ] as { id: RightTab; label: string; pro: boolean }[]).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setRightTab(tab.id)}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors relative',
+                  rightTab === tab.id
+                    ? 'text-foreground border-b-2 border-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {tab.label}
+                {tab.pro && user?.subscription_tier !== 'pro' && (
+                  <Crown className="h-2 w-2 text-yellow-500 absolute top-1 right-1" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {rightTab === 'pro' ? (
             <div className="flex-1 overflow-hidden">
-              <ProGate feature="Bullish Scanner">
-                <BullishWatchlist 
-                  tickers={activeTickers} 
-                  exchange={exchange} 
-                  marketType={marketType} 
-                  onSelectCoin={handleSelectCoin} 
-                />
+              <ProGate feature="fitur Pro ini">
+                <div className="p-4 space-y-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="p-3 bg-card border border-border rounded-lg text-xs text-muted-foreground">
+                      Pro feature item {i + 1}
+                    </div>
+                  ))}
+                </div>
               </ProGate>
             </div>
           ) : (
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-auto">
               <AnimatePresence mode="wait">
-                {rightTab === 'orderbook' ? (
-                  <motion.div key="ob" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
-                    <OrderBook
-                      orderBook={activeOrderBook}
-                      currentPrice={currentPrice}
-                      onPriceClick={() => {}}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div key="trades" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
-                    <TradeHistory trades={activeTrades} />
-                  </motion.div>
-                )}
+                <motion.div
+                  key={rightTab}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="p-3 space-y-1"
+                >
+                  {rightTab === 'activity' ? (
+                    [...Array(10)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-3 py-2 border-b border-border/50">
+                        <div className="w-2 h-2 rounded-full bg-primary/60 shrink-0" />
+                        <div className="text-xs text-muted-foreground flex-1">Activity item {i + 1}</div>
+                        <div className="text-[10px] text-muted-foreground/50">{i + 1}m ago</div>
+                      </div>
+                    ))
+                  ) : (
+                    [...Array(6)].map((_, i) => (
+                      <div key={i} className="p-3 bg-card border border-border rounded-lg">
+                        <div className="flex justify-between text-xs mb-1.5">
+                          <span className="font-medium text-foreground">Metric {i + 1}</span>
+                          <span className="text-primary">{40 + i * 10}%</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-1.5">
+                          <div
+                            className="h-1.5 rounded-full bg-primary/60"
+                            style={{ width: `${40 + i * 10}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </motion.div>
               </AnimatePresence>
             </div>
           )}

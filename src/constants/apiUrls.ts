@@ -1,33 +1,31 @@
-const API_DOMAIN = import.meta.env.VITE_API_DOMAIN || ''
-const WS_DOMAIN  = import.meta.env.VITE_WS_DOMAIN  || 'wss://cryptoex.id'
+export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export const API_URLS = {
-  internal: import.meta.env.VITE_API_URL || 'http://localhost:3001',
-
-  binance: {
-    spot:      `${API_DOMAIN}/binance/api/v3`,
-    futures:   `${API_DOMAIN}/binance-futures/fapi/v1`,
-    ws:        `${WS_DOMAIN}/binance-ws`,
-    wsFutures: `${WS_DOMAIN}/binance-futures-ws`,
+  auth: {
+    login:    `${API_BASE}/api/auth/login`,
+    register: `${API_BASE}/api/auth/register`,
+    refresh:  `${API_BASE}/api/auth/refresh`,
+    password: `${API_BASE}/api/auth/me/password`,
   },
-
-  kucoin: {
-    spot:    `${API_DOMAIN}/kucoin/api/v1`,
-    futures: `${API_DOMAIN}/kucoin-futures/api/v1`,
+  users: {
+    me:           `${API_BASE}/api/users/me`,
+    profile:      `${API_BASE}/api/users/profile`,
+    subscription: `${API_BASE}/api/users/me/subscription`,
+    all:          `${API_BASE}/api/users`,
+    stats:        `${API_BASE}/api/users/stats`,
   },
-
-  okx: {
-    market: `${API_DOMAIN}/okx/api/v5/market`,
-    public: `${API_DOMAIN}/okx/api/v5/public`,
+  articles: {
+    public: `${API_BASE}/api/articles`,
+    admin:  `${API_BASE}/api/articles/admin/all`,
   },
-
-  cryptoCom: {
-    public: `${API_DOMAIN}/crypto-com/exchange/v1/public`,
+  tickets: {
+    create: `${API_BASE}/api/tickets`,
+    mine:   `${API_BASE}/api/tickets/mine`,
+    admin:  `${API_BASE}/api/tickets/admin/all`,
   },
-
-  fearGreed: `${API_DOMAIN}/fear-greed/?limit=1&format=json`,
-
-  tradingView: {
-    script: 'https://s3.tradingview.com/tv.js',
+  payment: {
+    subscribe: `${API_BASE}/api/payment/subscribe`,
+    history:   `${API_BASE}/api/payment/history`,
+    admin:     `${API_BASE}/api/payment/admin/all`,
   },
 }

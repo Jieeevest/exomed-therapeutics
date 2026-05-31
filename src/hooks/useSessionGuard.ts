@@ -22,7 +22,7 @@ export function useSessionGuard() {
       lastChecked.current = now
 
       // sessionStorage is per-tab; if it's gone, the user's session is dead
-      const stored = sessionStorage.getItem('cryptoex-auth-storage')
+      const stored = sessionStorage.getItem('app-auth-storage')
       if (!stored) {
         logout()
         navigate('/login', { replace: true })

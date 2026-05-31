@@ -32,7 +32,7 @@ export const useAuth = create<AuthState>()(
       updateUser: (user) => set({ user }),
     }),
     {
-      name: 'cryptoex-auth-storage',
+      name: 'app-auth-storage',
       storage: createJSONStorage(() => sessionStorage), // Keeps user logged in during tab session
     }
   )

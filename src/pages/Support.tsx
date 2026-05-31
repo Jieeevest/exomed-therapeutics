@@ -306,7 +306,7 @@ export default function Support() {
                       </div>
                       <div className={`rounded-3xl px-5 py-4 text-[15px] ${r.is_admin ? 'bg-white/5 border border-white/10 rounded-tl-sm' : 'bg-primary text-black font-medium rounded-tr-sm shadow-[0_5px_15px_rgba(56,189,248,0.2)]'}`}>
                         <div className={`text-xs font-black mb-1.5 uppercase tracking-widest ${r.is_admin ? 'text-primary' : 'text-black/60'}`}>
-                          {r.is_admin ? 'Tim Support CryptoEx' : r.username}
+                          {r.is_admin ? 'Tim Support' : r.username}
                         </div>
                         <p className={`whitespace-pre-wrap leading-relaxed ${r.is_admin ? 'text-slate-300' : 'text-black/90'}`}>{r.message}</p>
                         <div className={`text-[10px] font-bold mt-2 text-right ${r.is_admin ? 'text-slate-600' : 'text-black/50'}`}>

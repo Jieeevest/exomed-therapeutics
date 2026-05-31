@@ -270,7 +270,7 @@ export default function Profile() {
                         <Crown className="w-5 h-5 text-yellow-400" />
                         <span className="font-black text-white text-lg">Paket PRO</span>
                       </div>
-                      <p className="text-slate-300 text-sm">Akses penuh ke semua fitur eksklusif CryptoEx</p>
+                      <p className="text-slate-300 text-sm">Akses penuh ke semua fitur eksklusif platform</p>
                     </div>
                     <span className="text-xs font-bold px-2.5 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full">AKTIF</span>
                   </div>
@@ -301,7 +301,7 @@ export default function Profile() {
                     <p className="text-slate-500 text-sm mb-4">Anda saat ini menggunakan paket gratis dengan akses terbatas.</p>
                     <div className="grid grid-cols-2 gap-2 text-sm mb-2">
                       {[
-                        { f: 'Live Ticker & Harga', pro: false },
+                        { f: 'Dashboard & Analytics', pro: false },
                         { f: 'Order Book & Trades', pro: false },
                         { f: 'Panel Sinyal AI', pro: true },
                         { f: 'Backtest Strategi', pro: true },
@@ -355,7 +355,7 @@ export default function Profile() {
                     {payHistory.map(p => (
                       <div key={p.id} className="px-6 py-4 flex items-center justify-between">
                         <div>
-                          <div className="text-sm font-semibold text-white">CryptoEx PRO — 30 Hari</div>
+                          <div className="text-sm font-semibold text-white">Pro Subscription — 30 Days</div>
                           <div className="text-xs text-slate-500 mt-0.5">{new Date(p.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                         </div>
                         <div className="text-right">

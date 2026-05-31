@@ -3,7 +3,7 @@ export function Logo({ className = "w-8 h-8", variant = "icon" }: { className?: 
     return (
       <img 
         src="/LOGO ORIGINAL FULL HORIZONTAL TRANSPARENT.png" 
-        alt="CryptoEx Logo" 
+        alt="App Logo"
         className={className} 
       />
     )
@@ -12,7 +12,7 @@ export function Logo({ className = "w-8 h-8", variant = "icon" }: { className?: 
   return (
     <img 
       src="/LOGO3.png" 
-      alt="CryptoEx Icon" 
+      alt="App Icon"
       className={className} 
     />
   )
