@@ -1,830 +1,709 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import {
-  TrendingUp, Shield, Activity, BarChart2, ArrowRight,
-  ChevronRight, Check, Star, Globe, Cpu,
-  Twitter, Github, Send, Menu, X, Clock, Eye,
-  Users, Zap, Lock, MapPin, Mail, Phone, Layers, Database
+  Menu, X, ChevronRight, Shield, Award, CheckCircle, Download,
+  Phone, Mail, MapPin, ArrowRight, Microscope, Dna, Zap,
+  Bone, Sparkles, Brain, Scissors, Activity, Eye,
 } from 'lucide-react'
-import { useAuth } from '@/store/useAuth'
 import { Logo } from '@/components/Logo'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { LanguageSelector } from '@/components/LanguageSelector'
+import { cn } from '@/lib/utils'
+import { useLanguage } from '@/store/useLanguage'
+import { tr } from '@/lib/i18n'
+import { API_URLS } from '@/constants/apiUrls'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// ── Static Data ───────────────────────────────────────────────────────────────
 
-// ── Counter animation hook ────────────────────────────────────────────────
-function useCounter(target: number, duration: number = 2000) {
-  const [count, setCount] = useState(0)
-  const ref = useRef<ReturnType<typeof setInterval> | null>(null)
-  const start = (fromZero = true) => {
-    if (fromZero) setCount(0)
-    const step = target / (duration / 16)
-    ref.current = setInterval(() => {
-      setCount(prev => {
-        const next = prev + step
-        if (next >= target) { clearInterval(ref.current!); return target }
-        return next
-      })
-    }, 16)
-  }
-  useEffect(() => () => { if (ref.current) clearInterval(ref.current) }, [])
-  return { count: Math.floor(count), start }
-}
-
-// ── Stat Counter ─────────────────────────────────────────────────────────
-function StatCounter({ value, label, suffix = '' }: { value: number; label: string; suffix?: string }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true })
-  const { count, start } = useCounter(value, 2200)
-  useEffect(() => { if (inView) start() }, [inView])
-  return (
-    <div ref={ref} className="text-center">
-      <div className="text-4xl md:text-5xl font-black text-white tabular-nums">
-        {count.toLocaleString()}{suffix}
-      </div>
-      <div className="text-sm text-slate-400 mt-2 font-medium">{label}</div>
-    </div>
-  )
-}
-
-// ── Feature Card ─────────────────────────────────────────────────────────
-function FeatureCard({ icon, title, desc, delay }: { icon: React.ReactNode; title: string; desc: string; delay: number }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-50px' })
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 hover:bg-white/[0.06] hover:border-amber-500/30 transition-all duration-300 overflow-hidden flex flex-col min-h-[200px]"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/8 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="relative z-10 flex flex-col h-full">
-        <div className="w-12 h-12 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:border-amber-500/40 transition-all duration-300">
-          {icon}
-        </div>
-        <h3 className="text-white font-semibold text-lg mb-2">{title}</h3>
-        <p className="text-slate-400 text-sm leading-relaxed flex-1">{desc}</p>
-      </div>
-    </motion.div>
-  )
-}
-
-// ── Pricing Card ─────────────────────────────────────────────────────────
-function PricingCard({ plan, price, priceNote, features, highlight, badge, cta }: {
-  plan: string; price: string; priceNote?: string; features: string[]; highlight?: boolean; badge?: string; cta?: string
-}) {
-  const { isAuthenticated, accessToken } = useAuth()
-  const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleSubscribe = async () => {
-    if (plan === 'Enterprise') {
-      navigate('/support')
-      return
-    }
-    if (!isAuthenticated) {
-      navigate('/login')
-      return
-    }
-    if (plan !== 'Pro') {
-      navigate('/app')
-      return
-    }
-    try {
-      setIsLoading(true)
-      const res = await fetch(API_URL + '/api/payment/subscribe', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${accessToken}` }
-      })
-      const data = await res.json()
-      if (data.success && data.data.paymentUrl) {
-        window.location.href = data.data.paymentUrl
-      } else {
-        alert('Gagal generate link pembayaran: ' + data.message)
-      }
-    } catch {
-      alert('Terjadi kesalahan saat memproses pembayaran.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  return (
-    <div className={`relative rounded-2xl p-8 border flex flex-col ${highlight
-      ? 'bg-gradient-to-b from-amber-950/60 to-black border-amber-500/50 shadow-[0_0_60px_rgba(245,166,35,0.15)]'
-      : 'bg-white/[0.03] border-white/[0.1] text-white'}`}>
-      {badge && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gold-gradient text-black text-xs font-black px-5 py-1.5 rounded-full whitespace-nowrap">
-          ⭐ {badge}
-        </div>
-      )}
-      <p className={`text-xs font-black tracking-widest uppercase mb-4 ${highlight ? 'text-amber-400' : 'text-slate-400'}`}>{plan}</p>
-      <div className={`text-5xl font-black mb-1 ${highlight ? 'text-white' : 'text-white'}`}>{price}</div>
-      <p className={`text-sm mb-8 ${highlight ? 'text-amber-300/60' : 'text-slate-500'}`}>{priceNote || 'per bulan'}</p>
-      <ul className="space-y-3 mb-8 flex-1">
-        {features.map((f, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm">
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${highlight ? 'bg-amber-500 text-black' : 'bg-white/10'}`}>
-              <Check className="w-3 h-3" />
-            </div>
-            <span className={highlight ? 'text-slate-200' : 'text-slate-300'}>{f}</span>
-          </li>
-        ))}
-      </ul>
-      <button
-        onClick={handleSubscribe}
-        disabled={isLoading}
-        className={`w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all group disabled:opacity-70 ${highlight
-          ? 'bg-gold-gradient text-black hover:opacity-90 shadow-[0_0_30px_rgba(245,166,35,0.3)]'
-          : 'bg-white/[0.07] border border-white/[0.15] text-white hover:bg-white/[0.12]'}`}
-      >
-        {isLoading ? 'Memproses...' : (cta || 'Mulai Sekarang')}
-        {!isLoading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
-      </button>
-    </div>
-  )
-}
-
-// ── Feature Marquee ───────────────────────────────────────────────────────
-const FEATURES_MARQUEE = [
-  { label: 'Authentication',   dot: true  },
-  { label: 'Role Management',  dot: false },
-  { label: 'Subscription',     dot: true  },
-  { label: 'Admin Dashboard',  dot: false },
-  { label: 'Article CMS',      dot: true  },
-  { label: 'Support Tickets',  dot: false },
-  { label: 'Payment Gateway',  dot: true  },
-  { label: 'Real-time Data',   dot: false },
-  { label: 'Session Guard',    dot: true  },
-  { label: 'Dark Mode UI',     dot: false },
+const AMNIOTIC_PRODUCTS = [
+  { name: 'EXOMED-AMNI-100M', nanoparticles: '100 Million Nanoparticles', type: 'MSC Amniotic Derived',                description: 'Standard formulation for general regenerative applications.' },
+  { name: 'EXOMED-AMNI-300M', nanoparticles: '300 Million Nanoparticles', type: 'MSC Amniotic Derived',                description: 'Mid-concentration for orthopedic and dermatology indications.' },
+  { name: 'EXOMED-AMNI-500M', nanoparticles: '500 Million Nanoparticles', type: 'MSC Amniotic Derived — High Potency', description: 'High-concentration formulation for complex cases.' },
 ]
 
-function FeatureMarquee() {
-  return (
-    <div className="relative flex overflow-hidden border-y border-white/[0.06] bg-black/40 py-3">
-      <div className="flex gap-8 animate-[marquee_25s_linear_infinite] whitespace-nowrap pr-8">
-        {[...FEATURES_MARQUEE, ...FEATURES_MARQUEE].map((f, i) => (
-          <span key={i} className="flex items-center gap-2 text-xs font-mono">
-            {f.dot
-              ? <span className="text-emerald-400">✦</span>
-              : <span className="text-amber-400">◆</span>}
-            <span className="text-slate-300">{f.label}</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  )
+const PLACENTAL_PRODUCTS = [
+  { name: 'EXOMED-CORD-100M',  nanoparticles: '100 Million Nanoparticles', type: 'Umbilical Cord MSC',              description: 'Standard umbilical cord-derived formulation.' },
+  { name: 'EXOMED-CORD-300M',  nanoparticles: '300 Million Nanoparticles', type: 'Umbilical Cord MSC',              description: 'Mid-concentration for aesthetic and dermatology use.' },
+  { name: 'EXOMED-CORD-NEURO', nanoparticles: '150 Million Nanoparticles', type: 'Neural-Optimized (Placental Cord)', description: 'Optimized for neurology applications. Available as special order.' },
+]
+
+const APPLICATION_AREA_KEYS = [
+  { icon: Bone,     nameKey: 'areas.ortho.name',  noteKey: 'areas.ortho.note'  },
+  { icon: Sparkles, nameKey: 'areas.derm.name',   noteKey: 'areas.derm.note'   },
+  { icon: Brain,    nameKey: 'areas.neuro.name',  noteKey: 'areas.neuro.note'  },
+  { icon: Eye,      nameKey: 'areas.aesth.name',  noteKey: 'areas.aesth.note'  },
+  { icon: Scissors, nameKey: 'areas.hair.name',   noteKey: 'areas.hair.note'   },
+  { icon: Activity, nameKey: 'areas.sports.name', noteKey: 'areas.sports.note' },
+  { icon: Dna,      nameKey: 'areas.andro.name',  noteKey: 'areas.andro.note'  },
+  { icon: Zap,      nameKey: 'areas.ophth.name',  noteKey: 'areas.ophth.note'  },
+]
+
+const CASE_STUDIES = [
+  {
+    specialtyKey: 'areas.ortho.name',
+    title: 'Observational: Knee Joint Pain in 12 OA Patients Grade II–III',
+    description: 'Patients aged 45–72 with knee OA grade II–III. Single intra-articular injection, 12-week follow-up.',
+    metrics: [
+      { label: 'VAS Score', value: '−4.1 pts' },
+      { label: 'ROM (knee)', value: '+28°' },
+      { label: 'WOMAC Score', value: '−38%' },
+    ],
+  },
+  {
+    specialtyKey: 'areas.derm.name',
+    title: 'Observational: Chronic Diabetic Ulcer in 8 Patients',
+    description: 'Type 2 diabetes patients with Wagner grade II–III ulcers. Topical application 2×/week for 8 weeks.',
+    metrics: [
+      { label: 'Wound Area', value: '−62%' },
+      { label: 'Healing Time', value: '−38%' },
+      { label: 'PDAI Score', value: '−2.8 pts' },
+    ],
+  },
+  {
+    specialtyKey: 'areas.aesth.name',
+    title: 'Observational: Non-Invasive Skin Rejuvenation in 15 Patients',
+    description: 'Patients aged 35–55 with moderate aging signs. Mesotherapy protocol, 3 sessions at 4-week intervals.',
+    metrics: [
+      { label: 'GAIS Score', value: '3.6 / 5' },
+      { label: 'Skin Hydration', value: '+34%' },
+      { label: 'Skin Texture', value: '+40%' },
+    ],
+  },
+]
+
+const PIPELINE = [
+  { product: 'EXOMED-CORD-NEURO', platform: 'Neurological Platform', stage: 'pre-clinical'   as const },
+  { product: 'EXOMED-AMNI-100M',  platform: 'Orthopedic Platform',   stage: 'research'       as const },
+  { product: 'EXOMED-CORD-300M',  platform: 'Dermatology Platform',  stage: 'special-order'  as const },
+  { product: 'EXOMED-AMNI-300M',  platform: 'Aesthetic Platform',    stage: 'early-research' as const },
+]
+
+const STAGE_STYLE: Record<string, string> = {
+  'pre-clinical':   'text-purple-500 dark:text-purple-400 bg-purple-500/10 border-purple-500/20',
+  'research':       'text-blue-500 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
+  'special-order':  'text-amber-500 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
+  'early-research': 'text-slate-500 dark:text-slate-400 bg-black/[0.04] dark:bg-slate-500/10 border-black/[0.08] dark:border-slate-500/20',
 }
 
-// ── Main Landing Page ─────────────────────────────────────────────────────
+const STAGE_LABELS: Record<string, string> = {
+  'pre-clinical': 'Pre-Clinical', research: 'Research', 'special-order': 'Special Order', 'early-research': 'Early Research',
+}
+
+const WA_NUMBER = '6281234567890'
+const WA_DEFAULT = 'Halo Exomed, saya ingin berkonsultasi mengenai produk exosome untuk klinik saya.'
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function Landing() {
-  const { isAuthenticated } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { lang } = useLanguage()
+  const t = (key: string) => tr(lang, key)
+
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [activeTab, setActiveTab] = useState<'amniotic' | 'placental'>('amniotic')
+  const [coaModal, setCoaModal] = useState(false)
+  const [coaForm, setCoaForm] = useState({ name: '', email: '' })
+  const [coaDone, setCoaDone] = useState(false)
+  const [form, setForm] = useState({
+    name: '', specialty: '', clinic: '', city: '',
+    whatsapp: '', product_interest: '', message: '',
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
   const { scrollY } = useScroll()
-  const navBg = useTransform(scrollY, [0, 80], ['rgba(0,0,0,0)', 'rgba(5,5,5,0.95)'])
-  const navBorder = useTransform(scrollY, [0, 80], ['rgba(255,255,255,0)', 'rgba(255,255,255,0.06)'])
+  const formRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const unsub = scrollY.on('change', v => setScrolled(v > 80))
+    return unsub
+  }, [scrollY])
+
+  useEffect(() => {
+    if (mobileOpen) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = ''
+    return () => { document.body.style.overflow = '' }
+  }, [mobileOpen])
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setMobileOpen(false)
+  }
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      await fetch(API_URLS.cms.inquirySubmit, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+    } catch {
+      // backend may not be ready yet
+    } finally {
+      setSubmitting(false)
+      setSubmitted(true)
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-[#030303] text-white overflow-x-hidden">
-      <style>{`
-        @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-        .float-anim{animation:float 6s ease-in-out infinite}
-        .float-anim-slow{animation:float 8s ease-in-out infinite}
-      `}</style>
+    <div className="min-h-screen bg-white dark:bg-[#050505] text-gray-900 dark:text-white overflow-x-hidden">
 
-      {/* ── NAVBAR ── */}
-      <motion.nav
-        style={{ backgroundColor: navBg, borderColor: navBorder }}
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b transition-all"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center shrink-0">
-              <Logo variant="horizontal" className="h-9 w-auto" />
-            </Link>
+      {/* ── Navbar ──────────────────────────────────────────────────────────── */}
+      <nav className={cn(
+        'fixed top-0 inset-x-0 z-50 border-b transition-all duration-300',
+        scrolled
+          ? 'bg-white/95 dark:bg-[#050505]/95 backdrop-blur-xl border-black/[0.06] dark:border-white/[0.06] shadow-sm dark:shadow-none'
+          : 'bg-transparent border-transparent',
+      )}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Logo className="h-9 w-auto" variant="horizontal" />
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#fitur" className="text-sm text-slate-400 hover:text-white transition-colors">Fitur</a>
-              <a href="#cara-kerja" className="text-sm text-slate-400 hover:text-white transition-colors">Cara Kerja</a>
-              <a href="#harga" className="text-sm text-slate-400 hover:text-white transition-colors">Harga</a>
-              <Link to="/articles" className="text-sm text-slate-400 hover:text-white transition-colors">Artikel</Link>
-              <Link to="/support" className="text-sm text-slate-400 hover:text-white transition-colors">Support</Link>
-            </div>
+          <div className="hidden md:flex items-center gap-1 text-sm font-semibold text-gray-500 dark:text-slate-400">
+            <a href="#tentang" className="px-3 py-2 rounded-xl hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all">{t('nav.about')}</a>
+            <a href="#produk"  className="px-3 py-2 rounded-xl hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all">{t('nav.products')}</a>
+            <a href="#riset"   className="px-3 py-2 rounded-xl hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all">{t('nav.research')}</a>
+            <div className="w-px h-5 bg-black/[0.10] dark:bg-white/[0.10] mx-1" />
+            <LanguageSelector />
+            <ThemeToggle />
+            <button onClick={scrollToForm} className="ms-1 px-5 py-2 bg-gold-gradient text-black rounded-xl hover:opacity-90 transition-opacity font-bold">
+              {t('nav.consultation')}
+            </button>
+          </div>
 
-            <div className="hidden md:flex items-center gap-3">
-              {isAuthenticated ? (
-                <Link
-                  to="/app"
-                  className="flex items-center gap-2 text-sm font-bold bg-gold-gradient text-black px-5 py-2.5 rounded-xl hover:opacity-90 transition-all active:scale-95"
-                >
-                  Dashboard <ArrowRight className="w-4 h-4" />
-                </Link>
-              ) : (
-                <>
-                  <Link to="/login" className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors">
-                    Masuk
-                  </Link>
-                  <Link
-                    to="/login"
-                    className="text-sm font-bold bg-gold-gradient text-black px-5 py-2.5 rounded-xl hover:opacity-90 transition-all active:scale-95"
-                  >
-                    Coba Gratis
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Mobile menu btn */}
-            <button
-              onClick={() => setMobileMenuOpen(v => !v)}
-              className="md:hidden text-slate-400 hover:text-white p-2"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <div className="flex items-center gap-1 md:hidden">
+            <LanguageSelector />
+            <ThemeToggle />
+            <button onClick={() => setMobileOpen(true)} className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white">
+              <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-xl overflow-hidden"
-            >
-              <div className="px-6 py-4 space-y-3">
-                <a href="#fitur" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Fitur</a>
-                <a href="#cara-kerja" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Cara Kerja</a>
-                <a href="#harga" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Harga</a>
-                <Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Artikel</Link>
-                <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-300 py-2">Support</Link>
-                {isAuthenticated ? (
-                  <Link to="/app" onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-gold-gradient text-black text-sm font-bold py-3 rounded-xl mt-2">
-                    Dashboard
-                  </Link>
-                ) : (
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-gold-gradient text-black text-sm font-bold py-3 rounded-xl mt-2">
-                    Mulai Gratis
-                  </Link>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
-
-      {/* ── HERO ── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden">
-
-        {/* Background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(180,120,30,0.18),transparent)]" />
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '44px 44px' }}
-        />
-        <div className="absolute top-1/4 left-[8%] w-80 h-80 bg-amber-600/15 rounded-full blur-[120px] float-anim" />
-        <div className="absolute bottom-1/3 right-[8%] w-80 h-80 bg-yellow-600/15 rounded-full blur-[120px] float-anim-slow" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-900/10 rounded-full blur-[150px]" />
-
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center pt-20 pb-10">
-
-          {/* Badge */}
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 bg-white/[0.06] border border-amber-500/20 px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 mb-8"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-white/98 dark:bg-black/95 backdrop-blur-xl flex flex-col p-8"
           >
-            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            React · TypeScript · Tailwind · Zustand · Framer Motion
-            <ChevronRight className="w-3 h-3 text-slate-500" />
+            <div className="flex justify-between items-center mb-12">
+              <Logo className="h-8 w-auto" variant="horizontal" />
+              <button onClick={() => setMobileOpen(false)} className="p-2 text-gray-500 dark:text-slate-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-4 text-2xl font-black">
+              <a href="#tentang" onClick={() => setMobileOpen(false)} className="text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white">{t('nav.about')}</a>
+              <a href="#produk"  onClick={() => setMobileOpen(false)} className="text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white">{t('nav.products')}</a>
+              <a href="#riset"   onClick={() => setMobileOpen(false)} className="text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white">{t('nav.research')}</a>
+              <button onClick={scrollToForm} className="text-start text-primary">{t('nav.consultation')} →</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-20 px-6">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/[0.05] rounded-full blur-3xl" />
+          <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-blue-500/[0.03] rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-4xl mx-auto relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-wrap gap-2 mb-8"
+          >
+            {([t('hero.badge.usa'), t('hero.badge.fda'), t('hero.badge.pro')] as string[]).map(badge => (
+              <span key={badge} className="px-3 py-1.5 text-xs font-bold bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-full text-gray-500 dark:text-slate-400 tracking-wide">
+                {badge}
+              </span>
+            ))}
           </motion.div>
 
-          {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.05] mb-6"
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-2"
           >
-            <span className="bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
-              Boilerplate SaaS
-            </span>
-            <br />
-            <span className="text-gold-gradient">
-              Modern & Siap Pakai
-            </span>
+            {t('hero.headline')}
           </motion.h1>
+          <div className="w-16 h-1 bg-gold-gradient rounded-full mb-4" />
 
-          {/* Subheadline */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
-            className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mb-10 leading-relaxed"
           >
-            Template aplikasi web lengkap dengan <strong className="text-white font-semibold">autentikasi, manajemen langganan, admin panel, CMS artikel</strong>, dan sistem tiket support — siap dikustomisasi untuk produk Anda.
+            {t('hero.subtext')}
           </motion.p>
 
-          {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4"
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-wrap gap-3"
           >
-            <Link
-              to={isAuthenticated ? '/app' : '/login'}
-              className="group w-full sm:w-auto bg-gold-gradient text-black font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_30px_rgba(212,166,58,0.3)] text-base"
+            <button
+              onClick={scrollToForm}
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gold-gradient text-black font-black rounded-2xl hover:opacity-90 transition-opacity text-base shadow-[0_0_40px_rgba(212,166,58,0.15)]"
             >
-              {isAuthenticated ? 'Buka Dashboard' : 'Mulai Gratis — Tanpa Kartu Kredit'}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+              {t('hero.cta')}
+              <ArrowRight className="w-5 h-5" />
+            </button>
             <a
-              href="#cara-kerja"
-              className="w-full sm:w-auto bg-white/[0.06] border border-white/[0.12] text-white font-semibold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/[0.1] hover:border-white/20 transition-all text-base"
+              href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_DEFAULT)}`}
+              target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-black/[0.05] dark:bg-white/[0.06] border border-black/[0.10] dark:border-white/[0.10] text-gray-700 dark:text-white font-bold rounded-2xl hover:bg-black/[0.09] dark:hover:bg-white/[0.10] transition-colors text-base"
             >
-              <Eye className="w-4 h-4" /> Lihat Fitur
+              <Phone className="w-4 h-4" />
+              WhatsApp
             </a>
           </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-xs text-slate-600 mb-8"
-          >
-            Tidak perlu kartu kredit · Setup dalam 2 menit · Gratis selamanya untuk akun Starter
-          </motion.p>
         </div>
+      </section>
 
-        {/* Hero App Preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 w-full max-w-6xl mx-auto px-4 pb-20"
-        >
-          <div className="relative rounded-2xl border border-amber-500/20 overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9),0_0_80px_rgba(180,120,30,0.08)] bg-[#080808]">
-            {/* Fake titlebar */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-[#111] border-b border-white/[0.07]">
-              <div className="w-3 h-3 rounded-full bg-red-500/70" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
-              <div className="w-3 h-3 rounded-full bg-green-500/70" />
-              <span className="text-xs text-slate-600 ml-2 font-mono">yourapp.id/app</span>
-              <div className="ml-auto flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                LIVE
-              </div>
+      {/* ── Tentang Exomed ──────────────────────────────────────────────────── */}
+      <section id="tentang" className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-xs font-black text-primary uppercase tracking-widest mb-4">{t('about.label')}</p>
+              <h2 className="text-4xl font-black leading-tight mb-6">{t('about.title')}</h2>
+              <p className="text-gray-500 dark:text-slate-400 leading-relaxed mb-4">{t('about.body1')}</p>
+              <p className="text-gray-500 dark:text-slate-400 leading-relaxed">{t('about.body2')}</p>
             </div>
-            {/* Mock dashboard UI */}
-            <div className="grid grid-cols-12 min-h-[420px] text-xs font-mono">
-              {/* Sidebar */}
-              <div className="col-span-2 bg-[#0a0a0a] border-r border-white/[0.06] p-3 hidden md:block">
-                <div className="text-slate-600 text-[10px] font-bold uppercase mb-3 tracking-wider">Menu</div>
-                {['Overview', 'Analytics', 'Users', 'Billing', 'Settings'].map((s, i) => (
-                  <div key={s} className={`py-1.5 px-2 rounded text-[10px] mb-0.5 ${i === 0 ? 'bg-amber-500/10 text-white border border-amber-500/20' : 'text-slate-500 hover:text-slate-300'}`}>
-                    {s}
-                  </div>
-                ))}
-              </div>
-              {/* Main area */}
-              <div className="col-span-12 md:col-span-7 p-5 relative">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-white font-bold text-sm">Overview</span>
-                  <span className="text-emerald-400 text-xs bg-emerald-400/10 px-2 py-0.5 rounded">+12%</span>
-                </div>
-                {/* Stat cards */}
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {[
-                    { l: 'Users', v: '1,248', c: 'text-blue-400' },
-                    { l: 'Revenue', v: 'Rp 4.2M', c: 'text-amber-400' },
-                    { l: 'Active', v: '342', c: 'text-emerald-400' },
-                  ].map(s => (
-                    <div key={s.l} className="bg-white/[0.03] border border-white/[0.07] rounded-lg p-3">
-                      <div className="text-[9px] text-slate-600 mb-1">{s.l}</div>
-                      <div className={`text-sm font-bold ${s.c}`}>{s.v}</div>
-                    </div>
-                  ))}
-                </div>
-                {/* Chart placeholder */}
-                <div className="flex items-end gap-[3px] h-36 px-2 mb-3">
-                  {[60,45,70,55,80,65,90,75,85,95,72,88,65,78,92,68,82,95,74,86,96,70,83,97,75,89,68,82,93,77,85,91,88,94,79,96,84,90,87,92].map((h, i) => (
-                    <div key={i} className="flex flex-col items-center flex-1 gap-[1px]">
-                      <div className="w-[1px] bg-slate-700" style={{ height: `${Math.abs(Math.sin(i)) * 10 + 3}%` }} />
-                      <div
-                        className={`w-full rounded-[1px] ${i % 3 !== 1 ? 'bg-amber-500/70' : 'bg-amber-900/50'}`}
-                        style={{ height: `${h * 0.45 + 8}%` }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-4 text-[9px] text-slate-600">
-                  <span>Jan <span className="text-amber-400">2.4M</span></span>
-                  <span>Feb <span className="text-amber-400">3.1M</span></span>
-                  <span>Mar <span className="text-emerald-400">4.2M ▲</span></span>
-                </div>
-              </div>
-              {/* Right panel */}
-              <div className="col-span-3 bg-[#0a0a0a] border-l border-white/[0.06] p-4 hidden md:flex flex-col">
-                <div className="text-slate-600 text-[10px] font-bold uppercase mb-3 tracking-wider flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                  Recent Activity
-                </div>
-                {[
-                  { user: 'Arif S.', action: 'Upgraded to Pro', time: '2m ago', dot: 'bg-amber-400' },
-                  { user: 'Bima R.', action: 'Opened ticket', time: '5m ago', dot: 'bg-blue-400' },
-                  { user: 'Citra N.', action: 'New signup', time: '8m ago', dot: 'bg-emerald-400' },
-                  { user: 'Dimas K.', action: 'Upgraded to Pro', time: '12m ago', dot: 'bg-amber-400' },
-                  { user: 'Eka P.', action: 'Password changed', time: '15m ago', dot: 'bg-purple-400' },
-                ].map((r, i) => (
-                  <div key={i} className="mb-3 flex items-start gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full ${r.dot} mt-1 shrink-0`} />
-                    <div>
-                      <div className="text-[10px] text-slate-300 font-bold">{r.user}</div>
-                      <div className="text-[9px] text-slate-600">{r.action}</div>
-                      <div className="text-[8px] text-slate-700">{r.time}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-amber-500/15 blur-[60px] rounded-full" />
-        </motion.div>
-      </section>
-
-      {/* ── FEATURE MARQUEE ── */}
-      <FeatureMarquee />
-
-      {/* ── TECH STACK ── */}
-      <section className="py-16 border-b border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-4">
-          <p className="text-center text-xs font-bold tracking-widest uppercase text-slate-600 mb-10">Tech Stack yang Sudah Terintegrasi</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { name: 'React + TypeScript', color: 'text-blue-400', bg: 'bg-blue-400/8 border-blue-400/20', symbol: '⚛' },
-              { name: 'Tailwind CSS',       color: 'text-cyan-400',  bg: 'bg-cyan-400/8 border-cyan-400/20',  symbol: '🎨' },
-              { name: 'Zustand + Router',   color: 'text-emerald-400', bg: 'bg-emerald-400/8 border-emerald-400/20', symbol: '⚡' },
-              { name: 'Framer Motion',      color: 'text-purple-400', bg: 'bg-purple-400/8 border-purple-400/20', symbol: '✨' },
-            ].map((ex) => (
-              <div key={ex.name} className={`flex flex-col items-center gap-3 p-6 rounded-2xl border ${ex.bg} group hover:scale-105 transition-transform duration-300`}>
-                <div className="text-3xl">{ex.symbol}</div>
-                <span className={`text-sm font-bold ${ex.color} text-center`}>{ex.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── STATS ── */}
-      <section className="py-24 border-b border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12">
-          <StatCounter value={10} suffix="+" label="Halaman siap pakai" />
-          <StatCounter value={5} label="Pattern komponen utama" />
-          <StatCounter value={20} suffix="+" label="Custom hooks & utilities" />
-          <StatCounter value={100} suffix="%" label="TypeScript typed" />
-        </div>
-      </section>
-
-      {/* ── FEATURES ── */}
-      <section id="fitur" className="py-28 max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4"
-          >
-            <Zap className="w-3.5 h-3.5" /> Fitur Boilerplate
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-black text-white"
-          >
-            Semua yang Anda Butuhkan<br />
-            <span className="text-slate-500">Sudah Ada di Sini</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-slate-400 mt-4 max-w-xl mx-auto text-sm leading-relaxed"
-          >
-            Dari autentikasi hingga manajemen langganan — semua infrastruktur sudah siap sehingga Anda bisa fokus membangun fitur produk utama.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[
-            { icon: <Lock className="w-5 h-5 text-blue-400" />, title: 'Auth & Session Guard', desc: 'Login, register, JWT access + refresh token, sesi berbasis sessionStorage, dan auto-redirect saat token kedaluwarsa. Zustand dengan middleware persist.', delay: 0 },
-            { icon: <Users className="w-5 h-5 text-amber-400" />, title: 'Role Management', desc: 'Sistem role user/admin dengan AdminRoute dan ProtectedRoute yang siap dipakai. Akses halaman admin otomatis terlindungi dari user biasa.', delay: 0.08 },
-            { icon: <BarChart2 className="w-5 h-5 text-emerald-400" />, title: 'Admin Dashboard', desc: 'Panel admin lengkap dengan manajemen user, histori transaksi, tiket support, dan CMS artikel — semuanya dalam satu tampilan sidebar yang rapi.', delay: 0.16 },
-            { icon: <Database className="w-5 h-5 text-orange-400" />, title: 'CMS Artikel', desc: 'Kelola artikel dan konten statis langsung dari admin panel. Mendukung publish/draft, kategori, excerpt, cover image, dan slug otomatis.', delay: 0.24 },
-            { icon: <Globe className="w-5 h-5 text-pink-400" />, title: 'Support Tickets', desc: 'Sistem tiket support dua arah antara user dan admin. User bisa buat tiket, admin bisa balas dan ubah status. Riwayat percakapan lengkap.', delay: 0.32 },
-            { icon: <Activity className="w-5 h-5 text-yellow-400" />, title: 'Payment & Subscription', desc: 'Integrasi pembayaran siap pakai dengan ProGate untuk membatasi akses fitur berdasarkan tier langganan. Riwayat pembayaran ditampilkan di profil.', delay: 0.40 },
-          ].map(f => <FeatureCard key={f.title} {...f} />)}
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ── */}
-      <section id="cara-kerja" className="py-28 border-y border-white/[0.06] bg-white/[0.01]">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4">
-              <Clock className="w-3.5 h-3.5" /> Cara Kerja
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white">
-              Clone, Kustomisasi,<br />
-              <span className="text-slate-500">Langsung Deploy</span>
-            </h2>
-            <p className="text-slate-400 mt-4 max-w-xl mx-auto text-sm">
-              Boilerplate ini dirancang agar Anda bisa fokus membangun fitur produk, bukan infrastruktur.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-12 left-[calc(33%-2rem)] right-[calc(33%-2rem)] h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-            {[
-              { n: '01', title: 'Clone & Install', desc: 'Clone repository, jalankan npm install, atur file .env dengan URL backend Anda. Semua dependency sudah dikonfigurasi — tidak perlu setup dari nol.', icon: <Layers className="w-7 h-7 text-amber-400" /> },
-              { n: '02', title: 'Ganti Branding', desc: 'Update nama aplikasi, logo, warna primary di CSS variables, dan teks konten. Design system berbasis Tailwind + CSS custom properties membuatnya mudah.', icon: <Globe className="w-7 h-7 text-yellow-400" /> },
-              { n: '03', title: 'Tambah Fitur', desc: 'Tambahkan route, komponen, dan hooks baru mengikuti pola yang sudah ada. Semua file sudah distrukturisasi dengan konvensi yang konsisten dan mudah diperluas.', icon: <TrendingUp className="w-7 h-7 text-emerald-400" /> },
-            ].map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.18 }}
-                className="relative text-center group"
-              >
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center z-10">
-                  <span className="text-[10px] font-black text-amber-400">{s.n}</span>
-                </div>
-                <div className="w-20 h-20 mx-auto rounded-2xl bg-white/[0.04] border border-white/[0.1] group-hover:border-amber-500/30 flex items-center justify-center mb-5 mt-2 transition-all duration-300 group-hover:bg-amber-500/5">
-                  {s.icon}
-                </div>
-                <h3 className="text-white font-bold text-lg mb-3">{s.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      <section id="harga" className="py-28 max-w-5xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4">
-            <Star className="w-3.5 h-3.5" /> Pilihan Paket
-          </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white">
-            Mulai Gratis, Upgrade Kapan Saja<br />
-            <span className="text-slate-500">Harga Transparan, Tanpa Biaya Tersembunyi</span>
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6 items-start">
-          <PricingCard
-            plan="Starter"
-            price="Gratis"
-            priceNote="selamanya"
-            cta="Mulai Sekarang"
-            features={[
-              'Akses dashboard dasar',
-              'Profil & manajemen akun',
-              'Baca artikel & konten',
-              'Buat tiket support',
-              'Update setiap 5 menit',
-            ]}
-          />
-          <PricingCard
-            plan="Pro"
-            price="Rp 89K"
-            badge="Paling Populer"
-            cta="Berlangganan Pro"
-            highlight
-            features={[
-              'Semua fitur Starter',
-              'Akses semua fitur Pro',
-              'Panel analitik lengkap',
-              'Ekspor data',
-              'Priority support',
-              'API access',
-              'Notifikasi real-time',
-            ]}
-          />
-          <PricingCard
-            plan="Enterprise"
-            price="Custom"
-            priceNote="hubungi tim kami"
-            cta="Hubungi Kami"
-            features={[
-              'Semua fitur Pro',
-              'White-label option',
-              'Custom domain',
-              'Dedicated account manager',
-              'SLA uptime 99.9%',
-              'Integrasi custom',
-              'Laporan bulanan',
-            ]}
-          />
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section className="py-24 border-y border-white/[0.06] bg-white/[0.01]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-amber-400 mb-4">
-              <Users className="w-3.5 h-3.5" /> Ulasan Pengguna
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white">Dipercaya Developer Indonesia</h2>
-            <p className="text-slate-400 mt-4 text-sm max-w-lg mx-auto">Pengalaman nyata dari developer dan tim produk yang menggunakan boilerplate ini untuk membangun aplikasi mereka.</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              { name: 'Rizky Aditya', role: 'Full Stack Developer', city: 'Jakarta', initials: 'RA', color: 'from-amber-600 to-yellow-500', text: 'Setup awal yang biasanya butuh 2–3 hari sekarang selesai dalam beberapa jam. Struktur kodenya bersih dan pola yang dipakai konsisten — mudah dipahami tim baru.' },
-              { name: 'Fadhil Nugraha', role: 'Product Engineer', city: 'Bandung', initials: 'FN', color: 'from-emerald-600 to-teal-500', text: 'Auth flow, role management, dan subscription gate sudah siap pakai. Kami tinggal fokus ke fitur bisnis utama tanpa repot bangun infrastruktur dari nol.' },
-              { name: 'Siti Maulida', role: 'Frontend Lead', city: 'Surabaya', initials: 'SM', color: 'from-pink-600 to-rose-500', text: 'Design system-nya solid. Dark theme, gold gradient, dan komponen yang ada terasa premium dan konsisten. Pelanggan kami langsung terpukau saat melihat UI-nya.' },
-              { name: 'Bagas Pratama', role: 'Indie Developer', city: 'Yogyakarta', initials: 'BP', color: 'from-blue-600 to-indigo-500', text: 'Admin panel-nya fitur lengkap tapi tidak over-engineered. Manajemen user, tiket, artikel, dan transaksi — semua yang dibutuhkan MVP sudah ada.' },
-              { name: 'Dinda Rahayu', role: 'Tech Co-Founder', city: 'Bali', initials: 'DR', color: 'from-violet-600 to-purple-500', text: 'Kami pakai ini sebagai basis tiga produk berbeda. Kustomisasi branding sangat mudah lewat CSS variables dan Tailwind config. Hemat waktu luar biasa.' },
-              { name: 'Hendra Wijaya', role: 'CTO Startup', city: 'Medan', initials: 'HW', color: 'from-orange-600 to-amber-500', text: 'TypeScript-nya ketat, pola hook dan komponen konsisten, dan tidak ada dependensi yang tidak perlu. Kualitas kode yang bisa langsung masuk production.' },
-            ].map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: (i % 3) * 0.1 }}
-                className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 hover:border-amber-500/20 hover:bg-white/[0.05] transition-all duration-300"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
-                </div>
-                <p className="text-slate-300 text-sm leading-relaxed mb-5">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center font-bold text-sm text-white shrink-0`}>
-                    {t.initials}
+            <div className="grid grid-cols-1 gap-3">
+              {[
+                { icon: Shield,       lk: 'about.cred1.label', sk: 'about.cred1.sub' },
+                { icon: Award,        lk: 'about.cred2.label', sk: 'about.cred2.sub' },
+                { icon: CheckCircle,  lk: 'about.cred3.label', sk: 'about.cred3.sub' },
+              ].map(item => (
+                <div key={item.lk} className="flex items-start gap-4 p-4 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <item.icon className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="text-white font-semibold text-sm">{t.name}</div>
-                    <div className="text-slate-500 text-xs">{t.role} · {t.city}</div>
+                    <div className="font-bold text-sm">{t(item.lk)}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">{t(item.sk)}</div>
                   </div>
                 </div>
-              </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Mengapa Exosome ─────────────────────────────────────────────────── */}
+      <section id="riset" className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('why.label')}</p>
+            <h2 className="text-4xl font-black">{t('why.title')}</h2>
+            <p className="text-gray-500 dark:text-slate-400 mt-3 max-w-xl mx-auto text-sm leading-relaxed">{t('why.subtitle')}</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { icon: Dna,        tk: 'why.card1.title', bk: 'why.card1.body' },
+              { icon: Microscope, tk: 'why.card2.title', bk: 'why.card2.body' },
+              { icon: Zap,        tk: 'why.card3.title', bk: 'why.card3.body' },
+            ].map(item => (
+              <div key={item.tk} className="p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-primary/20 transition-colors group">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors">
+                  <item.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-black text-base mb-3">{t(item.tk)}</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{t(item.bk)}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(180,120,30,0.12),transparent)]" />
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-amber-600/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-yellow-600/10 rounded-full blur-[100px]" />
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="relative z-10 max-w-3xl mx-auto px-4 text-center"
-        >
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold px-4 py-1.5 rounded-full mb-8">
-            <Zap className="w-3 h-3" /> Mulai Sekarang — Gratis
+      {/* ── Area Aplikasi ───────────────────────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-5">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('areas.label')}</p>
+            <h2 className="text-4xl font-black">{t('areas.title')}</h2>
           </div>
-          <h2 className="text-5xl md:text-6xl font-black text-white leading-tight mb-6">
-            Bangun Lebih Cepat,<br />
-            <span className="text-gold-gradient">Ship Lebih Awal</span>
-          </h2>
-          <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-            Fokus pada apa yang membuat produk Anda unik. Infrastruktur dasar sudah siap — mulai dengan akun Starter gratis selamanya.
+          <p className="text-center text-xs text-gray-500 dark:text-slate-500 border border-black/[0.07] dark:border-white/[0.06] bg-black/[0.02] dark:bg-white/[0.02] rounded-xl px-4 py-2.5 max-w-xl mx-auto mb-10">
+            {t('areas.disclaimer')}
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            {isAuthenticated ? (
-              <Link
-                to="/app"
-                className="group bg-gold-gradient text-black font-bold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_40px_rgba(212,166,58,0.25)] text-base"
-              >
-                Buka Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="group bg-gold-gradient text-black font-bold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_40px_rgba(212,166,58,0.25)] text-base"
-                >
-                  Buat Akun Gratis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  to="/login"
-                  className="bg-white/[0.06] border border-white/[0.12] text-white font-semibold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/[0.1] transition-all text-base"
-                >
-                  <Shield className="w-4 h-4" /> Masuk ke Dashboard
-                </Link>
-              </>
-            )}
-          </div>
-
-          <p className="text-xs text-slate-600">Tidak perlu kartu kredit · Setup 2 menit · Upgrade kapan saja</p>
-        </motion.div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-white/[0.06] py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
-            <div className="col-span-2">
-              <Link to="/" className="flex items-center gap-3 mb-5">
-                <Logo variant="horizontal" className="h-9 w-auto" />
-              </Link>
-              <p className="text-slate-500 text-sm leading-relaxed mb-5 max-w-xs">
-                Boilerplate aplikasi SaaS modern dengan design system premium, autentikasi lengkap, dan admin panel siap pakai.
-              </p>
-
-              <div className="space-y-2.5 mb-5">
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-slate-500 text-xs leading-relaxed">
-                    Alamat perusahaan Anda,<br />
-                    Kota, Provinsi, Kode Pos
-                  </p>
-                </div>
-                <a href="mailto:hello@yourapp.id" className="flex items-center gap-2.5 group">
-                  <Mail className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">hello@yourapp.id</span>
-                </a>
-                <a href="tel:+6200000000000" className="flex items-center gap-2.5 group">
-                  <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-slate-500 text-xs group-hover:text-amber-400 transition-colors">+62 000-0000-0000</span>
-                </a>
-              </div>
-
-              <div className="flex gap-3">
-                {[Twitter, Github, Send].map((Icon, i) => (
-                  <a key={i} href="#" className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all">
-                    <Icon className="w-4 h-4" />
-                  </a>
-                ))}
-              </div>
-            </div>
-            {[
-              { title: 'Produk', links: [
-                { name: 'Fitur', url: '/#fitur' },
-                { name: 'Cara Kerja', url: '/#cara-kerja' },
-                { name: 'Harga', url: '/#harga' },
-                { name: 'Roadmap', url: '/page/roadmap' }
-              ]},
-              { title: 'Support', links: [
-                { name: 'Dokumentasi', url: '/page/dokumentasi' },
-                { name: 'FAQ', url: '/page/faq' },
-                { name: 'Status', url: '/page/status' },
-                { name: 'Kontak CS', url: '/support' }
-              ]},
-              { title: 'Legal', links: [
-                { name: 'Syarat & Ketentuan', url: '/page/terms' },
-                { name: 'Kebijakan Privasi', url: '/page/privacy' },
-                { name: 'Disclaimer', url: '/page/disclaimer' },
-              ]},
-            ].map(col => (
-              <div key={col.title}>
-                <h4 className="text-xs font-bold tracking-widest uppercase text-slate-500 mb-4">{col.title}</h4>
-                <ul className="space-y-2.5">
-                  {col.links.map(l => (
-                    <li key={l.name}>
-                      {l.url.startsWith('/#') ? (
-                        <a href={l.url} className="text-sm text-slate-400 hover:text-white transition-colors">{l.name}</a>
-                      ) : (
-                        <Link to={l.url} className="text-sm text-slate-400 hover:text-white transition-colors">{l.name}</Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {APPLICATION_AREA_KEYS.map(area => (
+              <div key={area.nameKey} className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-black/[0.14] dark:hover:border-white/[0.12] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all group cursor-default">
+                <area.icon className="w-6 h-6 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                <div className="font-black text-sm mb-1">{t(area.nameKey)}</div>
+                <div className="text-[11px] text-gray-500 dark:text-slate-500 leading-snug">{t(area.noteKey)}</div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-600">© {new Date().getFullYear()} YourApp. Seluruh hak cipta dilindungi undang-undang.</p>
-            <div className="flex gap-4">
-              <Link to="/page/terms" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Terms of Service</Link>
-              <Link to="/page/privacy" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Privacy Policy</Link>
-              <Link to="/page/disclaimer" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Disclaimer</Link>
+      {/* ── Produk ──────────────────────────────────────────────────────────── */}
+      <section id="produk" className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('products.label')}</p>
+            <h2 className="text-4xl font-black">{t('products.title')}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-3 max-w-lg mx-auto">{t('products.subtitle')}</p>
+          </div>
+
+          <div className="flex gap-2 mb-8 bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-1.5 max-w-sm mx-auto">
+            {(['amniotic', 'placental'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'flex-1 py-2 text-sm font-bold rounded-xl transition-all',
+                  activeTab === tab
+                    ? 'bg-primary text-black shadow-[0_0_20px_rgba(212,166,58,0.2)]'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white',
+                )}
+              >
+                {t(tab === 'amniotic' ? 'products.tab.amniotic' : 'products.tab.placental')}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {(activeTab === 'amniotic' ? AMNIOTIC_PRODUCTS : PLACENTAL_PRODUCTS).map(product => (
+              <div key={product.name} className="p-6 bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl hover:border-primary/20 transition-colors flex flex-col">
+                <div className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">
+                  {t(activeTab === 'amniotic' ? 'products.tab.amniotic' : 'products.tab.placental')}
+                </div>
+                <h3 className="font-black text-lg mb-1">{product.name}</h3>
+                <div className="text-xs font-bold text-gray-600 dark:text-slate-300 mb-1">{product.nanoparticles}</div>
+                <div className="text-[11px] text-gray-400 dark:text-slate-500 font-semibold mb-3">{product.type}</div>
+                <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed flex-1">{product.description}</p>
+                <a
+                  href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Halo Exomed, saya ingin menanyakan produk ${product.name}.`)}`}
+                  target="_blank" rel="noreferrer"
+                  className="mt-5 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-black/[0.04] dark:bg-white/[0.05] border border-black/[0.10] dark:border-white/[0.10] rounded-xl text-sm font-bold hover:bg-black/[0.08] dark:hover:bg-white/[0.09] transition-colors text-gray-700 dark:text-white"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  {t('products.cta')}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Studi Kasus ─────────────────────────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-6">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('cases.label')}</p>
+            <h2 className="text-4xl font-black">{t('cases.title')}</h2>
+          </div>
+          <div className="flex items-start gap-3 p-4 mb-10 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl max-w-3xl mx-auto">
+            <Shield className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-300/80 leading-relaxed">{t('cases.disclaimer')}</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {CASE_STUDIES.map(cs => (
+              <div key={cs.title} className="p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">{t(cs.specialtyKey)}</span>
+                <h3 className="font-black text-sm mt-2 mb-3 leading-snug">{cs.title}</h3>
+                <p className="text-[11px] text-gray-500 dark:text-slate-500 leading-relaxed mb-5">{cs.description}</p>
+                <div className="space-y-2">
+                  {cs.metrics.map(m => (
+                    <div key={m.label} className="flex justify-between items-center py-2 border-t border-black/[0.06] dark:border-white/[0.06]">
+                      <span className="text-xs text-gray-500 dark:text-slate-400">{m.label}</span>
+                      <span className="text-sm font-black text-gray-900 dark:text-white">{m.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Kepatuhan & Sertifikasi ─────────────────────────────────────────── */}
+      <section className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('compliance.label')}</p>
+            <h2 className="text-4xl font-black">{t('compliance.title')}</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            {[
+              { icon: Shield,      lk: 'compliance.cert1.label', sk: 'compliance.cert1.sub' },
+              { icon: Award,       lk: 'compliance.cert2.label', sk: 'compliance.cert2.sub' },
+              { icon: CheckCircle, lk: 'compliance.cert3.label', sk: 'compliance.cert3.sub' },
+              { icon: Microscope,  lk: 'compliance.cert4.label', sk: 'compliance.cert4.sub' },
+            ].map(item => (
+              <div key={item.lk} className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl text-center">
+                <item.icon className="w-7 h-7 text-primary mx-auto mb-3" />
+                <div className="font-black text-sm mb-1">{t(item.lk)}</div>
+                <div className="text-[11px] text-gray-500 dark:text-slate-500">{t(item.sk)}</div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <button
+              onClick={() => { setCoaModal(true); setCoaDone(false); setCoaForm({ name: '', email: '' }) }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-black/[0.04] dark:bg-white/[0.05] border border-black/[0.10] dark:border-white/[0.10] text-gray-700 dark:text-white font-bold rounded-xl hover:bg-black/[0.08] dark:hover:bg-white/[0.09] transition-colors text-sm"
+            >
+              <Download className="w-4 h-4" />
+              {t('compliance.download')}
+            </button>
+            <p className="text-xs text-gray-400 dark:text-slate-600 mt-2">{t('compliance.download.hint')}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pipeline ────────────────────────────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('pipeline.label')}</p>
+            <h2 className="text-4xl font-black">{t('pipeline.title')}</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-black/[0.08] dark:border-white/[0.08]">
+                  {[t('pipeline.col.product'), t('pipeline.col.platform'), t('pipeline.col.stage')].map(h => (
+                    <th key={h} className="text-start py-3 px-4 text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
+                {PIPELINE.map(item => (
+                  <tr key={item.product} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-black">{item.product}</td>
+                    <td className="py-4 px-4 text-gray-500 dark:text-slate-400">{item.platform}</td>
+                    <td className="py-4 px-4">
+                      <span className={cn('px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border', STAGE_STYLE[item.stage])}>
+                        {STAGE_LABELS[item.stage]}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Form Konsultasi ─────────────────────────────────────────────────── */}
+      <section ref={formRef} id="konsultasi" className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">{t('form.label')}</p>
+            <h2 className="text-4xl font-black">{t('form.title')}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-3">{t('form.subtitle')}</p>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {submitted ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                className="text-center py-16 px-8 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl"
+              >
+                <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-black mb-2">{t('form.success.title')}</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('form.success.body')}</p>
+                <a
+                  href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_DEFAULT)}`}
+                  target="_blank" rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.10] dark:border-white/[0.10] rounded-xl text-sm font-bold hover:bg-black/[0.08] dark:hover:bg-white/[0.10] transition-colors"
+                >
+                  <Phone className="w-4 h-4" />
+                  {t('form.success.wa')}
+                </a>
+              </motion.div>
+            ) : (
+              <motion.form key="form" onSubmit={handleSubmit} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label={t('form.name')} name="name" value={form.name} onChange={handleFormChange} required placeholder={t('form.name.ph')} />
+                  <Field label={t('form.specialty')} name="specialty" value={form.specialty} onChange={handleFormChange} required placeholder={t('form.specialty.ph')} />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label={t('form.clinic')} name="clinic" value={form.clinic} onChange={handleFormChange} required placeholder={t('form.clinic.ph')} />
+                  <Field label={t('form.city')} name="city" value={form.city} onChange={handleFormChange} required placeholder={t('form.city.ph')} />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label={t('form.wa')} name="whatsapp" value={form.whatsapp} onChange={handleFormChange} required placeholder={t('form.wa.ph')} type="tel" />
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-slate-500">{t('form.product')}</label>
+                    <select
+                      name="product_interest"
+                      value={form.product_interest}
+                      onChange={handleFormChange}
+                      required
+                      className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-2xl px-4 py-3.5 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all"
+                    >
+                      <option value="">{t('form.product.ph')}</option>
+                      <option value="EXOMED-AMNI-100M">EXOMED-AMNI-100M</option>
+                      <option value="EXOMED-AMNI-300M">EXOMED-AMNI-300M</option>
+                      <option value="EXOMED-AMNI-500M">EXOMED-AMNI-500M</option>
+                      <option value="EXOMED-CORD-100M">EXOMED-CORD-100M</option>
+                      <option value="EXOMED-CORD-300M">EXOMED-CORD-300M</option>
+                      <option value="EXOMED-CORD-NEURO">EXOMED-CORD-NEURO</option>
+                      <option value="unknown">{t('form.product.unknown')}</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-slate-500">{t('form.message')}</label>
+                  <textarea
+                    name="message" value={form.message} onChange={handleFormChange} rows={4}
+                    placeholder={t('form.message.ph')}
+                    className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-2xl px-4 py-3.5 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-white/20"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    type="submit" disabled={submitting}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-8 py-4 bg-gold-gradient text-black font-black rounded-2xl hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? t('form.submitting') : t('form.submit')}
+                    {!submitting && <ChevronRight className="w-4 h-4" />}
+                  </button>
+                  <a
+                    href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_DEFAULT)}`}
+                    target="_blank" rel="noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-8 py-4 bg-black/[0.04] dark:bg-white/[0.05] border border-black/[0.10] dark:border-white/[0.10] text-gray-700 dark:text-white font-bold rounded-2xl hover:bg-black/[0.08] dark:hover:bg-white/[0.09] transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    {t('form.wa.direct')}
+                  </a>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </div>
+      </section>
+
+      {/* ── Footer ──────────────────────────────────────────────────────────── */}
+      <footer className="border-t border-black/[0.06] dark:border-white/[0.06] py-14 px-6 bg-gray-50 dark:bg-transparent">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-10 mb-10">
+            <div>
+              <Logo className="h-8 w-auto mb-4" variant="horizontal" />
+              <p className="text-xs text-gray-500 dark:text-slate-500 leading-relaxed">{t('footer.about')}</p>
             </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-slate-600 mb-4">{t('footer.contact')}</div>
+              <div className="space-y-2">
+                <a href={`https://wa.me/${WA_NUMBER}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <Phone className="w-3.5 h-3.5 text-primary" /> WhatsApp Business
+                </a>
+                <a href="mailto:info@exomed.id" className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <Mail className="w-3.5 h-3.5 text-primary" /> info@exomed.id
+                </a>
+                <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-slate-400">
+                  <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" /> Jakarta, Indonesia
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-slate-600 mb-4">{t('footer.legal')}</div>
+              <div className="space-y-2">
+                <a href="/page/privacy"    className="block text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">{t('footer.privacy')}</a>
+                <a href="/page/terms"      className="block text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">{t('footer.terms')}</a>
+                <a href="/page/disclaimer" className="block text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">{t('footer.disclaimer.link')}</a>
+              </div>
+            </div>
+          </div>
+          <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.05] flex flex-col md:flex-row justify-between gap-3 text-xs text-gray-400 dark:text-slate-600">
+            <p>© {new Date().getFullYear()} Exomed Therapeutics Indonesia. All rights reserved.</p>
+            <p className="font-bold uppercase tracking-wider">{t('footer.professional')}</p>
           </div>
         </div>
       </footer>
+
+      {/* ── COA Modal ───────────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {coaModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={e => { if (e.target === e.currentTarget) setCoaModal(false) }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
+              className="bg-white dark:bg-[#0a0a0a] border border-black/[0.10] dark:border-white/10 rounded-2xl w-full max-w-md p-8 shadow-2xl"
+            >
+              {coaDone ? (
+                <div className="text-center">
+                  <CheckCircle className="w-10 h-10 text-primary mx-auto mb-4" />
+                  <h3 className="font-black text-lg mb-2">{t('coa.success.title')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('coa.success.body')}</p>
+                  <button onClick={() => setCoaModal(false)} className="px-6 py-2.5 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.10] dark:border-white/[0.10] rounded-xl text-sm font-bold hover:bg-black/[0.08] dark:hover:bg-white/[0.10] transition-colors">
+                    {t('coa.success.close')}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="font-black text-lg">{t('coa.title')}</h3>
+                    <button onClick={() => setCoaModal(false)} className="text-gray-400 hover:text-gray-900 dark:text-slate-500 dark:hover:text-white"><X className="w-5 h-5" /></button>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('coa.body')}</p>
+                  <form onSubmit={e => { e.preventDefault(); setCoaDone(true) }} className="space-y-4">
+                    <ModalField label={t('coa.name')} value={coaForm.name} onChange={v => setCoaForm(p => ({ ...p, name: v }))} placeholder={t('coa.name.ph')} />
+                    <ModalField label={t('coa.email')} type="email" value={coaForm.email} onChange={v => setCoaForm(p => ({ ...p, email: v }))} placeholder={t('coa.email.ph')} />
+                    <button type="submit" className="w-full py-3 bg-gold-gradient text-black font-black rounded-xl hover:opacity-90 transition-opacity text-sm mt-2">
+                      {t('coa.submit')}
+                    </button>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  )
+}
+
+// ── Field helpers ─────────────────────────────────────────────────────────────
+
+function Field({
+  label, name, value, onChange, required, placeholder, type = 'text',
+}: {
+  label: string; name: string; value: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  required?: boolean; placeholder?: string; type?: string
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-slate-500">{label}</label>
+      <input
+        type={type} name={name} value={value} onChange={onChange}
+        required={required} placeholder={placeholder}
+        className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-2xl px-4 py-3.5 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20"
+      />
+    </div>
+  )
+}
+
+function ModalField({ label, value, onChange, placeholder, type = 'text' }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-slate-500">{label}</label>
+      <input
+        type={type} required value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        className="w-full bg-gray-100 dark:bg-[#111] border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20"
+      />
     </div>
   )
 }
