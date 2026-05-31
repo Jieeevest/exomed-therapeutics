@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs:dev": "npm run dev --prefix docs",
+    "docs:build": "npm run build --prefix docs",
+    "build:all": "npm run docs:build && npm run build"
   },
   "dependencies": {
     "@fontsource/space-grotesk": "^5.2.10",

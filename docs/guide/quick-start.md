@@ -32,7 +32,7 @@ VITE_API_URL=http://localhost:3001
 npm run dev
 ```
 
-Buka [http://localhost:5173](http://localhost:5173).
+Buka `http://localhost:5173` di browser.
 
 ## Scripts
 

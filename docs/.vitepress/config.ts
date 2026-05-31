@@ -4,6 +4,8 @@ export default defineConfig({
   title: 'SaaS Boilerplate',
   description: 'Dokumentasi boilerplate aplikasi SaaS modern siap pakai',
   lang: 'id-ID',
+  base: '/docs/',
+  outDir: '../public/docs',
 
   themeConfig: {
     logo: '/logo.png',

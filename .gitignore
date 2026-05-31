@@ -11,3 +11,8 @@ coverage/
 *.log
 
 .claude/
+
+# VitePress build output & cache
+public/docs/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
