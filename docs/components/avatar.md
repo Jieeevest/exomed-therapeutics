@@ -2,6 +2,10 @@
 
 Komponen avatar berbasis inisial dengan warna otomatis dari nama user.
 
+## Preview
+
+<iframe src="/preview?id=avatar" style="width:100%;height:160px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts

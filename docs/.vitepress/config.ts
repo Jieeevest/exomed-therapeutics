@@ -6,6 +6,7 @@ export default defineConfig({
   lang: 'id-ID',
   base: '/docs/',
   outDir: '../public/docs',
+  markdown: { html: true },
 
   themeConfig: {
     logo: '/logo.png',

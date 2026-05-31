@@ -1,5 +1,13 @@
 # Input & Textarea
 
+## Preview — Input
+
+<iframe src="/preview?id=input" style="width:100%;height:400px;border:none;border-radius:12px;" loading="lazy" />
+
+## Preview — Textarea
+
+<iframe src="/preview?id=textarea" style="width:100%;height:340px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Input
 
 ### Import

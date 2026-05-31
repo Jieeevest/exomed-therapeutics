@@ -2,6 +2,10 @@
 
 Indikator loading berbentuk lingkaran berputar.
 
+## Preview
+
+<iframe src="/preview?id=spinner" style="width:100%;height:170px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts

@@ -1,6 +1,10 @@
 # Select
 
-Berbasis `react-select` dengan dark theme custom. Support searchable, multi-select, async, dan grouping out of the box.
+Berbasis `react-select` dengan dark theme custom.
+
+## Preview
+
+<iframe src="/preview?id=select" style="width:100%;height:300px;border:none;border-radius:12px;" loading="lazy" /> Support searchable, multi-select, async, dan grouping out of the box.
 
 ## Import
 

@@ -1,5 +1,13 @@
 # Table & Pagination
 
+## Preview — Table
+
+<iframe src="/preview?id=table" style="width:100%;height:240px;border:none;border-radius:12px;" loading="lazy" />
+
+## Preview — Pagination
+
+<iframe src="/preview?id=pagination" style="width:100%;height:140px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Table
 
 Komponen tabel dengan loading overlay dan sub-komponen untuk struktur yang konsisten.

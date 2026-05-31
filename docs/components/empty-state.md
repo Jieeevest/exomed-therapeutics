@@ -2,6 +2,10 @@
 
 Tampilan kosong dengan icon, judul, deskripsi, dan tombol aksi opsional.
 
+## Preview
+
+<iframe src="/preview?id=emptystate" style="width:100%;height:360px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts

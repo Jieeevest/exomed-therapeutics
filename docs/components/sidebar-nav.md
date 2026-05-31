@@ -2,6 +2,10 @@
 
 Daftar navigasi sidebar dengan active state, icon, dan badge opsional.
 
+## Preview
+
+<iframe src="/preview?id=sidebarnav" style="width:100%;height:250px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts

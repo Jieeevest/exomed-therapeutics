@@ -1,5 +1,13 @@
 # Alert & Badge
 
+## Preview — Alert
+
+<iframe src="/preview?id=alert" style="width:100%;height:240px;border:none;border-radius:12px;" loading="lazy" />
+
+## Preview — Badge
+
+<iframe src="/preview?id=badge" style="width:100%;height:120px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Alert
 
 Pesan notifikasi dengan animasi height collapse saat muncul dan menghilang.

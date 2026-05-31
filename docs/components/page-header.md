@@ -2,6 +2,10 @@
 
 Header halaman dengan judul, deskripsi opsional, dan slot aksi.
 
+## Preview
+
+<iframe src="/preview?id=pageheader" style="width:100%;height:240px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts

@@ -1,5 +1,13 @@
 # Card & StatCard
 
+## Preview — Card
+
+<iframe src="/preview?id=card" style="width:100%;height:300px;border:none;border-radius:12px;" loading="lazy" />
+
+## Preview — StatCard
+
+<iframe src="/preview?id=statcard" style="width:100%;height:140px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Card
 
 Wrapper card gelap dengan sub-komponen `Card.Header` dan `Card.Footer`.

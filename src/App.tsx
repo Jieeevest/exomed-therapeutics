@@ -10,6 +10,7 @@ import ArticleDetail from '@/pages/ArticleDetail'
 import StaticPage from '@/pages/StaticPage'
 import PaymentSuccess from '@/pages/PaymentSuccess'
 import PaymentCancel from '@/pages/PaymentCancel'
+import ComponentPreview from '@/pages/ComponentPreview'
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
 
@@ -21,6 +22,7 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/" element={<Landing />} />
+        <Route path="/preview" element={<ComponentPreview />} />
         <Route path="/articles" element={<Articles />} />
         <Route path="/articles/:slug" element={<ArticleDetail />} />
         <Route path="/page/:slug" element={<StaticPage />} />

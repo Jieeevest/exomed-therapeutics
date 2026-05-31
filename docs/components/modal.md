@@ -2,6 +2,10 @@
 
 Dialog overlay dengan backdrop blur, animasi masuk/keluar, dan slot header/body/footer.
 
+## Preview
+
+<iframe src="/preview?id=modal" style="width:100%;height:100px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts

@@ -2,6 +2,10 @@
 
 Komponen tombol dengan 5 variant, 3 ukuran, dan loading state.
 
+## Preview
+
+<iframe src="/preview?id=button" style="width:100%;height:180px;border:none;border-radius:12px;" loading="lazy" />
+
 ## Import
 
 ```ts
