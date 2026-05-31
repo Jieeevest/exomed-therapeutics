@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "docs:dev": "bun run dev --cwd docs",
-    "docs:build": "bun run build --cwd docs",
+    "docs:dev": "cd docs && bun run dev",
+    "docs:build": "cd docs && bun run build",
     "build:all": "bun run docs:build && bun run build"
   },
   "dependencies": {
