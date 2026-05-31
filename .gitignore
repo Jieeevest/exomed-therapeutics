@@ -16,3 +16,7 @@ coverage/
 public/docs/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+# npm lockfile — proyek ini pakai bun
+package-lock.json
+docs/package-lock.json

@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "docs:dev": "npm run dev --prefix docs",
-    "docs:build": "npm run build --prefix docs",
-    "build:all": "npm run docs:build && npm run build"
+    "docs:dev": "bun run dev --cwd docs",
+    "docs:build": "bun run build --cwd docs",
+    "build:all": "bun run docs:build && bun run build"
   },
   "dependencies": {
     "@fontsource/space-grotesk": "^5.2.10",
