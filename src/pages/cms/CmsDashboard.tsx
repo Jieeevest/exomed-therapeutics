@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { MessageSquare, Package, BookOpen, TrendingUp, ArrowRight, Clock } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
-import { cn } from '@/lib/utils'
 
 const STATS = [
   { label: 'Total Inquiry',      value: 24, icon: MessageSquare, color: 'text-blue-500',    bg: 'bg-blue-500/10',    link: '/cms/inquiries' },

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import {
   LayoutDashboard, BarChart2, Settings, List,
-  LogOut, ShieldAlert, User, Crown, Ticket, Bell
+  LogOut, ShieldAlert, User, Crown, Ticket
 } from 'lucide-react'
 
 import { useAuth } from '@/store/useAuth'
