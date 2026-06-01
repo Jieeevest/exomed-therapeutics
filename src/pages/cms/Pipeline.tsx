@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils'
 import type { PipelineItem } from '@/types'
 
 const DUMMY: PipelineItem[] = [
-  { id: '1', product_name: 'EXOMED-CORD-NEURO', platform: 'Neurological Platform',  stage: 'pre-clinical',   order: 1 },
-  { id: '2', product_name: 'EXOMED-AMNI-100M',  platform: 'Orthopedic Platform',    stage: 'research',       order: 2 },
-  { id: '3', product_name: 'EXOMED-CORD-300M',  platform: 'Dermatology Platform',   stage: 'special-order',  order: 3 },
-  { id: '4', product_name: 'EXOMED-AMNI-300M',  platform: 'Aesthetic Platform',     stage: 'early-research', order: 4 },
+  { id: '1', product_name: 'ExoMatrix', platform: 'Neurological Platform',  stage: 'pre-clinical',   order: 1 },
+  { id: '2', product_name: 'ExoTher 3', platform: 'Orthopedic Platform',    stage: 'research',       order: 2 },
+  { id: '3', product_name: 'ExoGen',    platform: 'Dermatology Platform',   stage: 'special-order',  order: 3 },
+  { id: '4', product_name: 'ExoPro',    platform: 'Aesthetic Platform',     stage: 'early-research', order: 4 },
 ]
 
 const STAGES: { value: PipelineItem['stage']; label: string; color: string }[] = [

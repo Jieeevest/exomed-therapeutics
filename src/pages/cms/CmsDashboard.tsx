@@ -11,11 +11,11 @@ const STATS = [
 ]
 
 const RECENT = [
-  { id: '1', name: 'dr. Ahmad Fauzi, SpOT',   clinic: 'RS Husada Utama',       product: 'EXOMED-AMNI-300M',   status: 'baru',     time: '09:14' },
-  { id: '2', name: 'dr. Siti Rahayu, SpKK',   clinic: 'Klinik Estetika Sehat', product: 'EXOMED-CORD-300M',   status: 'diproses', time: '08:52' },
-  { id: '3', name: 'dr. Budi Santoso, SpN',   clinic: 'RSUP dr. Sardjito',     product: 'EXOMED-CORD-NEURO',  status: 'baru',     time: '08:31' },
-  { id: '4', name: 'dr. Dewi Lestari',         clinic: 'Klinik Prima',          product: 'EXOMED-AMNI-100M',   status: 'selesai',  time: 'Kemarin' },
-  { id: '5', name: 'dr. Rudi Hartono, SpOG',  clinic: 'RS Bunda',              product: 'EXOMED-AMNI-500M',   status: 'diproses', time: 'Kemarin' },
+  { id: '1', name: 'dr. Ahmad Fauzi, SpOT',   clinic: 'RS Husada Utama',       product: 'ExoTher 3',  status: 'baru',     time: '09:14' },
+  { id: '2', name: 'dr. Siti Rahayu, SpKK',   clinic: 'Klinik Estetika Sehat', product: 'ExoLite',    status: 'diproses', time: '08:52' },
+  { id: '3', name: 'dr. Budi Santoso, SpN',   clinic: 'RSUP dr. Sardjito',     product: 'ExoMatrix',  status: 'baru',     time: '08:31' },
+  { id: '4', name: 'dr. Dewi Lestari',         clinic: 'Klinik Prima',          product: 'ExoTher 1',  status: 'selesai',  time: 'Kemarin' },
+  { id: '5', name: 'dr. Rudi Hartono, SpOG',  clinic: 'RS Bunda',              product: 'ExoGen',     status: 'diproses', time: 'Kemarin' },
 ]
 
 const STATUS_COLOR: Record<string, string> = {

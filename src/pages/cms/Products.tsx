@@ -6,12 +6,17 @@ import { cn } from '@/lib/utils'
 import type { Product } from '@/types'
 
 const DUMMY: Product[] = [
-  { id: '1', name: 'EXOMED-AMNI-100M', series: 'amniotic',  nanoparticles: '100 Juta', type: 'MSC Amniotic Derived',                description: 'Formulasi standar untuk aplikasi regeneratif umum.',                        status: 'aktif' },
-  { id: '2', name: 'EXOMED-AMNI-300M', series: 'amniotic',  nanoparticles: '300 Juta', type: 'MSC Amniotic Derived',                description: 'Konsentrasi menengah untuk ortopedi dan dermatologi.',                      status: 'aktif' },
-  { id: '3', name: 'EXOMED-AMNI-500M', series: 'amniotic',  nanoparticles: '500 Juta', type: 'MSC Amniotic Derived — High Potency', description: 'Formulasi konsentrasi tinggi untuk kasus kompleks.',                        status: 'aktif' },
-  { id: '4', name: 'EXOMED-CORD-100M', series: 'placental', nanoparticles: '100 Juta', type: 'Umbilical Cord MSC',                  description: 'Formulasi standar berbasis tali pusat umbilikal.',                          status: 'aktif' },
-  { id: '5', name: 'EXOMED-CORD-300M', series: 'placental', nanoparticles: '300 Juta', type: 'Umbilical Cord MSC',                  description: 'Konsentrasi menengah untuk estetika dan dermatologi.',                      status: 'aktif' },
-  { id: '6', name: 'EXOMED-CORD-NEURO', series: 'placental', nanoparticles: '150 Juta', type: 'Neural-Optimized (Placental Cord)', description: 'Dioptimalkan untuk aplikasi neurologi. Tersedia sebagai special order.', status: 'special_order' },
+  { id: '1',  name: 'ExoMed 1',   series: 'amniotic',  nanoparticles: '200 Million',   type: 'MSC Amniotic Derived (with HA)',        description: 'Formulasi dengan Hyaluronic Acid untuk regenerasi sendi dan jaringan.',               status: 'aktif' },
+  { id: '2',  name: 'ExoMed 2',   series: 'amniotic',  nanoparticles: '1 Billion',     type: 'MSC Amniotic Derived (with HA)',        description: 'Konsentrasi tinggi dengan HA untuk aplikasi ortopedi intensif.',                      status: 'aktif' },
+  { id: '3',  name: 'ExoTher',    series: 'amniotic',  nanoparticles: '200 Million',   type: 'MSC Amniotic Derived',                  description: 'Formulasi dasar standar untuk aplikasi regeneratif umum.',                            status: 'aktif' },
+  { id: '4',  name: 'ExoTher 1',  series: 'amniotic',  nanoparticles: '1 Billion',     type: 'MSC Amniotic Derived',                  description: 'Konsentrasi optimal untuk dermatologi, estetika medis, dan restorasi rambut.',        status: 'aktif' },
+  { id: '5',  name: 'ExoTher 2',  series: 'amniotic',  nanoparticles: '10 Billion',    type: 'MSC Amniotic Derived',                  description: 'Formulasi potent untuk kasus kompleks dermatologi dan anti-aging.',                    status: 'aktif' },
+  { id: '6',  name: 'ExoTher 3',  series: 'amniotic',  nanoparticles: '100 Billion',   type: 'MSC Amniotic Derived',                  description: 'Konsentrasi tinggi untuk ortopedi dan pemulihan cedera berat.',                       status: 'aktif' },
+  { id: '7',  name: 'ExoPro',     series: 'amniotic',  nanoparticles: '300 Billion',   type: 'MSC Amniotic Derived',                  description: 'Formulasi profesional konsentrasi tinggi untuk kasus klinis advanced.',               status: 'aktif' },
+  { id: '8',  name: 'ExoFit',     series: 'amniotic',  nanoparticles: '750 Billion',   type: 'MSC Amniotic Derived',                  description: 'Konsentrasi premium untuk sports medicine dan regenerasi intensif.',                   status: 'aktif' },
+  { id: '9',  name: 'ExoMatrix',  series: 'amniotic',  nanoparticles: '1.5 Trillion',  type: 'MSC Amniotic Derived',                  description: 'Formulasi ultra-konsentrasi. Special order dengan supervisi medis penuh.',             status: 'special_order' },
+  { id: '10', name: 'ExoLite',    series: 'placental', nanoparticles: '750 Billion',   type: 'Placental Cord MSC',                    description: 'Formulasi Placental Cord standar untuk estetika dan dermatologi.',                    status: 'aktif' },
+  { id: '11', name: 'ExoGen',     series: 'placental', nanoparticles: '1.5 Trillion',  type: 'Placental Cord MSC',                    description: 'Formulasi Placental Cord ultra-konsentrasi. Special order dengan supervisi medis penuh.', status: 'special_order' },
 ]
 
 const STATUS_COLOR: Record<string, string> = {

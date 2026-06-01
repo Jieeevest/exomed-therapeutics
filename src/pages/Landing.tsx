@@ -34,45 +34,37 @@ import { API_URLS } from "@/constants/apiUrls";
 
 const AMNIOTIC_PRODUCTS = [
   {
-    name: "EXOMED-AMNI-100M",
-    nanoparticles: "100 Million Nanoparticles",
+    name: "ExoTher 1",
+    nanoparticles: "1 Billion Nanoparticles",
     type: "MSC Amniotic Derived",
-    description: "Standard formulation for general regenerative applications.",
+    description: "Optimal concentration for dermatology, aesthetic medicine, and hair restoration.",
   },
   {
-    name: "EXOMED-AMNI-300M",
-    nanoparticles: "300 Million Nanoparticles",
+    name: "ExoPro",
+    nanoparticles: "300 Billion Nanoparticles",
     type: "MSC Amniotic Derived",
-    description:
-      "Mid-concentration for orthopedic and dermatology indications.",
+    description: "Professional-grade high-concentration formulation for advanced clinical cases.",
   },
   {
-    name: "EXOMED-AMNI-500M",
-    nanoparticles: "500 Million Nanoparticles",
-    type: "MSC Amniotic Derived — High Potency",
-    description: "High-concentration formulation for complex cases.",
+    name: "ExoMatrix",
+    nanoparticles: "1.5 Trillion Nanoparticles",
+    type: "MSC Amniotic Derived — Special Order",
+    description: "Ultra-high concentration formulation. Available as special order under full medical supervision.",
   },
 ];
 
 const PLACENTAL_PRODUCTS = [
   {
-    name: "EXOMED-CORD-100M",
-    nanoparticles: "100 Million Nanoparticles",
-    type: "Umbilical Cord MSC",
-    description: "Standard umbilical cord-derived formulation.",
+    name: "ExoLite",
+    nanoparticles: "750 Billion Nanoparticles",
+    type: "Placental Cord MSC",
+    description: "Standard Placental Cord formulation for aesthetic and dermatology applications.",
   },
   {
-    name: "EXOMED-CORD-300M",
-    nanoparticles: "300 Million Nanoparticles",
-    type: "Umbilical Cord MSC",
-    description: "Mid-concentration for aesthetic and dermatology use.",
-  },
-  {
-    name: "EXOMED-CORD-NEURO",
-    nanoparticles: "150 Million Nanoparticles",
-    type: "Neural-Optimized (Placental Cord)",
-    description:
-      "Optimized for neurology applications. Available as special order.",
+    name: "ExoGen",
+    nanoparticles: "1.5 Trillion Nanoparticles",
+    type: "Placental Cord MSC — Special Order",
+    description: "Ultra-high concentration Placental Cord formulation. Available as special order under full medical supervision.",
   },
 ];
 
@@ -129,22 +121,22 @@ const CASE_STUDIES = [
 
 const PIPELINE = [
   {
-    product: "EXOMED-CORD-NEURO",
+    product: "ExoMatrix",
     platform: "Neurological Platform",
     stage: "pre-clinical" as const,
   },
   {
-    product: "EXOMED-AMNI-100M",
+    product: "ExoTher 3",
     platform: "Orthopedic Platform",
     stage: "research" as const,
   },
   {
-    product: "EXOMED-CORD-300M",
+    product: "ExoGen",
     platform: "Dermatology Platform",
     stage: "special-order" as const,
   },
   {
-    product: "EXOMED-AMNI-300M",
+    product: "ExoPro",
     platform: "Aesthetic Platform",
     stage: "early-research" as const,
   },
@@ -904,14 +896,21 @@ export default function Landing() {
                       className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-2xl px-4 py-3.5 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all"
                     >
                       <option value="">{t("form.product.ph")}</option>
-                      <option value="EXOMED-AMNI-100M">EXOMED-AMNI-100M</option>
-                      <option value="EXOMED-AMNI-300M">EXOMED-AMNI-300M</option>
-                      <option value="EXOMED-AMNI-500M">EXOMED-AMNI-500M</option>
-                      <option value="EXOMED-CORD-100M">EXOMED-CORD-100M</option>
-                      <option value="EXOMED-CORD-300M">EXOMED-CORD-300M</option>
-                      <option value="EXOMED-CORD-NEURO">
-                        EXOMED-CORD-NEURO
-                      </option>
+                      <optgroup label="Amniotic Series">
+                        <option value="ExoMed 1">ExoMed 1 — 200M Nanoparticles (with HA)</option>
+                        <option value="ExoMed 2">ExoMed 2 — 1B Nanoparticles (with HA)</option>
+                        <option value="ExoTher">ExoTher — 200M Nanoparticles</option>
+                        <option value="ExoTher 1">ExoTher 1 — 1B Nanoparticles</option>
+                        <option value="ExoTher 2">ExoTher 2 — 10B Nanoparticles</option>
+                        <option value="ExoTher 3">ExoTher 3 — 100B Nanoparticles</option>
+                        <option value="ExoPro">ExoPro — 300B Nanoparticles</option>
+                        <option value="ExoFit">ExoFit — 750B Nanoparticles</option>
+                        <option value="ExoMatrix">ExoMatrix — 1.5T Nanoparticles (Special Order)</option>
+                      </optgroup>
+                      <optgroup label="Placental Cord Series">
+                        <option value="ExoLite">ExoLite — 750B Nanoparticles</option>
+                        <option value="ExoGen">ExoGen — 1.5T Nanoparticles (Special Order)</option>
+                      </optgroup>
                       <option value="unknown">
                         {t("form.product.unknown")}
                       </option>
