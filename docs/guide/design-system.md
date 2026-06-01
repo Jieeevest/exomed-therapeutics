@@ -7,15 +7,15 @@ Semua token warna didefinisikan di `src/index.css` menggunakan format HSL. Ini m
 ```css
 /* src/index.css */
 :root {
-  --background:        0 0% 4%;    /* Background utama */
-  --foreground:        0 0% 98%;   /* Teks utama */
-  --card:              0 0% 7%;    /* Background card */
-  --card-foreground:   0 0% 98%;
-  --primary:           45 93% 47%; /* Aksen gold */
-  --primary-foreground:0 0% 0%;
-  --muted:             0 0% 14%;   /* Background muted */
-  --muted-foreground:  0 0% 65%;   /* Teks sekunder */
-  --border:            0 0% 15%;   /* Border semua elemen */
+  --background: 0 0% 4%; /* Background utama */
+  --foreground: 0 0% 98%; /* Teks utama */
+  --card: 0 0% 7%; /* Background card */
+  --card-foreground: 0 0% 98%;
+  --primary: 179 25% 41%; /* Aksen (rgb(78 130 129)) */
+  --primary-foreground: 0 0% 0%;
+  --muted: 0 0% 14%; /* Background muted */
+  --muted-foreground: 0 0% 65%; /* Teks sekunder */
+  --border: 0 0% 15%; /* Border semua elemen */
 }
 ```
 
@@ -60,7 +60,12 @@ Untuk mengganti warna gradient, edit di `src/index.css`:
 
 ```css
 .bg-gold-gradient {
-  background: linear-gradient(135deg, #F4D06F 0%, #D4A63A 40%, #A87412 70%, #7A5200 100%);
+  background: linear-gradient(
+    135deg,
+    rgb(122 183 182) 0%,
+    rgb(78 130 129) 40%,
+    rgb(48 80 79) 100%
+  );
 }
 ```
 
