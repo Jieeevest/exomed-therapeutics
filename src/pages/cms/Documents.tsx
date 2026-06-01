@@ -58,7 +58,7 @@ export default function Documents() {
       action={
         <button
           onClick={() => { setForm(EMPTY_FORM); setModal(true) }}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
         >
           <Plus className="w-4 h-4" />
           Upload Dokumen
@@ -66,14 +66,14 @@ export default function Documents() {
       }
     >
       <div className="space-y-4">
-        <div className="flex gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl w-fit">
+        <div className="flex gap-1 p-1 bg-muted/30 border border-border rounded-xl w-fit">
           {(['semua', 'coa', 'legal', 'brosur', 'protokol'] as CategoryFilter[]).map(c => (
             <button
               key={c}
               onClick={() => setCategoryFilter(c)}
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all',
-                categoryFilter === c ? 'bg-primary text-black' : 'text-slate-400 hover:text-white',
+                categoryFilter === c ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {c === 'semua' ? 'Semua' : CATEGORY_LABEL[c]}
@@ -81,26 +81,26 @@ export default function Documents() {
           ))}
         </div>
 
-        <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.02] border-b border-white/5">
+            <thead className="bg-muted/20 border-b border-border">
               <tr>
                 {['Dokumen', 'Kategori', 'Akses', 'Tanggal Upload', 'Aksi'].map(h => (
-                  <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-slate-400">{h}</th>
+                  <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-border">
               {visible.map(item => (
-                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+                <tr key={item.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2.5">
-                      <FileText className="w-4 h-4 text-slate-500 shrink-0" />
+                      <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
                       <span className="font-bold text-sm">{item.name}</span>
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className={cn('px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border', CATEGORY_COLOR[item.category])}>
+                    <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', CATEGORY_COLOR[item.category])}>
                       {CATEGORY_LABEL[item.category]}
                     </span>
                   </td>
@@ -112,19 +112,19 @@ export default function Documents() {
                       }
                     </div>
                   </td>
-                  <td className="px-5 py-3.5 text-xs text-slate-500">
+                  <td className="px-5 py-3.5 text-xs text-muted-foreground">
                     {new Date(item.uploaded_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex gap-1">
-                      <a href={item.file_url} target="_blank" rel="noreferrer" className="p-1.5 text-slate-500 hover:text-white hover:bg-white/[0.05] rounded-lg transition-colors"><ExternalLink className="w-3.5 h-3.5" /></a>
-                      <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <a href={item.file_url} target="_blank" rel="noreferrer" className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><ExternalLink className="w-3.5 h-3.5" /></a>
+                      <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
               {visible.length === 0 && (
-                <tr><td colSpan={5} className="px-5 py-12 text-center text-slate-500 text-sm">Belum ada dokumen.</td></tr>
+                <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground text-sm">Belum ada dokumen.</td></tr>
               )}
             </tbody>
           </table>
@@ -133,17 +133,17 @@ export default function Documents() {
 
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(false) }}>
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="p-6 border-b border-border flex justify-between items-center">
               <h2 className="font-black text-lg">Upload Dokumen</h2>
-              <button onClick={() => setModal(false)}><X className="w-5 h-5 text-slate-500 hover:text-white" /></button>
+              <button onClick={() => setModal(false)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
             </div>
             <div className="p-6 space-y-4">
               <Field label="Nama Dokumen" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">Kategori</label>
-                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value as CmsDocument['category'] }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-white">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Kategori</label>
+                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value as CmsDocument['category'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
                     <option value="coa">COA</option>
                     <option value="legal">Legal</option>
                     <option value="brosur">Brosur</option>
@@ -151,18 +151,18 @@ export default function Documents() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">Akses</label>
-                  <select value={form.access} onChange={e => setForm(p => ({ ...p, access: e.target.value as CmsDocument['access'] }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-white">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Akses</label>
+                  <select value={form.access} onChange={e => setForm(p => ({ ...p, access: e.target.value as CmsDocument['access'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
                     <option value="gated">Gated (isi form dulu)</option>
                     <option value="publik">Publik (langsung download)</option>
                   </select>
                 </div>
               </div>
               <Field label="URL File PDF" value={form.file_url} onChange={v => setForm(p => ({ ...p, file_url: v }))} />
-              <p className="text-xs text-slate-600">Upload file ke storage terlebih dahulu, lalu paste URL-nya di sini.</p>
+              <p className="text-xs text-muted-foreground">Upload file ke storage terlebih dahulu, lalu paste URL-nya di sini.</p>
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl text-sm font-bold hover:bg-white/[0.09] transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-black rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
               </div>
             </div>
           </div>
@@ -175,8 +175,8 @@ export default function Documents() {
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground" />
     </div>
   )
 }

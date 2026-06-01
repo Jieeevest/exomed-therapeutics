@@ -217,7 +217,7 @@ export default function Profile() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <button type="submit" disabled={loadingProfile} className="px-5 py-2.5 bg-primary text-black font-bold rounded-xl text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+                  <button type="submit" disabled={loadingProfile} className="px-5 py-2.5 bg-primary text-white font-bold rounded-xl text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
                     {loadingProfile ? 'Menyimpan...' : 'Simpan Perubahan'}
                   </button>
                 </form>

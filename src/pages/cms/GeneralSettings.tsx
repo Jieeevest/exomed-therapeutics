@@ -21,7 +21,7 @@ const INITIAL: GeneralData = {
   ga_id:              '',
   wa_number:          '6281234567890',
   wa_default_message: 'Halo Exomed, saya ingin berkonsultasi mengenai produk exosome untuk klinik saya.',
-  logo_url:           '/LOGO ORIGINAL FULL HORIZONTAL TRANSPARENT.png',
+  logo_url:           '/Logo Exomed BG Hitam.png',
   favicon_url:        '/favicon.png',
 }
 
@@ -48,7 +48,7 @@ export default function GeneralSettings() {
       action={
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
         >
           {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           {saved ? 'Tersimpan' : 'Simpan Perubahan'}
@@ -65,12 +65,12 @@ export default function GeneralSettings() {
         <Section title="SEO (Meta Tags)">
           <InputField label="Meta Title" value={form.meta_title} onChange={v => handleChange('meta_title', v)} />
           <div className="space-y-1.5">
-            <label className="text-xs font-black uppercase tracking-wider text-slate-500">Meta Description</label>
+            <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Meta Description</label>
             <textarea
               value={form.meta_description}
               onChange={e => handleChange('meta_description', e.target.value)}
               rows={3}
-              className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-white"
+              className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-foreground"
             />
           </div>
           <InputField label="Google Analytics ID (mis. G-XXXXXXXXXX)" value={form.ga_id} onChange={v => handleChange('ga_id', v)} placeholder="G-XXXXXXXXXX" />
@@ -79,16 +79,16 @@ export default function GeneralSettings() {
         <Section title="Integrasi WhatsApp Business">
           <InputField label="Nomor WA (tanpa +, mis. 6281234567890)" value={form.wa_number} onChange={v => handleChange('wa_number', v)} placeholder="6281234567890" />
           <div className="space-y-1.5">
-            <label className="text-xs font-black uppercase tracking-wider text-slate-500">Pesan Default WA</label>
+            <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Pesan Default WA</label>
             <textarea
               value={form.wa_default_message}
               onChange={e => handleChange('wa_default_message', e.target.value)}
               rows={2}
-              className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-white"
+              className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-foreground"
             />
           </div>
-          <div className="p-3 bg-white/[0.02] border border-white/[0.06] rounded-xl">
-            <div className="text-xs text-slate-500">Preview link WhatsApp:</div>
+          <div className="p-3 bg-muted/20 border border-border rounded-xl">
+            <div className="text-xs text-muted-foreground">Preview link WhatsApp:</div>
             <div className="text-xs text-primary mt-1 font-mono break-all">
               {`https://wa.me/${form.wa_number}?text=${encodeURIComponent(form.wa_default_message)}`}
             </div>
@@ -101,8 +101,8 @@ export default function GeneralSettings() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 space-y-4">
-      <div className="font-black text-sm text-slate-300 border-b border-white/5 pb-3">{title}</div>
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+      <div className="font-black text-sm text-foreground border-b border-border pb-3">{title}</div>
       {children}
     </div>
   )
@@ -111,12 +111,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function InputField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white placeholder:text-white/20"
+        className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30"
       />
     </div>
   )

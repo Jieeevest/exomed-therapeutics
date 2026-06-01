@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
-import { XCircle } from 'lucide-react'
-import { Logo } from '@/components/Logo'
+import { Link } from "react-router-dom";
+import { XCircle } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export default function PaymentCancel() {
   return (
@@ -14,19 +14,22 @@ export default function PaymentCancel() {
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
             <XCircle className="w-10 h-10 text-red-500" />
           </div>
-          <h2 className="text-2xl font-bold mb-2 text-white">Pembayaran Dibatalkan</h2>
+          <h2 className="text-2xl font-bold mb-2 text-white">
+            Pembayaran Dibatalkan
+          </h2>
           <p className="text-slate-400 text-sm leading-relaxed mb-8">
-            Proses pembayaran Anda telah dibatalkan. Jika Anda memiliki pertanyaan atau kendala, silakan hubungi tim dukungan kami.
+            Proses pembayaran Anda telah dibatalkan. Jika Anda memiliki
+            pertanyaan atau kendala, silakan hubungi tim dukungan kami.
           </p>
-          
+
           <div className="flex flex-col gap-3 w-full">
-            <Link 
+            <Link
               to="/app"
-              className="w-full bg-gold-gradient text-black font-semibold py-3.5 rounded-xl hover:opacity-90 transition-opacity"
+              className="w-full bg-gold-gradient text-white font-semibold py-3.5 rounded-xl hover:opacity-90 transition-opacity"
             >
               Kembali ke Dashboard
             </Link>
-            <Link 
+            <Link
               to="/support"
               className="w-full flex justify-center items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm py-2"
             >
@@ -36,5 +39,5 @@ export default function PaymentCancel() {
         </div>
       </div>
     </div>
-  )
+  );
 }

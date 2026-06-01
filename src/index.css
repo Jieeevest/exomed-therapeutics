@@ -9,17 +9,17 @@
     --foreground: 0 0% 6%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 6%;
-    --primary: 45 93% 40%;
+    --primary: 179 25% 41%;
     --primary-foreground: 0 0% 0%;
     --secondary: 45 15% 92%;
     --secondary-foreground: 0 0% 10%;
     --muted: 0 0% 93%;
     --muted-foreground: 0 0% 42%;
-    --accent: 45 93% 40%;
+    --accent: 179 25% 41%;
     --accent-foreground: 0 0% 0%;
     --border: 0 0% 87%;
     --input: 0 0% 93%;
-    --ring: 45 93% 40%;
+    --ring: 179 25% 41%;
     --radius: 0.5rem;
   }
 
@@ -29,31 +29,31 @@
     --foreground: 0 0% 98%;
     --card: 0 0% 7%;
     --card-foreground: 0 0% 98%;
-    --primary: 45 93% 47%;
+    --primary: 179 25% 41%;
     --primary-foreground: 0 0% 0%;
     --secondary: 45 10% 15%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14%;
     --muted-foreground: 0 0% 65%;
-    --accent: 45 93% 47%;
+    --accent: 179 25% 41%;
     --accent-foreground: 0 0% 0%;
     --border: 0 0% 15%;
     --input: 0 0% 15%;
-    --ring: 45 93% 47%;
+    --ring: 179 25% 41%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: "Space Grotesk", system-ui, sans-serif;
   }
   html {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: "Space Grotesk", system-ui, sans-serif;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: "Space Grotesk", system-ui, sans-serif;
   }
 }
 
@@ -61,19 +61,18 @@
   .bg-gold-gradient {
     background: linear-gradient(
       135deg,
-      #F4D06F 0%,
-      #D4A63A 40%,
-      #A87412 70%,
-      #7A5200 100%
+      rgb(122 183 182) 0%,
+      rgb(78 130 129) 40%,
+      rgb(48 80 79) 100%
     );
+    color: #fff;
   }
   .text-gold-gradient {
     background: linear-gradient(
       135deg,
-      #F4D06F 0%,
-      #D4A63A 40%,
-      #A87412 70%,
-      #7A5200 100%
+      rgb(122 183 182) 0%,
+      rgb(78 130 129) 40%,
+      rgb(48 80 79) 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

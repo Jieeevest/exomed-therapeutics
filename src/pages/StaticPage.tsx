@@ -20,139 +20,166 @@ const PAGE_CONTENT: Record<string, { title: string; category: string; date: stri
   changelog: {
     title: 'Changelog',
     category: 'Produk',
-    date: 'Diperbarui: 12 Mei 2026',
+    date: 'Diperbarui: 1 Juni 2026',
     content: `### Versi 1.2.0 (Terbaru)
-- **Fitur Baru:** Penambahan fitur Grid Charts (Khusus Pro)
-- **Optimasi:** Rendering Engine pada Order Book 3x lebih cepat
-- **UI/UX:** Fitur tema gelap/terang adaptif dengan sistem perangkat
+- **Fitur Baru:** Pipeline produk dengan status riset real-time (Pre-Clinical, Research, Special Order)
+- **Fitur Baru:** Permintaan Certificate of Analysis (CoA) langsung dari portal
+- **Perbaikan:** Performa halaman artikel dan detail studi klinis
 
 ### Versi 1.1.0
-- **Integrasi:** Dukungan Bursa KuCoin dan Crypto.com
-- **Perbaikan:** Bug sinkronisasi harga saat koneksi internet tidak stabil
-- **Pembaruan:** Peningkatan akurasi sinyal Bullish Scanner MTF
+- **Fitur Baru:** Dukungan multibahasa — Bahasa Indonesia, Inggris, dan Mandarin
+- **Fitur Baru:** Halaman artikel edukasi klinis untuk dokter dan tenaga medis
+- **UI/UX:** Tampilan dark/light mode adaptif pada halaman publik
 
 ### Versi 1.0.0
-- **Rilis:** Peluncuran awal CryptoEx ke publik
-- **Fitur Dasar:** Dukungan Binance & OKX, Trading Terminal Dasar`
+- **Rilis:** Peluncuran portal Exomed Therapeutics Indonesia
+- **Fitur Dasar:** Katalog produk, formulir konsultasi, dan halaman profil profesional`
   },
   roadmap: {
     title: 'Roadmap Pengembangan',
     category: 'Produk',
-    date: 'Diperbarui: 1 Mei 2026',
+    date: 'Diperbarui: 1 Juni 2026',
     content: `### Q3 2026 (Sedang Berjalan)
-- Peluncuran Fitur Copy Trading Institusional
-- AI Auto-Trading Bots dengan integrasi LLM
-- Penambahan 5 indikator premium kustom
+- Sistem pemesanan produk online langsung melalui portal
+- Dashboard laporan penggunaan dan riwayat pemesanan per klinik
+- Integrasi notifikasi WhatsApp untuk update status pesanan
 
 ### Q4 2026
-- Aplikasi Mobile Native (iOS & Android)
-- Dukungan Decentralized Exchange (DEX) seperti Uniswap & PancakeSwap
-- Program Afiliasi Global
+- Aplikasi mobile native (iOS & Android) untuk dokter mitra
+- Modul edukasi klinis berbasis video dengan sertifikat CPD
+- Ekspansi distribusi ke wilayah Kalimantan dan Sulawesi
 
 ### Q1 2027
-- Lisensi Regulasi Kripto di berbagai wilayah
-- Peluncuran Token Ekosistem CryptoEx
-- Fitur Staking dan Yield Farming langsung dari Terminal`
+- Program kemitraan klinik berjenjang (Silver, Gold, Platinum)
+- Portal data studi observasional eksklusif untuk mitra terdaftar
+- Penambahan lini produk platform Neurologis (EXOMED-CORD-NEURO)`
   },
   dokumentasi: {
     title: 'Pusat Dokumentasi',
     category: 'Support',
-    date: 'Diperbarui: 10 Mei 2026',
-    content: `Selamat datang di Pusat Dokumentasi CryptoEx. Panduan komprehensif untuk memaksimalkan pengalaman trading Anda.
+    date: 'Diperbarui: 1 Juni 2026',
+    content: `Selamat datang di Pusat Dokumentasi Exomed Therapeutics Indonesia. Panduan lengkap untuk menggunakan portal dan mengakses layanan kami.
 
-### 1. Memulai Trading
-Buat akun, lalu masuk ke halaman Dashboard Terminal. Anda dapat melihat chart, daftar koin, dan indikator tanpa perlu koneksi API. Cukup navigasikan melalui sidebar untuk menjelajahi pasar.
+### 1. Registrasi Akun Profesional
+Portal ini hanya dapat diakses oleh tenaga medis berlisensi. Daftarkan akun Anda dengan menyertakan nomor SIP/STR dan informasi klinik. Tim kami akan memverifikasi data dalam 1×24 jam kerja.
 
-### 2. Menghubungkan Bursa (Exchange API)
-Jika Anda ingin melakukan eksekusi Buy/Sell langsung dari terminal kami:
-- Buka pengaturan API Management di profil Anda.
-- Masukkan API Key dan Secret Key dari Binance atau OKX.
-- **Penting:** Selalu nonaktifkan izin penarikan (Withdrawal) pada API Key Anda.
+### 2. Mengajukan Permintaan CoA
+Certificate of Analysis (CoA) tersedia untuk setiap batch produk. Untuk mengunduh CoA:
+- Masuk ke portal dan buka menu Profil.
+- Pilih "Permintaan CoA" dan isi formulir singkat.
+- CoA akan dikirimkan ke email terdaftar Anda dalam waktu 1 jam.
 
-### 3. Menggunakan Bullish Scanner
-Bullish Scanner memindai pasar 24/7 di 4 Timeframe berbeda secara bersamaan.
-- **Sinyal STRONG BUY:** Muncul jika 4 TF terkonfirmasi naik. Probabilitas historis mencapai 82%.
-- Harap selalu kombinasikan dengan analisis teknikal pribadi Anda.`
+### 3. Pemesanan Produk
+Semua produk hanya tersedia melalui jalur distribusi resmi. Untuk melakukan pemesanan:
+- Hubungi tim kami melalui formulir konsultasi atau WhatsApp.
+- Tim Medical Representative akan menghubungi Anda untuk konfirmasi kebutuhan klinis dan proses order.
+- **Catatan:** Produk dengan status Special Order memerlukan waktu pemrosesan tambahan.
+
+### 4. Mengakses Artikel Klinis
+Bagian Artikel menyediakan materi edukasi berbasis studi klinis dan data observasional. Beberapa artikel memerlukan akun Pro untuk akses penuh.`
   },
   faq: {
     title: 'Frequently Asked Questions (FAQ)',
     category: 'Support',
-    date: 'Diperbarui: 5 Mei 2026',
-    content: `### Apa itu CryptoEx?
-CryptoEx adalah terminal trading kripto profesional yang mengumpulkan likuiditas, chart, dan indikator premium dari berbagai bursa ke dalam satu antarmuka yang mulus.
+    date: 'Diperbarui: 1 Juni 2026',
+    content: `### Apa itu Exomed Therapeutics Indonesia?
+Exomed Therapeutics Indonesia adalah subsidiary resmi dari Exomed Therapeutics USA, perusahaan bioteknologi berbasis di Florida. Kami adalah distributor eksklusif produk exosome terstandarisasi untuk dokter dan klinik profesional di Indonesia.
 
-### Apakah layanan ini gratis?
-Ya. Kami menyediakan paket "Mulai Gratis" selamanya dengan fitur dasar (Single Chart, Market Data, Basic Scanner). Jika Anda butuh fitur ahli, Anda dapat berlangganan Paket Pro.
+### Apa perbedaan exosome dengan stem cell konvensional?
+Exosome adalah vesikel nanopartikel, bukan sel hidup. Keunggulan utamanya: tidak memerlukan donor autologus dari pasien, tidak mengekspresikan MHC class II sehingga risiko reaksi imunogenik sangat rendah, dan tersedia dalam formulasi siap pakai dengan standar konsisten di setiap batch.
 
-### Apakah uang saya aman?
-CryptoEx **BUKAN** dompet (wallet) atau bursa. Kami tidak pernah memegang aset Anda. Anda tetap menyimpan dana Anda di Binance/OKX, dan hanya menghubungkan API Key untuk membaca data atau mengirim instruksi eksekusi pesanan.`
+### Siapa yang dapat memesan produk Exomed?
+Produk kami hanya tersedia untuk tenaga medis berlisensi — dokter spesialis, dokter umum berpraktik, dan klinik profesional. Pembelian langsung oleh konsumen umum tidak tersedia.
+
+### Apa saja lini produk yang tersedia?
+Saat ini kami mendistribusikan dua lini utama: **Amniotic Platform** dan **Placental Platform**, dengan aplikasi klinis mencakup Ortopedi, Dermatologi, Estetika Medis, Restorasi Rambut, dan Sports Medicine. Beberapa produk tersedia sebagai Special Order.
+
+### Apakah produk sudah tersertifikasi?
+Ya. Seluruh produk diproduksi di fasilitas berlisensi FDA di Florida, USA, dengan standar FDA-Regulated Manufacturing. Certificate of Analysis (CoA) tersedia untuk setiap batch produk.
+
+### Bagaimana cara memulai konsultasi?
+Isi formulir konsultasi di halaman utama atau hubungi kami langsung via WhatsApp. Tim Medical Representative kami akan merespons dalam 1×24 jam kerja.`
   },
   status: {
     title: 'Status Sistem',
     category: 'Support',
     date: 'Real-time',
     content: `### Status Infrastruktur Inti
-- **Server Utama (Frontend):** 🟢 OPERATIONAL
-- **Database Engine:** 🟢 OPERATIONAL
-- **WebSocket API (Market Data):** 🟢 OPERATIONAL
+- **Server Utama (Portal):** 🟢 OPERATIONAL
+- **Database:** 🟢 OPERATIONAL
+- **Layanan Email & Notifikasi:** 🟢 OPERATIONAL
 
-### Status Koneksi Bursa
-- **Binance API:** 🟢 OPERATIONAL (Ping: 42ms)
-- **OKX API:** 🟢 OPERATIONAL (Ping: 38ms)
-- **KuCoin API:** 🟢 OPERATIONAL (Ping: 45ms)
-- **Crypto.com API:** 🟢 OPERATIONAL (Ping: 50ms)
+### Status Layanan Portal
+- **Autentikasi & Akun:** 🟢 OPERATIONAL
+- **Sistem Artikel & Konten:** 🟢 OPERATIONAL
+- **Formulir Konsultasi:** 🟢 OPERATIONAL
+- **Permintaan CoA:** 🟢 OPERATIONAL
 
-Semua sistem CryptoEx berjalan normal. Tidak ada gangguan atau latensi tinggi yang dilaporkan saat ini.`
+Semua sistem Exomed Therapeutics Indonesia berjalan normal. Tidak ada gangguan yang dilaporkan saat ini.`
   },
   terms: {
     title: 'Syarat & Ketentuan',
     category: 'Legal',
     date: 'Berlaku Sejak: 1 Januari 2026',
-    content: `Dengan mengakses dan menggunakan platform CryptoEx, Anda setuju untuk terikat oleh Syarat dan Ketentuan berikut. Harap baca dengan saksama.
+    content: `Dengan mengakses dan menggunakan portal Exomed Therapeutics Indonesia, Anda menyatakan telah membaca, memahami, dan menyetujui Syarat & Ketentuan berikut.
 
-### 1. Risiko Trading
-Trading aset kripto memiliki tingkat risiko yang sangat tinggi dan dapat mengakibatkan hilangnya sebagian atau seluruh modal Anda. Anda sepenuhnya bertanggung jawab atas setiap keputusan investasi yang Anda buat.
+### 1. Persyaratan Pengguna
+Portal ini diperuntukkan khusus bagi tenaga medis berlisensi di Indonesia. Dengan mendaftar, Anda menyatakan bahwa informasi profesi yang Anda berikan adalah benar dan dapat diverifikasi. Exomed Therapeutics Indonesia berhak menonaktifkan akun yang tidak memenuhi persyaratan ini.
 
-### 2. Penggunaan Layanan
-Anda setuju untuk tidak menggunakan platform ini untuk kegiatan ilegal, pencucian uang, manipulasi pasar, atau aktivitas penipuan lainnya. CryptoEx berhak secara sepihak untuk membekukan akun Anda jika terdeteksi aktivitas mencurigakan.
+### 2. Penggunaan Konten
+Seluruh konten pada portal ini — termasuk data klinis, artikel, dan informasi produk — merupakan milik Exomed Therapeutics Indonesia dan hanya boleh digunakan untuk keperluan klinis profesional. Reproduksi atau distribusi ulang tanpa izin tertulis dilarang.
 
-### 3. Ketersediaan Sistem
-Meskipun kami berusaha keras untuk memastikan uptime 99.9%, CryptoEx tidak menjamin bahwa platform akan selalu bebas dari gangguan, bug, atau downtime akibat masalah server eksternal (seperti pemeliharaan bursa).
+### 3. Pemesanan & Distribusi
+Semua transaksi pemesanan produk tunduk pada kebijakan distribusi yang berlaku. Exomed Therapeutics Indonesia berhak menolak pesanan yang tidak memenuhi syarat klinis atau persyaratan regulasi yang berlaku.
 
-### 4. Modifikasi
-Kami berhak untuk memperbarui syarat dan ketentuan ini kapan saja. Perubahan akan segera berlaku setelah diunggah ke halaman ini.`
+### 4. Ketersediaan Layanan
+Kami berupaya menjaga ketersediaan portal 24/7, namun tidak menjamin bebas dari gangguan teknis atau pemeliharaan berkala. Pemberitahuan pemeliharaan terjadwal akan disampaikan terlebih dahulu.
+
+### 5. Perubahan Syarat
+Kami berhak memperbarui syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku efektif sejak tanggal publikasi di halaman ini.`
   },
   privacy: {
     title: 'Kebijakan Privasi',
     category: 'Legal',
     date: 'Berlaku Sejak: 1 Januari 2026',
-    content: `CryptoEx ("kami") sangat menghargai dan berkomitmen untuk melindungi privasi data Anda di ekosistem Web3 ini.
+    content: `Exomed Therapeutics Indonesia ("kami") berkomitmen untuk melindungi privasi data seluruh pengguna terdaftar portal ini.
 
-### 1. Pengumpulan Data
-Kami hanya mengumpulkan data yang mutlak diperlukan: alamat email, nama pengguna, dan log aktivitas dasar demi menjaga keamanan akun dan meningkatkan kualitas layanan.
+### 1. Data yang Dikumpulkan
+Kami mengumpulkan data yang diperlukan untuk operasional layanan: nama lengkap, nomor SIP/STR, alamat email, nomor telepon, nama klinik/institusi, dan log aktivitas penggunaan portal untuk keperluan keamanan dan peningkatan layanan.
 
-### 2. Keamanan API Key
-Setiap API Key yang Anda hubungkan ke platform kami dienkripsi menggunakan standar perbankan (AES-256) di level database. Karyawan kami tidak memiliki akses untuk melihat API Key Anda secara mentah.
+### 2. Penggunaan Data
+Data Anda digunakan untuk: verifikasi akun profesional, pengiriman informasi produk dan update klinis yang relevan, komunikasi terkait pesanan dan konsultasi, serta peningkatan kualitas layanan portal.
 
-### 3. Pembagian Data
-Kami memegang teguh prinsip desentralisasi privasi. Kami tidak pernah menjual atau membagikan data pribadi Anda ke perusahaan iklan, pialang data, atau pihak ketiga yang tidak berkepentingan.
+### 3. Keamanan Data
+Seluruh data disimpan dan dienkripsi menggunakan standar keamanan industri. Akses terhadap data pengguna dibatasi hanya pada personel yang berwenang dan memiliki kebutuhan operasional yang sah.
 
-### 4. Hak Penghapusan Akun
-Anda memiliki kontrol penuh. Anda berhak untuk menghapus akun dan seluruh jejak data Anda dari server kami secara permanen kapan saja melalui halaman Pengaturan.`
+### 4. Pembagian Data
+Kami tidak menjual atau membagikan data pribadi Anda kepada pihak ketiga untuk keperluan komersial. Data hanya dapat dibagikan kepada mitra distribusi resmi Exomed untuk keperluan pemenuhan pesanan, atau kepada otoritas regulasi sesuai kewajiban hukum yang berlaku.
+
+### 5. Hak Pengguna
+Anda berhak mengakses, memperbarui, atau meminta penghapusan data pribadi Anda kapan saja melalui halaman Pengaturan Akun atau dengan menghubungi tim support kami.`
   },
   disclaimer: {
-    title: 'Disclaimer Peringatan Risiko',
+    title: 'Disclaimer',
     category: 'Legal',
     date: 'Berlaku Sejak: 1 Januari 2026',
-    content: `### PERINGATAN RISIKO TINGGI
+    content: `### Penggunaan Profesional
 
-Semua informasi, analisis, sinyal, chart, dan indikator yang disediakan di platform CryptoEx murni didesain untuk tujuan edukasi dan referensi data informasional. 
+Seluruh produk yang didistribusikan oleh Exomed Therapeutics Indonesia diperuntukkan khusus untuk penggunaan oleh tenaga medis berlisensi dalam setting klinis profesional. Produk ini **bukan** untuk penggunaan langsung oleh konsumen umum.
 
-**CRYPTOEX BUKAN PENASIHAT KEUANGAN.** 
+### Informasi Klinis
 
-Semua konten yang ada di situs ini tidak boleh ditafsirkan sebagai ajakan, rekomendasi, nasihat investasi, atau panduan mutlak untuk membeli atau menjual aset kripto tertentu.
+Data klinis, studi observasional, dan materi edukasi yang tersedia di portal ini disediakan semata-mata untuk tujuan referensi ilmiah dan edukasi profesional. Informasi ini tidak boleh ditafsirkan sebagai rekomendasi terapi tunggal atau panduan klinis yang menggantikan penilaian medis profesional.
 
-Kinerja historis dari sinyal atau indikator algoritma kami sama sekali tidak menjamin hasil serupa di masa depan. Anda menyadari sepenuhnya bahwa pasar mata uang kripto beroperasi 24/7 dan sangat fluktuatif. Anda bersedia menanggung 100% segala risiko kerugian finansial dari transaksi yang Anda eksekusi.`
+**Keputusan terapi sepenuhnya berada pada diskresi dokter yang merawat** berdasarkan kondisi spesifik pasien, komorbiditas, dan standar praktik klinis yang berlaku.
+
+### Hasil Klinis
+
+Hasil yang dilaporkan dalam studi observasional dan data klinis yang tersedia di portal ini mencerminkan pengamatan pada populasi dan protokol spesifik. Hasil individual dapat bervariasi. Data historis tidak menjamin hasil serupa pada setiap pasien.
+
+### Regulasi
+
+Exomed Therapeutics Indonesia beroperasi sesuai regulasi distribusi alat kesehatan dan produk bioteknologi yang berlaku di Indonesia. Seluruh produk diproduksi di fasilitas berlisensi FDA di Florida, USA.`
   }
 }
 

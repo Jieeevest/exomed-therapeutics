@@ -69,10 +69,10 @@ export default function CmsDashboard() {
                     <div className="text-xs text-muted-foreground">{r.clinic} &bull; {r.product}</div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${STATUS_COLOR[r.status]}`}>
+                    <span className={`px-2 py-0.5 rounded text-xs font-black uppercase border ${STATUS_COLOR[r.status]}`}>
                       {r.status}
                     </span>
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" />
                       {r.time}
                     </div>

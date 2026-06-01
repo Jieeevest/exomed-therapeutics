@@ -17,7 +17,7 @@ const DUMMY: Product[] = [
 const STATUS_COLOR: Record<string, string> = {
   aktif:        'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   special_order:'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  nonaktif:     'bg-slate-500/10 text-slate-400 border-slate-500/20',
+  nonaktif:     'bg-slate-500/10 text-muted-foreground border-slate-500/20',
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -78,7 +78,7 @@ export default function Products() {
       action={
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
         >
           <Plus className="w-4 h-4" />
           Tambah Produk
@@ -86,14 +86,14 @@ export default function Products() {
       }
     >
       <div className="space-y-5">
-        <div className="flex gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl w-fit">
+        <div className="flex gap-1 p-1 bg-muted/30 border border-border rounded-xl w-fit">
           {(['semua', 'amniotic', 'placental'] as SeriesFilter[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={cn(
                 'px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-all',
-                tab === t ? 'bg-primary text-black' : 'text-slate-400 hover:text-white',
+                tab === t ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {t === 'amniotic' ? 'Amniotic Series' : t === 'placental' ? 'Placental Cord Series' : 'Semua'}
@@ -103,51 +103,51 @@ export default function Products() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {visible.map(item => (
-            <div key={item.id} className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-5 flex flex-col">
+            <div key={item.id} className="bg-card border border-border rounded-2xl p-5 flex flex-col">
               <div className="flex justify-between items-start mb-3">
-                <span className={cn('px-2 py-0.5 rounded text-[10px] font-black uppercase border', STATUS_COLOR[item.status])}>
+                <span className={cn('px-2 py-0.5 rounded text-xs font-black uppercase border', STATUS_COLOR[item.status])}>
                   {STATUS_LABEL[item.status]}
                 </span>
                 <div className="flex gap-1">
-                  <button onClick={() => openEdit(item)} className="p-1.5 text-slate-500 hover:text-white hover:bg-white/[0.05] rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
-              <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">
+              <div className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-1">
                 {item.series === 'amniotic' ? 'Amniotic Series' : 'Placental Cord Series'}
               </div>
               <h3 className="font-black text-base mb-0.5">{item.name}</h3>
               <div className="text-xs font-bold text-primary mb-0.5">{item.nanoparticles} Nanopartikel</div>
-              <div className="text-[11px] text-slate-500 font-semibold mb-3">{item.type}</div>
-              <p className="text-xs text-slate-400 leading-relaxed flex-1">{item.description}</p>
+              <div className="text-[11px] text-muted-foreground font-semibold mb-3">{item.type}</div>
+              <p className="text-xs text-muted-foreground leading-relaxed flex-1">{item.description}</p>
             </div>
           ))}
           {visible.length === 0 && (
-            <div className="col-span-3 py-16 text-center text-slate-500 text-sm">Belum ada produk pada series ini.</div>
+            <div className="col-span-3 py-16 text-center text-muted-foreground text-sm">Belum ada produk pada series ini.</div>
           )}
         </div>
       </div>
 
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl">
+            <div className="p-6 border-b border-border flex justify-between items-center">
               <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Produk' : 'Edit Produk'}</h2>
-              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-slate-500 hover:text-white" /></button>
+              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
             </div>
             <div className="p-6 space-y-4">
               <FormField label="Nama Produk" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">Series</label>
-                  <select value={form.series} onChange={e => setForm(p => ({ ...p, series: e.target.value as Product['series'] }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-white">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Series</label>
+                  <select value={form.series} onChange={e => setForm(p => ({ ...p, series: e.target.value as Product['series'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
                     <option value="amniotic">Amniotic Series</option>
                     <option value="placental">Placental Cord Series</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">Status</label>
-                  <select value={form.status} onChange={e => setForm(p => ({ ...p, status: e.target.value as Product['status'] }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-white">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Status</label>
+                  <select value={form.status} onChange={e => setForm(p => ({ ...p, status: e.target.value as Product['status'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
                     <option value="aktif">Aktif</option>
                     <option value="special_order">Special Order</option>
                     <option value="nonaktif">Nonaktif</option>
@@ -157,13 +157,13 @@ export default function Products() {
               <FormField label="Jumlah Nanopartikel (mis. 100 Juta)" value={form.nanoparticles} onChange={v => setForm(p => ({ ...p, nanoparticles: v }))} />
               <FormField label="Tipe (mis. MSC Amniotic Derived)" value={form.type} onChange={v => setForm(p => ({ ...p, type: v }))} />
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500">Deskripsi Singkat</label>
-                <textarea rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-white placeholder:text-white/20" />
+                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Singkat</label>
+                <textarea rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
               </div>
               <FormField label="URL Gambar Vial (opsional)" value={form.image_url ?? ''} onChange={v => setForm(p => ({ ...p, image_url: v }))} />
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl text-sm font-bold hover:bg-white/[0.09] transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-black rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
               </div>
             </div>
           </div>
@@ -176,8 +176,8 @@ export default function Products() {
 function FormField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white placeholder:text-white/20" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

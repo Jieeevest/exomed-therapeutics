@@ -74,7 +74,7 @@ export function CmsLayout({ title, subtitle, action, children }: CmsLayoutProps)
             <Logo className="h-8 w-auto" variant="icon" />
             <div>
               <div className="font-black text-sm leading-tight text-foreground">Exomed CMS</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+              <div className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
                 Content Manager
               </div>
             </div>
@@ -84,7 +84,7 @@ export function CmsLayout({ title, subtitle, action, children }: CmsLayoutProps)
         <nav className="flex-1 p-3 overflow-y-auto space-y-5">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
-              <div className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1.5 px-3">
+              <div className="text-xs font-black text-muted-foreground/50 uppercase tracking-widest mb-1.5 px-3">
                 {group.label}
               </div>
               <div className="space-y-0.5">
@@ -150,7 +150,7 @@ export function CmsLayout({ title, subtitle, action, children }: CmsLayoutProps)
               </div>
               <div className="text-xs">
                 <div className="font-bold text-foreground leading-tight">{user?.username ?? 'Admin'}</div>
-                <div className="text-[10px] text-muted-foreground uppercase font-semibold">Admin</div>
+                <div className="text-xs text-muted-foreground uppercase font-semibold">Admin</div>
               </div>
             </div>
           </div>

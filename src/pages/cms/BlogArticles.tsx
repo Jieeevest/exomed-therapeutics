@@ -74,43 +74,43 @@ export default function BlogArticles() {
       title="Artikel"
       subtitle="Kelola konten edukasi dan update perusahaan"
       action={
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity">
+        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity">
           <Plus className="w-4 h-4" />
           Tulis Artikel
         </button>
       }
     >
-      <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-white/[0.02] border-b border-white/5">
+          <thead className="bg-muted/20 border-b border-border">
             <tr>
               {['Judul', 'Kategori', 'Author', 'Tanggal', 'Status', 'Aksi'].map(h => (
-                <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-slate-400">{h}</th>
+                <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04]">
+          <tbody className="divide-y divide-border">
             {items.map(item => (
-              <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+              <tr key={item.id} className="hover:bg-muted/20 transition-colors">
                 <td className="px-5 py-4 max-w-xs">
                   <div className="font-bold text-sm truncate">{item.title}</div>
-                  <div className="text-xs text-slate-600 mt-0.5">/{item.slug}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">/{item.slug}</div>
                 </td>
                 <td className="px-5 py-4">
-                  <span className={cn('px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border whitespace-nowrap', CATEGORY_COLOR[item.category])}>
+                  <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border whitespace-nowrap', CATEGORY_COLOR[item.category])}>
                     {CATEGORY_LABEL[item.category]}
                   </span>
                 </td>
-                <td className="px-5 py-4 text-xs text-slate-400">{item.author}</td>
-                <td className="px-5 py-4 text-xs text-slate-500">
+                <td className="px-5 py-4 text-xs text-muted-foreground">{item.author}</td>
+                <td className="px-5 py-4 text-xs text-muted-foreground">
                   {new Date(item.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </td>
                 <td className="px-5 py-4">
                   <button
                     onClick={() => toggleStatus(item.id)}
                     className={cn(
-                      'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border transition-all',
-                      item.status === 'publish' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+                      'px-2.5 py-1 rounded-lg text-xs font-black uppercase border transition-all',
+                      item.status === 'publish' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-muted-foreground border-slate-500/20',
                     )}
                   >
                     {item.status === 'publish' ? 'Publish' : 'Draft'}
@@ -118,14 +118,14 @@ export default function BlogArticles() {
                 </td>
                 <td className="px-5 py-4">
                   <div className="flex gap-1">
-                    <button onClick={() => openEdit(item)} className="p-1.5 text-slate-500 hover:text-white hover:bg-white/[0.05] rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </td>
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-12 text-center text-slate-500 text-sm">Belum ada artikel.</td></tr>
+              <tr><td colSpan={6} className="px-5 py-12 text-center text-muted-foreground text-sm">Belum ada artikel.</td></tr>
             )}
           </tbody>
         </table>
@@ -133,17 +133,17 @@ export default function BlogArticles() {
 
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div className="p-6 border-b border-border flex justify-between items-center">
               <h2 className="font-black text-lg">{modal === 'create' ? 'Tulis Artikel' : 'Edit Artikel'}</h2>
-              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-slate-500 hover:text-white" /></button>
+              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
             </div>
             <div className="p-6 overflow-y-auto space-y-4">
               <Field label="Judul Artikel" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">Kategori</label>
-                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value as BlogArticle['category'] }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-white">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Kategori</label>
+                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value as BlogArticle['category'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
                     <option value="edukasi-exosome">Edukasi Exosome</option>
                     <option value="riset">Riset</option>
                     <option value="update-perusahaan">Update Perusahaan</option>
@@ -154,16 +154,16 @@ export default function BlogArticles() {
               <Field label="Slug URL (opsional — auto-generate jika kosong)" value={form.slug} onChange={v => setForm(p => ({ ...p, slug: v }))} />
               <Field label="URL Thumbnail (opsional)" value={form.thumbnail_url ?? ''} onChange={v => setForm(p => ({ ...p, thumbnail_url: v }))} />
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500">Konten Artikel</label>
-                <textarea rows={12} value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-y font-mono text-white placeholder:text-white/20" placeholder="Tulis konten artikel di sini..." />
+                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Konten Artikel</label>
+                <textarea rows={12} value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-y font-mono text-foreground placeholder:text-foreground/20" placeholder="Tulis konten artikel di sini..." />
               </div>
               <label className="flex items-center gap-2 cursor-pointer text-sm">
                 <input type="checkbox" checked={form.status === 'publish'} onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'publish' : 'draft' }))} className="rounded" />
                 Publish langsung
               </label>
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl text-sm font-bold hover:bg-white/[0.09] transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-black rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
               </div>
             </div>
           </div>
@@ -176,8 +176,8 @@ export default function BlogArticles() {
 function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white placeholder:text-white/20" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

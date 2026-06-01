@@ -435,7 +435,7 @@ export default function Admin() {
                 <div>
                   <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
                     <h3 className="font-bold">Daftar Artikel</h3>
-                    <button onClick={() => setArticleForm({ title: '', excerpt: '', content: '', category: 'news', is_published: false })} className="px-4 py-2 bg-primary text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    <button onClick={() => setArticleForm({ title: '', excerpt: '', content: '', category: 'news', is_published: false })} className="px-4 py-2 bg-primary text-white font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
                       + Tulis Artikel Baru
                     </button>
                   </div>
@@ -512,7 +512,7 @@ export default function Admin() {
             <div className="p-6 flex-1 overflow-y-auto space-y-4">
               {(ticketDetail.replies || []).map((r: any) => (
                 <div key={r.id} className={`flex gap-3 ${r.is_admin ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${r.is_admin ? 'bg-primary text-black' : 'bg-white/10 text-white'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${r.is_admin ? 'bg-primary text-white' : 'bg-white/10 text-white'}`}>
                     {r.is_admin ? 'CS' : r.username[0].toUpperCase()}
                   </div>
                   <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${r.is_admin ? 'bg-primary/10 border border-primary/20' : 'bg-white/5 border border-white/10'}`}>
@@ -534,7 +534,7 @@ export default function Admin() {
                   placeholder="Tulis balasan untuk user..."
                   className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary resize-none"
                 />
-                <button type="submit" className="self-end px-5 py-2.5 bg-primary text-black font-bold rounded-xl text-sm hover:opacity-90">Balas</button>
+                <button type="submit" className="self-end px-5 py-2.5 bg-primary text-white font-bold rounded-xl text-sm hover:opacity-90">Balas</button>
               </form>
             )}
           </div>
@@ -589,7 +589,7 @@ export default function Admin() {
                 </label>
                 <div className="flex-1" />
                 <button type="button" onClick={() => setArticleForm(null)} className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-semibold hover:bg-white/10">Batal</button>
-                <button type="submit" className="px-5 py-2.5 bg-primary text-black rounded-xl text-sm font-bold hover:opacity-90">Simpan Artikel</button>
+                <button type="submit" className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:opacity-90">Simpan Artikel</button>
               </div>
             </form>
           </div>

@@ -14,7 +14,7 @@ const DUMMY: AdminUser[] = [
 const ROLE_CONFIG: Record<AdminUser['role'], { label: string; color: string; icon: React.ElementType }> = {
   'super-admin': { label: 'Super Admin', color: 'bg-primary/10 text-primary border-primary/20',       icon: ShieldCheck },
   'editor':      { label: 'Editor',      color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',   icon: Pencil },
-  'viewer':      { label: 'Viewer',      color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: Shield },
+  'viewer':      { label: 'Viewer',      color: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', icon: Shield },
 }
 
 interface InviteForm {
@@ -63,7 +63,7 @@ export default function AdminUsers() {
       action={
         <button
           onClick={() => { setForm(EMPTY_INVITE); setModal(true) }}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
         >
           <Plus className="w-4 h-4" />
           Undang Admin
@@ -76,30 +76,30 @@ export default function AdminUsers() {
             const cfg = ROLE_CONFIG[role]
             const count = users.filter(u => u.role === role).length
             return (
-              <div key={role} className={cn('p-4 border rounded-2xl bg-white/[0.02]', cfg.color.includes('primary') ? 'border-primary/10' : cfg.color.includes('blue') ? 'border-blue-500/10' : 'border-slate-500/10')}>
+              <div key={role} className={cn('p-4 border rounded-2xl bg-muted/20', cfg.color.includes('primary') ? 'border-primary/10' : cfg.color.includes('blue') ? 'border-blue-500/10' : 'border-slate-500/10')}>
                 <cfg.icon className={cn('w-5 h-5 mb-2', cfg.color.split(' ')[1])} />
                 <div className="font-black text-2xl">{count}</div>
-                <div className="text-xs font-bold text-slate-500 mt-0.5">{cfg.label}</div>
+                <div className="text-xs font-bold text-muted-foreground mt-0.5">{cfg.label}</div>
               </div>
             )
           })}
         </div>
 
-        <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.02] border-b border-white/5">
+            <thead className="bg-muted/20 border-b border-border">
               <tr>
                 {['Pengguna', 'Email', 'Role', 'Bergabung', 'Aksi'].map(h => (
-                  <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-slate-400">{h}</th>
+                  <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-border">
               {users.map(user => {
                 const cfg = ROLE_CONFIG[user.role]
                 const RoleIcon = cfg.icon
                 return (
-                  <tr key={user.id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={user.id} className="hover:bg-muted/20 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center font-black text-sm">
@@ -108,7 +108,7 @@ export default function AdminUsers() {
                         <span className="font-bold">{user.name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-sm text-slate-400">{user.email}</td>
+                    <td className="px-5 py-4 text-sm text-muted-foreground">{user.email}</td>
                     <td className="px-5 py-4">
                       {editingRole === user.id ? (
                         <select
@@ -116,7 +116,7 @@ export default function AdminUsers() {
                           autoFocus
                           onBlur={() => setEditingRole(null)}
                           onChange={e => handleRoleChange(user.id, e.target.value as AdminUser['role'])}
-                          className="bg-[#111] border border-white/10 rounded-lg px-2 py-1 text-xs outline-none focus:border-primary/40 text-white"
+                          className="bg-background border border-border rounded-lg px-2 py-1 text-xs outline-none focus:border-primary/40 text-foreground"
                         >
                           <option value="super-admin">Super Admin</option>
                           <option value="editor">Editor</option>
@@ -125,19 +125,19 @@ export default function AdminUsers() {
                       ) : (
                         <button
                           onClick={() => setEditingRole(user.id)}
-                          className={cn('flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border transition-all hover:opacity-80', cfg.color)}
+                          className={cn('flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black uppercase border transition-all hover:opacity-80', cfg.color)}
                         >
                           <RoleIcon className="w-3 h-3" />
                           {cfg.label}
                         </button>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-xs text-slate-500">
+                    <td className="px-5 py-4 text-xs text-muted-foreground">
                       {new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td className="px-5 py-4">
                       {user.role !== 'super-admin' && (
-                        <button onClick={() => handleDelete(user.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                        <button onClick={() => handleDelete(user.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
@@ -149,36 +149,36 @@ export default function AdminUsers() {
           </table>
         </div>
 
-        <div className="p-4 bg-white/[0.02] border border-white/[0.06] rounded-2xl text-xs text-slate-500 space-y-1">
-          <div className="font-black text-slate-400 mb-2">Deskripsi Role</div>
+        <div className="p-4 bg-muted/20 border border-border rounded-2xl text-xs text-muted-foreground space-y-1">
+          <div className="font-black text-muted-foreground mb-2">Deskripsi Role</div>
           <div><span className="font-bold text-primary">Super Admin</span> — Akses penuh ke semua menu CMS termasuk manajemen user.</div>
           <div><span className="font-bold text-blue-400">Editor</span> — Dapat mengelola konten (produk, artikel, studi kasus, dll.) tapi tidak dapat mengelola user atau pengaturan sistem.</div>
-          <div><span className="font-bold text-slate-400">Viewer</span> — Hanya dapat melihat data. Tidak dapat membuat atau mengubah apapun.</div>
+          <div><span className="font-bold text-muted-foreground">Viewer</span> — Hanya dapat melihat data. Tidak dapat membuat atau mengubah apapun.</div>
         </div>
       </div>
 
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(false) }}>
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="p-6 border-b border-border flex justify-between items-center">
               <h2 className="font-black text-lg">Undang Admin Baru</h2>
-              <button onClick={() => setModal(false)}><X className="w-5 h-5 text-slate-500 hover:text-white" /></button>
+              <button onClick={() => setModal(false)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
             </div>
             <div className="p-6 space-y-4">
               <Field label="Nama Lengkap" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
               <Field label="Email" value={form.email} onChange={v => setForm(p => ({ ...p, email: v }))} type="email" />
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500">Role</label>
-                <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value as AdminUser['role'] }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-white">
+                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Role</label>
+                <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value as AdminUser['role'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
                   <option value="editor">Editor</option>
                   <option value="viewer">Viewer</option>
                   <option value="super-admin">Super Admin</option>
                 </select>
               </div>
-              <p className="text-xs text-slate-600">Link undangan akan dikirim ke email admin baru saat backend tersedia.</p>
+              <p className="text-xs text-muted-foreground">Link undangan akan dikirim ke email admin baru saat backend tersedia.</p>
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl text-sm font-bold hover:bg-white/[0.09] transition-colors">Batal</button>
-                <button onClick={handleInvite} className="px-5 py-2.5 bg-primary text-black rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Undang</button>
+                <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                <button onClick={handleInvite} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Undang</button>
               </div>
             </div>
           </div>
@@ -191,8 +191,8 @@ export default function AdminUsers() {
 function Field({ label, value, onChange, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white placeholder:text-white/20" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

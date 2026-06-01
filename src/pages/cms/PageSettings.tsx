@@ -44,7 +44,7 @@ export default function PageSettings() {
       action={
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity"
         >
           {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           {saved ? 'Tersimpan' : 'Simpan Perubahan'}
@@ -73,8 +73,8 @@ export default function PageSettings() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 space-y-4">
-      <div className="font-black text-sm text-slate-300 border-b border-white/5 pb-3">{title}</div>
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+      <div className="font-black text-sm text-foreground border-b border-border pb-3">{title}</div>
       {children}
     </div>
   )
@@ -83,12 +83,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function InputField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white placeholder:text-white/20"
+        className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30"
       />
     </div>
   )
@@ -97,12 +97,12 @@ function InputField({ label, value, onChange, placeholder }: { label: string; va
 function TextareaField({ label, value, onChange, rows }: { label: string; value: string; onChange: (v: string) => void; rows?: number }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
       <textarea
         value={value}
         onChange={e => onChange(e.target.value)}
         rows={rows ?? 3}
-        className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-y transition-colors text-white"
+        className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-y transition-colors text-foreground"
       />
     </div>
   )

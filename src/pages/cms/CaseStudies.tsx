@@ -108,42 +108,42 @@ export default function CaseStudies() {
       title="Studi Kasus"
       subtitle="Kelola data observasional klinis"
       action={
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-primary text-black text-sm font-black rounded-xl hover:opacity-90 transition-opacity">
+        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-black rounded-xl hover:opacity-90 transition-opacity">
           <Plus className="w-4 h-4" />
           Tambah Studi Kasus
         </button>
       }
     >
-      <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-white/[0.02] border-b border-white/5">
+          <thead className="bg-muted/20 border-b border-border">
             <tr>
               {['Spesialisasi', 'Judul', 'Metrik', 'Status', 'Aksi'].map(h => (
-                <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-slate-400">{h}</th>
+                <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04]">
+          <tbody className="divide-y divide-border">
             {items.map(item => (
-              <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+              <tr key={item.id} className="hover:bg-muted/20 transition-colors">
                 <td className="px-5 py-4 text-xs font-black text-primary uppercase tracking-wider">{item.specialty}</td>
                 <td className="px-5 py-4">
                   <div className="font-bold text-sm max-w-xs">{item.title}</div>
-                  <div className="text-xs text-slate-500 mt-0.5 truncate max-w-xs">{item.patient_description}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{item.patient_description}</div>
                 </td>
-                <td className="px-5 py-4 text-xs text-slate-400">{item.metrics.length} metrik</td>
+                <td className="px-5 py-4 text-xs text-muted-foreground">{item.metrics.length} metrik</td>
                 <td className="px-5 py-4">
                   <button onClick={() => togglePublish(item.id)} className={cn(
-                    'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border transition-all',
-                    item.is_published ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+                    'px-2.5 py-1 rounded-lg text-xs font-black uppercase border transition-all',
+                    item.is_published ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-muted-foreground border-slate-500/20',
                   )}>
                     {item.is_published ? 'Publish' : 'Draft'}
                   </button>
                 </td>
                 <td className="px-5 py-4">
                   <div className="flex gap-1">
-                    <button onClick={() => openEdit(item)} className="p-1.5 text-slate-500 hover:text-white hover:bg-white/[0.05] rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </td>
               </tr>
@@ -154,31 +154,31 @@ export default function CaseStudies() {
 
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div className="p-6 border-b border-border flex justify-between items-center">
               <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Studi Kasus' : 'Edit Studi Kasus'}</h2>
-              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-slate-500 hover:text-white" /></button>
+              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
             </div>
             <div className="p-6 overflow-y-auto space-y-4">
               <Field label="Spesialisasi" value={form.specialty} onChange={v => setForm(p => ({ ...p, specialty: v }))} />
               <Field label="Judul Studi Kasus" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500">Deskripsi Pasien / Metode</label>
-                <textarea rows={3} value={form.patient_description} onChange={e => setForm(p => ({ ...p, patient_description: e.target.value }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-white placeholder:text-white/20" />
+                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Pasien / Metode</label>
+                <textarea rows={3} value={form.patient_description} onChange={e => setForm(p => ({ ...p, patient_description: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">Metrik</label>
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Metrik</label>
                   <button onClick={addMetric} className="flex items-center gap-1 text-xs text-primary hover:underline"><PlusCircle className="w-3.5 h-3.5" /> Tambah Metrik</button>
                 </div>
                 <div className="space-y-2">
                   {form.metrics.map((m, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
-                      <input placeholder="Label (mis. VAS Score)" value={m.label} onChange={e => updateMetric(idx, 'label', e.target.value)} className="flex-1 bg-[#111] border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-white placeholder:text-white/20" />
-                      <input placeholder="Nilai (mis. −4.1 poin)" value={m.value} onChange={e => updateMetric(idx, 'value', e.target.value)} className="flex-1 bg-[#111] border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-white placeholder:text-white/20" />
+                      <input placeholder="Label (mis. VAS Score)" value={m.label} onChange={e => updateMetric(idx, 'label', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <input placeholder="Nilai (mis. −4.1 poin)" value={m.value} onChange={e => updateMetric(idx, 'value', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
                       {form.metrics.length > 1 && (
-                        <button onClick={() => removeMetric(idx)} className="text-slate-600 hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
+                        <button onClick={() => removeMetric(idx)} className="text-muted-foreground hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
                       )}
                     </div>
                   ))}
@@ -186,8 +186,8 @@ export default function CaseStudies() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500">Disclaimer</label>
-                <textarea rows={2} value={form.disclaimer} onChange={e => setForm(p => ({ ...p, disclaimer: e.target.value }))} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-white" />
+                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Disclaimer</label>
+                <textarea rows={2} value={form.disclaimer} onChange={e => setForm(p => ({ ...p, disclaimer: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground" />
               </div>
 
               <label className="flex items-center gap-2 cursor-pointer text-sm">
@@ -196,8 +196,8 @@ export default function CaseStudies() {
               </label>
 
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl text-sm font-bold hover:bg-white/[0.09] transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-black rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
               </div>
             </div>
           </div>
@@ -210,8 +210,8 @@ export default function CaseStudies() {
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-white" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground" />
     </div>
   )
 }
