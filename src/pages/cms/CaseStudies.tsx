@@ -3,49 +3,71 @@ import { Plus, Pencil, Trash2, X, PlusCircle, MinusCircle } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { cn } from '@/lib/utils'
-import type { CaseStudy, CaseStudyMetric } from '@/types'
+import type { CaseStudy, CaseStudyMetric, CaseStudyImage } from '@/types'
 
 const DUMMY: CaseStudy[] = [
   {
-    id: '1', specialty: 'Ortopedi',
-    title: 'Observasi Nyeri Sendi pada 12 Pasien OA Lutut Grade II–III',
-    patient_description: 'Pasien usia 45–72 tahun dengan OA lutut grade II–III. Single intra-articular injection, follow-up 12 minggu.',
+    id: '1', specialty: 'Neurologi',
+    title: 'Tik Wajah & Gerakan Involunter',
+    patient_description: 'Pasien dengan tik wajah (gerakan involunter) dan nyeri.',
     metrics: [
-      { label: 'VAS Score', value: '−4.1 poin' },
-      { label: 'ROM Lutut', value: '+28°' },
-      { label: 'WOMAC Score', value: '−38%' },
+      { label: 'Respons awal — reduksi tik langsung', value: '20 detik' },
+      { label: 'Kunjungan ke-3 — resolusi bertahan, tidak ada nyeri', value: '3 minggu' },
     ],
     disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
     is_published: true, created_at: '2026-05-01T00:00:00Z',
   },
   {
     id: '2', specialty: 'Dermatologi',
-    title: 'Observasi Luka Diabetik Kronik pada 8 Pasien',
-    patient_description: 'Pasien diabetes tipe 2 dengan ulkus derajat Wagner II–III. Aplikasi topikal 2x/minggu selama 8 minggu.',
+    title: 'Psoriasis Berat — Full Body Coverage',
+    patient_description: 'Pasien 37 tahun · >95% BSA terdampak · Treatment: ExoTher 1 Miliar Nanopartikel.',
     metrics: [
-      { label: 'Reduksi Area Luka', value: '−62%' },
-      { label: 'Waktu Penyembuhan', value: '−38%' },
-      { label: 'PDAI Score', value: '−2.8 poin' },
+      { label: 'BSA terdampak sebelum treatment', value: '>95% BSA' },
+      { label: 'Near-complete skin clearance pasca ExoTher', value: '2 Minggu' },
     ],
     disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
     is_published: true, created_at: '2026-04-15T00:00:00Z',
   },
   {
-    id: '3', specialty: 'Estetika Medis',
-    title: 'Observasi Peremajaan Kulit Non-Invasif pada 15 Pasien',
-    patient_description: 'Pasien usia 35–55 tahun dengan tanda penuaan sedang. Protokol mesotherapy, 3 sesi dengan interval 4 minggu.',
+    id: '3', specialty: 'Neurologi',
+    title: 'Pemulihan Stroke Hemoragik',
+    patient_description: 'Pasien kursi roda dengan paralisis tungkai bawah — protokol treatment exosome 2 bulan.',
     metrics: [
-      { label: 'GAIS Score', value: '3.6 / 5' },
-      { label: 'Hidrasi Kulit', value: '+34%' },
-      { label: 'Tekstur Kulit', value: '+40%' },
+      { label: 'Durasi treatment hingga ambulasi', value: '2 Bulan' },
+      { label: 'Pasien berjalan dengan bantuan tongkat pasca-treatment', value: 'Ambulatori' },
     ],
     disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
-    is_published: false, created_at: '2026-03-20T00:00:00Z',
+    is_published: true, created_at: '2026-04-01T00:00:00Z',
+  },
+  {
+    id: '4', specialty: 'Ortopedi',
+    title: 'Osteoartritis Lutut (OA)',
+    patient_description: 'Peningkatan ruang sendi radiografis pada 1 bulan · Skala nyeri VRS mendekati nol pada 6 bulan.',
+    metrics: [
+      { label: 'Peningkatan ruang sendi terlihat di X-ray', value: '1 Bulan' },
+      { label: 'Bebas nyeri saat istirahat & aktivitas — bertahan hingga 6 bulan', value: 'VRS Score 0' },
+    ],
+    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
+    is_published: true, created_at: '2026-03-15T00:00:00Z',
+  },
+  {
+    id: '5', specialty: 'Neurologi Anak',
+    title: 'Palsi Serebral — Kasus Pediatrik',
+    patient_description: 'Pasien Syamil — Peningkatan ketahanan duduk dan kekuatan inti dari Hari ke-3.',
+    metrics: [
+      { label: 'Hari ke-3', value: 'Ketahanan duduk meningkat — dari 5 menit ke periode bertahan tanpa kelelahan' },
+      { label: 'Motorik', value: 'Perbaikan aktivasi otot inti terlihat; fisioterapi berjalan bersamaan dengan treatment' },
+      { label: 'Neurologis', value: 'Tidak ada episode sakit kepala berat selama periode observasi' },
+      { label: 'Adverse Events', value: 'Ruam wajah transien ringan — self-resolving, tidak mengkhawatirkan' },
+    ],
+    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
+    is_published: false, created_at: '2026-03-01T00:00:00Z',
   },
 ]
 
 const EMPTY_FORM: Omit<CaseStudy, 'id' | 'created_at'> = {
   specialty: '', title: '', patient_description: '',
+  images: [],
   metrics: [{ label: '', value: '' }],
   disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
   is_published: false,
@@ -103,6 +125,16 @@ export default function CaseStudies() {
   const addMetric = () => setForm(p => ({ ...p, metrics: [...p.metrics, { label: '', value: '' }] }))
   const removeMetric = (idx: number) => setForm(p => ({ ...p, metrics: p.metrics.filter((_, i) => i !== idx) }))
 
+  const updateImage = (idx: number, field: keyof CaseStudyImage, value: string) => {
+    setForm(p => {
+      const images = [...(p.images ?? [])]
+      images[idx] = { ...images[idx], [field]: value }
+      return { ...p, images }
+    })
+  }
+  const addImage = () => setForm(p => ({ ...p, images: [...(p.images ?? []), { src: '', caption: '' }] }))
+  const removeImage = (idx: number) => setForm(p => ({ ...p, images: (p.images ?? []).filter((_, i) => i !== idx) }))
+
   return (
     <CmsLayout
       title="Studi Kasus"
@@ -131,7 +163,7 @@ export default function CaseStudies() {
                   <div className="font-bold text-sm max-w-xs">{item.title}</div>
                   <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{item.patient_description}</div>
                 </td>
-                <td className="px-5 py-4 text-xs text-muted-foreground">{item.metrics.length} metrik</td>
+                <td className="px-5 py-4 text-xs text-muted-foreground">{item.metrics.length} metrik · {(item.images ?? []).length} gambar</td>
                 <td className="px-5 py-4">
                   <button onClick={() => togglePublish(item.id)} className={cn(
                     'px-2.5 py-1 rounded-lg text-xs font-black uppercase border transition-all',
@@ -165,6 +197,25 @@ export default function CaseStudies() {
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Pasien / Metode</label>
                 <textarea rows={3} value={form.patient_description} onChange={e => setForm(p => ({ ...p, patient_description: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Gambar (URL)</label>
+                  <button onClick={addImage} className="flex items-center gap-1 text-xs text-primary hover:underline"><PlusCircle className="w-3.5 h-3.5" /> Tambah Gambar</button>
+                </div>
+                <div className="space-y-2">
+                  {(form.images ?? []).map((img, idx) => (
+                    <div key={idx} className="flex gap-2 items-center">
+                      <input placeholder="URL gambar (mis. /case-images/foto.jpg)" value={img.src} onChange={e => updateImage(idx, 'src', e.target.value)} className="flex-[2] bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <input placeholder="Caption (mis. Pre-treatment)" value={img.caption} onChange={e => updateImage(idx, 'caption', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <button onClick={() => removeImage(idx)} className="text-muted-foreground hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
+                    </div>
+                  ))}
+                  {(form.images ?? []).length === 0 && (
+                    <p className="text-xs text-muted-foreground/50 italic">Belum ada gambar. Klik "Tambah Gambar" untuk menambahkan foto before/after.</p>
+                  )}
+                </div>
               </div>
 
               <div>

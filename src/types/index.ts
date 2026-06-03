@@ -56,11 +56,17 @@ export interface CaseStudyMetric {
   value: string
 }
 
+export interface CaseStudyImage {
+  src: string
+  caption: string
+}
+
 export interface CaseStudy {
   id: string
   specialty: string
   title: string
   patient_description: string
+  images?: CaseStudyImage[]
   metrics: CaseStudyMetric[]
   disclaimer: string
   is_published: boolean

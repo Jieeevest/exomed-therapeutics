@@ -15,12 +15,6 @@ import {
   Microscope,
   Dna,
   Zap,
-  Bone,
-  Sparkles,
-  Brain,
-  Scissors,
-  Activity,
-  Eye,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -68,53 +62,83 @@ const PLACENTAL_PRODUCTS = [
   },
 ];
 
-const APPLICATION_AREA_KEYS = [
-  { icon: Bone, nameKey: "areas.ortho.name", noteKey: "areas.ortho.note" },
-  { icon: Sparkles, nameKey: "areas.derm.name", noteKey: "areas.derm.note" },
-  { icon: Brain, nameKey: "areas.neuro.name", noteKey: "areas.neuro.note" },
-  { icon: Eye, nameKey: "areas.aesth.name", noteKey: "areas.aesth.note" },
-  { icon: Scissors, nameKey: "areas.hair.name", noteKey: "areas.hair.note" },
-  {
-    icon: Activity,
-    nameKey: "areas.sports.name",
-    noteKey: "areas.sports.note",
-  },
-  { icon: Dna, nameKey: "areas.andro.name", noteKey: "areas.andro.note" },
-  { icon: Zap, nameKey: "areas.ophth.name", noteKey: "areas.ophth.note" },
+const CLINICAL_AREAS = [
+  { filled: true,  nameKey: "areas.1.name", catKey: "areas.1.cat", descKey: "areas.1.desc" },
+  { filled: true,  nameKey: "areas.2.name", catKey: "areas.2.cat", descKey: "areas.2.desc" },
+  { filled: true,  nameKey: "areas.3.name", catKey: "areas.3.cat", descKey: "areas.3.desc" },
+  { filled: false, nameKey: "areas.4.name", catKey: "areas.4.cat", descKey: "areas.4.desc" },
+  { filled: true,  nameKey: "areas.5.name", catKey: "areas.5.cat", descKey: "areas.5.desc" },
+  { filled: true,  nameKey: "areas.6.name", catKey: "areas.6.cat", descKey: "areas.6.desc" },
+  { filled: true,  nameKey: "areas.7.name", catKey: "areas.7.cat", descKey: "areas.7.desc" },
+  { filled: false, nameKey: "areas.8.name", catKey: "areas.8.cat", descKey: "areas.8.desc" },
 ];
 
 const CASE_STUDIES = [
   {
-    specialtyKey: "areas.ortho.name",
-    title: "Observational: Knee Joint Pain in 12 OA Patients Grade II–III",
-    description:
-      "Patients aged 45–72 with knee OA grade II–III. Single intra-articular injection, 12-week follow-up.",
+    specialtyKey: "cases.1.spec",
+    title: "Facial Tics & Involuntary Movement",
+    description: "Patient with facial tics (involuntary movement) and pain.",
+    images: [
+      { src: "/case-images/facial-tics-pre.jpg", caption: "Pretreatment" },
+      { src: "/case-images/facial-tics-20s.jpg", caption: "20 sec post treatment" },
+      { src: "/case-images/facial-tics-3w.jpg", caption: "3rd visit (3 weeks)" },
+    ],
     metrics: [
-      { label: "VAS Score", value: "−4.1 pts" },
-      { label: "ROM (knee)", value: "+28°" },
-      { label: "WOMAC Score", value: "−38%" },
+      { label: "Initial response — immediate tic reduction", value: "20 seconds" },
+      { label: "3rd visit — sustained resolution, no pain reported", value: "3 weeks" },
     ],
   },
   {
-    specialtyKey: "areas.derm.name",
-    title: "Observational: Chronic Diabetic Ulcer in 8 Patients",
-    description:
-      "Type 2 diabetes patients with Wagner grade II–III ulcers. Topical application 2×/week for 8 weeks.",
+    specialtyKey: "cases.2.spec",
+    title: "Severe Psoriasis — Full Body Coverage",
+    description: "37-year-old patient · >95% BSA affected · Treatment: ExoTher 1 Billion Nanoparticles.",
+    images: [
+      { src: "/case-images/psoriasis-pre.jpg", caption: "Pre-treatment" },
+      { src: "/case-images/psoriasis-post.jpg", caption: "2 Weeks Post-treatment" },
+    ],
     metrics: [
-      { label: "Wound Area", value: "−62%" },
-      { label: "Healing Time", value: "−38%" },
-      { label: "PDAI Score", value: "−2.8 pts" },
+      { label: "Body surface area affected pre-treatment", value: ">95% BSA" },
+      { label: "Near-complete skin clearance post ExoTher", value: "2 Weeks" },
     ],
   },
   {
-    specialtyKey: "areas.aesth.name",
-    title: "Observational: Non-Invasive Skin Rejuvenation in 15 Patients",
-    description:
-      "Patients aged 35–55 with moderate aging signs. Mesotherapy protocol, 3 sessions at 4-week intervals.",
+    specialtyKey: "cases.3.spec",
+    title: "Hemorrhagic Stroke Recovery",
+    description: "Wheelchair-bound patient with lower limb paralysis — 2-month exosome treatment protocol.",
+    images: [
+      { src: "/case-images/stroke-pre.jpg", caption: "Pre-treatment" },
+      { src: "/case-images/stroke-post.jpg", caption: "2 Months Post-treatment" },
+    ],
     metrics: [
-      { label: "GAIS Score", value: "3.6 / 5" },
-      { label: "Skin Hydration", value: "+34%" },
-      { label: "Skin Texture", value: "+40%" },
+      { label: "Treatment duration to ambulation", value: "2 Months" },
+      { label: "Patient walking with cane support post-treatment", value: "Ambulatory" },
+    ],
+  },
+  {
+    specialtyKey: "cases.4.spec",
+    title: "Knee Osteoarthritis (OA)",
+    description: "Radiographic joint space increase at 1 month · VRS pain scale near-zero at 6 months.",
+    images: [
+      { src: "/case-images/oa-before.jpg", caption: "Before" },
+      { src: "/case-images/oa-after.jpg", caption: "After 1 Month" },
+    ],
+    metrics: [
+      { label: "Visible joint space increase on X-ray", value: "1 Month" },
+      { label: "Pain-free at rest & activity — sustained to 6 months", value: "VRS Score 0" },
+    ],
+  },
+  {
+    specialtyKey: "cases.5.spec",
+    title: "Cerebral Palsy — Pediatric Case",
+    description: "Patient Syamil — Improvement in sitting endurance and core strength from Day 3.",
+    images: [
+      { src: "/case-images/cp-syamil.jpg", caption: "Patient Syamil" },
+    ],
+    metrics: [
+      { label: "Day 3", value: "Sitting endurance improved — from 5 min to sustained periods without fatigue" },
+      { label: "Motor", value: "Visible core muscle activation improvement; physical therapy ongoing alongside treatment" },
+      { label: "Neurological", value: "No severe headache episodes reported through observation period" },
+      { label: "Adverse Events", value: "Mild transient facial rash noted — self-resolving, non-distressing" },
     ],
   },
 ];
@@ -525,15 +549,21 @@ export default function Landing() {
             {t("areas.disclaimer")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {APPLICATION_AREA_KEYS.map((area) => (
+            {CLINICAL_AREAS.map((area) => (
               <div
                 key={area.nameKey}
-                className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-black/[0.14] dark:hover:border-white/[0.12] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all group cursor-default"
+                className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-black/[0.14] dark:hover:border-white/[0.12] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all cursor-default"
               >
-                <area.icon className="w-6 h-6 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                {area.filled
+                  ? <div className="w-2.5 h-2.5 bg-primary rotate-45 mb-4" />
+                  : <div className="w-2.5 h-2.5 border-2 border-primary/50 rounded-full mb-4" />
+                }
                 <div className="font-black text-base mb-1">{t(area.nameKey)}</div>
+                <div className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-2">
+                  {t(area.catKey)}
+                </div>
                 <div className="text-sm text-gray-500 dark:text-slate-500 leading-snug">
-                  {t(area.noteKey)}
+                  {t(area.descKey)}
                 </div>
               </div>
             ))}
@@ -634,35 +664,58 @@ export default function Landing() {
               {t("cases.disclaimer")}
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {CASE_STUDIES.map((cs) => (
               <div
                 key={cs.title}
-                className="p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl"
+                className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl overflow-hidden"
               >
-                <span className="text-xs font-black uppercase tracking-widest text-primary">
-                  {t(cs.specialtyKey)}
-                </span>
-                <h3 className="font-black text-base mt-2 mb-3 leading-snug">
-                  {cs.title}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-slate-500 leading-relaxed mb-5">
-                  {cs.description}
-                </p>
-                <div className="space-y-2">
-                  {cs.metrics.map((m) => (
-                    <div
-                      key={m.label}
-                      className="flex justify-between items-center py-2 border-t border-black/[0.06] dark:border-white/[0.06]"
-                    >
-                      <span className="text-sm text-gray-500 dark:text-slate-400">
-                        {m.label}
-                      </span>
-                      <span className="text-sm font-black text-gray-900 dark:text-white">
-                        {m.value}
-                      </span>
-                    </div>
-                  ))}
+                {cs.images && cs.images.length > 0 && (
+                  <div className={cn(
+                    "grid gap-0.5",
+                    cs.images.length === 1 ? "grid-cols-1" :
+                    cs.images.length === 2 ? "grid-cols-2" : "grid-cols-3"
+                  )}>
+                    {cs.images.map((img) => (
+                      <div key={img.src} className="relative aspect-[4/3] bg-black/[0.06] dark:bg-white/[0.04] group overflow-hidden">
+                        <img
+                          src={img.src}
+                          alt={img.caption}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                        />
+                        <div className="absolute bottom-0 inset-x-0 bg-black/60 px-2 py-1">
+                          <span className="text-[10px] text-white/80 font-medium">{img.caption}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="p-6">
+                  <span className="text-xs font-black uppercase tracking-widest text-primary">
+                    {t(cs.specialtyKey)}
+                  </span>
+                  <h3 className="font-black text-base mt-2 mb-3 leading-snug">
+                    {cs.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-slate-500 leading-relaxed mb-5">
+                    {cs.description}
+                  </p>
+                  <div className="space-y-2">
+                    {cs.metrics.map((m) => (
+                      <div
+                        key={m.label}
+                        className="flex justify-between items-start gap-3 py-2 border-t border-black/[0.06] dark:border-white/[0.06]"
+                      >
+                        <span className="text-sm text-gray-500 dark:text-slate-400 shrink-0">
+                          {m.label}
+                        </span>
+                        <span className="text-sm font-black text-gray-900 dark:text-white text-right">
+                          {m.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
