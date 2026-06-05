@@ -1,18 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, X, Download } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
+import { fetchWithAuth } from '@/lib/api'
+import { Pagination } from '@/components/cms/Pagination'
+import { LimitSelector } from '@/components/cms/LimitSelector'
+import { SortableHeader } from '@/components/cms/SortableHeader'
 import { cn } from '@/lib/utils'
 import type { Inquiry } from '@/types'
-
-const DUMMY: Inquiry[] = [
-  { id: '1', name: 'dr. Ahmad Fauzi, SpOT',    specialty: 'Ortopedi',            clinic: 'RS Husada Utama',       city: 'Jakarta',    whatsapp: '081234000001', product_interest: 'ExoTher 3',  message: 'Ingin mengetahui protokol untuk OA lutut grade II.', status: 'baru',     created_at: '2026-05-31T09:14:00Z' },
-  { id: '2', name: 'dr. Siti Rahayu, SpKK',    specialty: 'Dermatologi',         clinic: 'Klinik Estetika Sehat', city: 'Bandung',    whatsapp: '081234000002', product_interest: 'ExoLite',    message: 'Tertarik untuk wound healing dan anti-aging.', status: 'diproses', created_at: '2026-05-31T08:52:00Z' },
-  { id: '3', name: 'dr. Budi Santoso, SpN',    specialty: 'Neurologi',           clinic: 'RSUP dr. Sardjito',     city: 'Yogyakarta', whatsapp: '081234000003', product_interest: 'ExoMatrix',  message: 'Apakah tersedia untuk aplikasi neurologi klinis?', status: 'baru',     created_at: '2026-05-31T08:31:00Z' },
-  { id: '4', name: 'dr. Dewi Lestari',          specialty: 'Umum',                clinic: 'Klinik Prima',          city: 'Surabaya',   whatsapp: '081234000004', product_interest: 'ExoTher 1',  message: '',                                            status: 'selesai',  notes: 'Sudah dikirim brosur dan info harga.', created_at: '2026-05-30T14:20:00Z' },
-  { id: '5', name: 'dr. Rudi Hartono, SpOG',   specialty: 'Obstetri Ginekologi', clinic: 'RS Bunda',              city: 'Jakarta',    whatsapp: '081234000005', product_interest: 'ExoGen',     message: 'Ingin tahu aplikasi untuk andrologi.', status: 'diproses', created_at: '2026-05-30T11:05:00Z' },
-  { id: '6', name: 'dr. Farida Hanum, SpM',    specialty: 'Oftalmologi',         clinic: 'Klinik Mata Cerah',     city: 'Medan',      whatsapp: '081234000006', product_interest: 'ExoTher 2',  message: 'Dry eye syndrome management.', status: 'baru',     created_at: '2026-05-29T16:44:00Z' },
-]
 
 const STATUS_OPTS = ['semua', 'baru', 'diproses', 'selesai'] as const
 type StatusFilter = typeof STATUS_OPTS[number]
@@ -28,36 +23,66 @@ export default function Inquiries() {
 
   const [filter, setFilter] = useState<StatusFilter>('semua')
   const [search, setSearch] = useState('')
-  const [items, setItems] = useState<Inquiry[]>(DUMMY)
+  const [items, setItems] = useState<Inquiry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [limit, setLimit] = useState(5)
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [selected, setSelected] = useState<Inquiry | null>(null)
   const [notes, setNotes] = useState('')
 
-  const visible = items.filter(item => {
-    const matchStatus = filter === 'semua' || item.status === filter
-    const matchSearch = !search || item.name.toLowerCase().includes(search.toLowerCase()) || item.clinic.toLowerCase().includes(search.toLowerCase())
-    return matchStatus && matchSearch
-  })
+  useEffect(() => { setPage(1) }, [search, filter, limit, sortBy, sortDir])
+  useEffect(() => { fetchItems() }, [page, search, filter, limit, sortBy, sortDir])
 
-  const updateStatus = (id: string, status: Inquiry['status']) => {
-    setItems(prev => prev.map(i => i.id === id ? { ...i, status } : i))
-    if (selected?.id === id) setSelected(prev => prev ? { ...prev, status } : null)
+  const handleSort = (field: string) => {
+    if (sortBy === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
   }
 
-  const saveNotes = (id: string) => {
-    setItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i))
-    if (selected?.id === id) setSelected(prev => prev ? { ...prev, notes } : null)
+  const fetchItems = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit), sort_by: sortBy, sort_dir: sortDir })
+      if (search) params.set('search', search)
+      if (filter !== 'semua') params.set('status', filter)
+      const res = await fetchWithAuth(`/api/cms/inquiries?${params}`)
+      const data = await res.json()
+      if (data.success) { setItems(data.data); setTotal(data.total ?? data.data.length) }
+    } catch {}
+    finally { setLoading(false) }
+  }
+
+  const updateStatus = async (id: string, status: Inquiry['status']) => {
+    const res = await fetchWithAuth(`/api/cms/inquiries/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    const data = await res.json()
+    if (data.success) {
+      setItems(prev => prev.map(i => i.id === id ? { ...i, status } : i))
+      if (selected?.id === id) setSelected(prev => prev ? { ...prev, status } : null)
+    }
+  }
+
+  const saveNotes = async (id: string) => {
+    const res = await fetchWithAuth(`/api/cms/inquiries/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: selected?.status, notes }),
+    })
+    const data = await res.json()
+    if (data.success) {
+      setItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i))
+      if (selected?.id === id) setSelected(prev => prev ? { ...prev, notes } : null)
+    }
   }
 
   const openDetail = (item: Inquiry) => {
     setSelected(item)
     setNotes(item.notes ?? '')
-  }
-
-  const counts = {
-    semua: items.length,
-    baru: items.filter(i => i.status === 'baru').length,
-    diproses: items.filter(i => i.status === 'diproses').length,
-    selesai: items.filter(i => i.status === 'selesai').length,
   }
 
   return (
@@ -83,7 +108,7 @@ export default function Inquiries() {
                   filter === s ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {s} ({counts[s]})
+                {s}
               </button>
             ))}
           </div>
@@ -99,47 +124,58 @@ export default function Inquiries() {
         </div>
 
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm whitespace-nowrap">
-              <thead className="bg-muted/20 text-muted-foreground border-b border-border">
-                <tr>
-                  {['Nama & Profesi', 'Klinik / Kota', 'Produk', 'Tanggal', 'Status'].map(h => (
-                    <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {visible.map(item => (
-                  <tr
-                    key={item.id}
-                    onClick={() => openDetail(item)}
-                    className="hover:bg-muted/30 transition-colors cursor-pointer"
-                  >
-                    <td className="px-5 py-3.5">
-                      <div className="font-bold">{item.name}</div>
-                      <div className="text-xs text-muted-foreground">{item.specialty}</div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="text-foreground">{item.clinic}</div>
-                      <div className="text-xs text-muted-foreground">{item.city}</div>
-                    </td>
-                    <td className="px-5 py-3.5 text-foreground font-mono text-xs">{item.product_interest}</td>
-                    <td className="px-5 py-3.5 text-xs text-muted-foreground">
-                      {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', STATUS_COLOR[item.status])}>
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {visible.length === 0 && (
-                  <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground text-sm">Tidak ada inquiry ditemukan.</td></tr>
-                )}
-              </tbody>
-            </table>
+          <div className="px-5 py-3 border-b border-border flex items-center justify-between gap-3">
+            <span className="text-xs text-muted-foreground">{total} inquiry ditemukan</span>
+            <LimitSelector value={limit} onChange={v => { setLimit(v); setPage(1) }} />
           </div>
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="py-16 flex justify-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+            ) : (
+              <table className="w-full text-sm whitespace-nowrap">
+                <thead className="bg-muted/20 text-muted-foreground border-b border-border">
+                  <tr>
+                    <SortableHeader label="Nama & Profesi" field="name" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                    <SortableHeader label="Klinik / Kota" field="city" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                    <th className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Produk</th>
+                    <SortableHeader label="Tanggal" field="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                    <SortableHeader label="Status" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {items.map(item => (
+                    <tr
+                      key={item.id}
+                      onClick={() => openDetail(item)}
+                      className="hover:bg-muted/30 transition-colors cursor-pointer"
+                    >
+                      <td className="px-5 py-3.5">
+                        <div className="font-bold">{item.name}</div>
+                        <div className="text-xs text-muted-foreground">{item.specialty}</div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="text-foreground">{item.clinic}</div>
+                        <div className="text-xs text-muted-foreground">{item.city}</div>
+                      </td>
+                      <td className="px-5 py-3.5 text-foreground font-mono text-xs">{item.product_interest}</td>
+                      <td className="px-5 py-3.5 text-xs text-muted-foreground">
+                        {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', STATUS_COLOR[item.status])}>
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {items.length === 0 && (
+                    <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground text-sm">Tidak ada inquiry ditemukan.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+          <Pagination page={page} total={total} limit={limit} onChange={setPage} />
         </div>
       </div>
 

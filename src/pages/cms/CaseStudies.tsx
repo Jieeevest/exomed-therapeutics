@@ -1,69 +1,13 @@
-import { useState } from 'react'
-import { Plus, Pencil, Trash2, X, PlusCircle, MinusCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Pencil, Trash2, X, PlusCircle, MinusCircle, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
+import { fetchWithAuth } from '@/lib/api'
+import { Pagination } from '@/components/cms/Pagination'
+import { LimitSelector } from '@/components/cms/LimitSelector'
+import { SortableHeader } from '@/components/cms/SortableHeader'
 import { cn } from '@/lib/utils'
 import type { CaseStudy, CaseStudyMetric, CaseStudyImage } from '@/types'
-
-const DUMMY: CaseStudy[] = [
-  {
-    id: '1', specialty: 'Neurologi',
-    title: 'Tik Wajah & Gerakan Involunter',
-    patient_description: 'Pasien dengan tik wajah (gerakan involunter) dan nyeri.',
-    metrics: [
-      { label: 'Respons awal — reduksi tik langsung', value: '20 detik' },
-      { label: 'Kunjungan ke-3 — resolusi bertahan, tidak ada nyeri', value: '3 minggu' },
-    ],
-    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
-    is_published: true, created_at: '2026-05-01T00:00:00Z',
-  },
-  {
-    id: '2', specialty: 'Dermatologi',
-    title: 'Psoriasis Berat — Full Body Coverage',
-    patient_description: 'Pasien 37 tahun · >95% BSA terdampak · Treatment: ExoTher 1 Miliar Nanopartikel.',
-    metrics: [
-      { label: 'BSA terdampak sebelum treatment', value: '>95% BSA' },
-      { label: 'Near-complete skin clearance pasca ExoTher', value: '2 Minggu' },
-    ],
-    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
-    is_published: true, created_at: '2026-04-15T00:00:00Z',
-  },
-  {
-    id: '3', specialty: 'Neurologi',
-    title: 'Pemulihan Stroke Hemoragik',
-    patient_description: 'Pasien kursi roda dengan paralisis tungkai bawah — protokol treatment exosome 2 bulan.',
-    metrics: [
-      { label: 'Durasi treatment hingga ambulasi', value: '2 Bulan' },
-      { label: 'Pasien berjalan dengan bantuan tongkat pasca-treatment', value: 'Ambulatori' },
-    ],
-    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
-    is_published: true, created_at: '2026-04-01T00:00:00Z',
-  },
-  {
-    id: '4', specialty: 'Ortopedi',
-    title: 'Osteoartritis Lutut (OA)',
-    patient_description: 'Peningkatan ruang sendi radiografis pada 1 bulan · Skala nyeri VRS mendekati nol pada 6 bulan.',
-    metrics: [
-      { label: 'Peningkatan ruang sendi terlihat di X-ray', value: '1 Bulan' },
-      { label: 'Bebas nyeri saat istirahat & aktivitas — bertahan hingga 6 bulan', value: 'VRS Score 0' },
-    ],
-    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
-    is_published: true, created_at: '2026-03-15T00:00:00Z',
-  },
-  {
-    id: '5', specialty: 'Neurologi Anak',
-    title: 'Palsi Serebral — Kasus Pediatrik',
-    patient_description: 'Pasien Syamil — Peningkatan ketahanan duduk dan kekuatan inti dari Hari ke-3.',
-    metrics: [
-      { label: 'Hari ke-3', value: 'Ketahanan duduk meningkat — dari 5 menit ke periode bertahan tanpa kelelahan' },
-      { label: 'Motorik', value: 'Perbaikan aktivasi otot inti terlihat; fisioterapi berjalan bersamaan dengan treatment' },
-      { label: 'Neurologis', value: 'Tidak ada episode sakit kepala berat selama periode observasi' },
-      { label: 'Adverse Events', value: 'Ruam wajah transien ringan — self-resolving, tidak mengkhawatirkan' },
-    ],
-    disclaimer: 'Data observasional. Bukan RCT. Tidak dimaksudkan sebagai klaim efektivitas.',
-    is_published: false, created_at: '2026-03-01T00:00:00Z',
-  },
-]
 
 const EMPTY_FORM: Omit<CaseStudy, 'id' | 'created_at'> = {
   specialty: '', title: '', patient_description: '',
@@ -76,10 +20,41 @@ const EMPTY_FORM: Omit<CaseStudy, 'id' | 'created_at'> = {
 export default function CaseStudies() {
   useSessionGuard()
 
-  const [items, setItems] = useState<CaseStudy[]>(DUMMY)
+  const [items, setItems] = useState<CaseStudy[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [limit, setLimit] = useState(5)
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [specialtyFilter, setSpecialtyFilter] = useState('')
+  const [publishedFilter, setPublishedFilter] = useState('')
+  const [search, setSearch] = useState('')
   const [modal, setModal] = useState<null | 'create' | 'edit'>(null)
   const [form, setForm] = useState<Omit<CaseStudy, 'id' | 'created_at'>>(EMPTY_FORM)
   const [editId, setEditId] = useState<string | null>(null)
+
+  useEffect(() => { setPage(1) }, [limit, sortBy, sortDir, specialtyFilter, publishedFilter, search])
+  useEffect(() => { fetchItems() }, [page, limit, sortBy, sortDir, specialtyFilter, publishedFilter, search])
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
+
+  const fetchItems = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit), sort_by: sortBy, sort_dir: sortDir })
+      if (specialtyFilter) params.set('specialty', specialtyFilter)
+      if (publishedFilter) params.set('is_published', publishedFilter)
+      if (search) params.set('search', search)
+      const res = await fetchWithAuth(`/api/cms/case-studies?${params}`)
+      const data = await res.json()
+      if (data.success) { setItems(data.data); setTotal(data.total ?? data.data.length) }
+    } catch {}
+    finally { setLoading(false) }
+  }
 
   const openCreate = () => {
     setForm({ ...EMPTY_FORM, metrics: [{ label: '', value: '' }] })
@@ -95,23 +70,44 @@ export default function CaseStudies() {
     setModal('edit')
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title || !form.specialty) return
     if (modal === 'edit' && editId) {
-      setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      const res = await fetchWithAuth(`/api/cms/case-studies/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.success) setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
     } else {
-      setItems(prev => [...prev, { id: String(Date.now()), created_at: new Date().toISOString(), ...form }])
+      const res = await fetchWithAuth('/api/cms/case-studies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.success) setItems(prev => [data.data, ...prev])
     }
     setModal(null)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Hapus studi kasus ini?')) return
-    setItems(prev => prev.filter(i => i.id !== id))
+    const res = await fetchWithAuth(`/api/cms/case-studies/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
   }
 
-  const togglePublish = (id: string) => {
-    setItems(prev => prev.map(i => i.id === id ? { ...i, is_published: !i.is_published } : i))
+  const togglePublish = async (item: CaseStudy) => {
+    const is_published = !item.is_published
+    const res = await fetchWithAuth(`/api/cms/case-studies/${item.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_published }),
+    })
+    const data = await res.json()
+    if (data.success) setItems(prev => prev.map(i => i.id === item.id ? { ...i, is_published } : i))
   }
 
   const updateMetric = (idx: number, field: keyof CaseStudyMetric, value: string) => {
@@ -146,42 +142,83 @@ export default function CaseStudies() {
         </button>
       }
     >
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/20 border-b border-border">
-            <tr>
-              {['Spesialisasi', 'Judul', 'Metrik', 'Status', 'Aksi'].map(h => (
-                <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {items.map(item => (
-              <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                <td className="px-5 py-4 text-xs font-black text-primary uppercase tracking-wider">{item.specialty}</td>
-                <td className="px-5 py-4">
-                  <div className="font-bold text-sm max-w-xs">{item.title}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{item.patient_description}</div>
-                </td>
-                <td className="px-5 py-4 text-xs text-muted-foreground">{item.metrics.length} metrik · {(item.images ?? []).length} gambar</td>
-                <td className="px-5 py-4">
-                  <button onClick={() => togglePublish(item.id)} className={cn(
-                    'px-2.5 py-1 rounded-lg text-xs font-black uppercase border transition-all',
-                    item.is_published ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-muted-foreground border-slate-500/20',
-                  )}>
-                    {item.is_published ? 'Publish' : 'Draft'}
-                  </button>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex gap-1">
-                    <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="space-y-4">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-border flex flex-wrap items-center gap-3">
+            <input
+              value={specialtyFilter}
+              onChange={e => setSpecialtyFilter(e.target.value)}
+              placeholder="Filter spesialisasi..."
+              className="px-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+            />
+            <select
+              value={publishedFilter}
+              onChange={e => setPublishedFilter(e.target.value)}
+              className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
+            >
+              <option value="">Semua Status</option>
+              <option value="true">Published</option>
+              <option value="false">Draft</option>
+            </select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Cari judul..."
+                className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+              />
+            </div>
+            <div className="ml-auto">
+              <LimitSelector value={limit} onChange={v => { setLimit(v); setPage(1) }} />
+            </div>
+          </div>
+          {loading ? (
+            <div className="py-16 flex justify-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="bg-muted/20 border-b border-border">
+                <tr>
+                  <SortableHeader label="Spesialisasi" field="specialty" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <SortableHeader label="Judul" field="title" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <th className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Metrik</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Status</th>
+                  <th className="px-5 py-3.5 text-center text-xs font-black uppercase tracking-wider text-muted-foreground">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {items.map(item => (
+                  <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-5 py-4 text-xs font-black text-primary uppercase tracking-wider">{item.specialty}</td>
+                    <td className="px-5 py-4">
+                      <div className="font-bold text-sm max-w-xs">{item.title}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{item.patient_description}</div>
+                    </td>
+                    <td className="px-5 py-4 text-xs text-muted-foreground">{item.metrics.length} metrik &bull; {(item.images ?? []).length} gambar</td>
+                    <td className="px-5 py-4">
+                      <button onClick={() => togglePublish(item)} className={cn(
+                        'px-2.5 py-1 rounded-lg text-xs font-black uppercase border transition-all',
+                        item.is_published ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-muted-foreground border-slate-500/20',
+                      )}>
+                        {item.is_published ? 'Publish' : 'Draft'}
+                      </button>
+                    </td>
+                    <td className="px-5 py-4 text-center">
+                      <div className="flex gap-1 justify-center">
+                        <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {items.length === 0 && (
+                  <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground text-sm">Belum ada data.</td></tr>
+                )}
+              </tbody>
+            </table>
+          )}
+          <Pagination page={page} total={total} limit={limit} onChange={setPage} />
+        </div>
       </div>
 
       {modal && (
@@ -248,7 +285,7 @@ export default function CaseStudies() {
 
               <div className="flex justify-end gap-3 pt-2">
                 <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
               </div>
             </div>
           </div>

@@ -1,16 +1,13 @@
-import { useState } from 'react'
-import { Plus, Pencil, Trash2, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
+import { fetchWithAuth } from '@/lib/api'
+import { Pagination } from '@/components/cms/Pagination'
+import { LimitSelector } from '@/components/cms/LimitSelector'
+import { SortableHeader } from '@/components/cms/SortableHeader'
 import { cn } from '@/lib/utils'
 import type { PipelineItem } from '@/types'
-
-const DUMMY: PipelineItem[] = [
-  { id: '1', product_name: 'ExoMatrix', platform: 'Neurological Platform',  stage: 'pre-clinical',   order: 1 },
-  { id: '2', product_name: 'ExoTher 3', platform: 'Orthopedic Platform',    stage: 'research',       order: 2 },
-  { id: '3', product_name: 'ExoGen',    platform: 'Dermatology Platform',   stage: 'special-order',  order: 3 },
-  { id: '4', product_name: 'ExoPro',    platform: 'Aesthetic Platform',     stage: 'early-research', order: 4 },
-]
 
 const STAGES: { value: PipelineItem['stage']; label: string; color: string }[] = [
   { value: 'pre-clinical',   label: 'Pre-Clinical',   color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
@@ -28,10 +25,55 @@ const EMPTY_FORM: Omit<PipelineItem, 'id'> = {
 export default function Pipeline() {
   useSessionGuard()
 
-  const [items, setItems] = useState<PipelineItem[]>(DUMMY)
+  const [items, setItems] = useState<PipelineItem[]>([])
+  const [allItems, setAllItems] = useState<PipelineItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [limit, setLimit] = useState(5)
+  const [sortBy, setSortBy] = useState('')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [stageFilter, setStageFilter] = useState('')
+  const [search, setSearch] = useState('')
   const [modal, setModal] = useState<null | 'create' | 'edit'>(null)
   const [form, setForm] = useState<Omit<PipelineItem, 'id'>>(EMPTY_FORM)
   const [editId, setEditId] = useState<string | null>(null)
+
+  useEffect(() => { setPage(1) }, [limit, sortBy, sortDir, stageFilter, search])
+  useEffect(() => { fetchItems() }, [page, limit, sortBy, sortDir, stageFilter, search])
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
+
+  const fetchItems = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit), sort_dir: sortDir })
+      if (sortBy) params.set('sort_by', sortBy)
+      if (stageFilter) params.set('stage', stageFilter)
+      if (search) params.set('search', search)
+      const res = await fetchWithAuth(`/api/cms/pipeline?${params}`)
+      const data = await res.json()
+      if (data.success) {
+        setItems(data.data)
+        setTotal(data.total ?? data.data.length)
+        if (page === 1 && !stageFilter && !search) setAllItems(data.data)
+      }
+    } catch {}
+    finally { setLoading(false) }
+  }
+
+  const fetchAllForCards = async () => {
+    try {
+      const res = await fetchWithAuth('/api/cms/pipeline?limit=500')
+      const data = await res.json()
+      if (data.success) setAllItems(data.data)
+    } catch {}
+  }
+
+  useEffect(() => { fetchAllForCards() }, [])
 
   const openCreate = () => {
     setForm({ ...EMPTY_FORM, order: items.length + 1 })
@@ -46,19 +88,42 @@ export default function Pipeline() {
     setModal('edit')
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.product_name || !form.platform) return
     if (modal === 'edit' && editId) {
-      setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      const res = await fetchWithAuth(`/api/cms/pipeline/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+        setAllItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      }
     } else {
-      setItems(prev => [...prev, { id: String(Date.now()), ...form }])
+      const res = await fetchWithAuth('/api/cms/pipeline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setItems(prev => [...prev, data.data])
+        setAllItems(prev => [...prev, data.data])
+      }
     }
     setModal(null)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Hapus item pipeline ini?')) return
-    setItems(prev => prev.filter(i => i.id !== id))
+    const res = await fetchWithAuth(`/api/cms/pipeline/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (data.success) {
+      setItems(prev => prev.filter(i => i.id !== id))
+      setAllItems(prev => prev.filter(i => i.id !== id))
+    }
   }
 
   return (
@@ -72,67 +137,99 @@ export default function Pipeline() {
         </button>
       }
     >
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {STAGES.map(stage => {
-            const stageItems = items.filter(i => i.stage === stage.value)
-            return (
-              <div key={stage.value} className="bg-card border border-border rounded-2xl p-4">
-                <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', stage.color)}>
-                  {stage.label}
-                </span>
-                <div className="mt-3 space-y-2">
-                  {stageItems.sort((a, b) => a.order - b.order).map(item => (
-                    <div key={item.id} className="bg-muted/30 border border-border rounded-xl p-3 text-xs">
-                      <div className="font-black text-foreground mb-0.5">{item.product_name}</div>
-                      <div className="text-muted-foreground">{item.platform}</div>
-                    </div>
-                  ))}
-                  {stageItems.length === 0 && (
-                    <div className="text-xs text-muted-foreground py-3 text-center">Belum ada item</div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border text-sm font-black text-muted-foreground">Semua Item Pipeline</div>
-          <table className="w-full text-sm">
-            <thead className="bg-muted/20 border-b border-border">
-              <tr>
-                {['Urutan', 'Produk', 'Platform', 'Tahap', 'Aksi'].map(h => (
-                  <th key={h} className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {items.sort((a, b) => a.order - b.order).map(item => {
-                const stage = STAGE_MAP[item.stage]
-                return (
-                  <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-5 py-3.5 font-black text-muted-foreground">{item.order}</td>
-                    <td className="px-5 py-3.5 font-black font-mono text-sm">{item.product_name}</td>
-                    <td className="px-5 py-3.5 text-muted-foreground">{item.platform}</td>
-                    <td className="px-5 py-3.5">
-                      <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', stage.color)}>
-                        {stage.label}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex gap-1">
-                        <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+      {loading && items.length === 0 ? (
+        <div className="py-16 flex justify-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {STAGES.map(stage => {
+              const stageItems = allItems.filter(i => i.stage === stage.value)
+              return (
+                <div key={stage.value} className="bg-card border border-border rounded-2xl p-4">
+                  <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', stage.color)}>
+                    {stage.label}
+                  </span>
+                  <div className="mt-3 space-y-2">
+                    {stageItems.sort((a, b) => a.order - b.order).map(item => (
+                      <div key={item.id} className="bg-muted/30 border border-border rounded-xl p-3 text-xs">
+                        <div className="font-black text-foreground mb-0.5">{item.product_name}</div>
+                        <div className="text-muted-foreground">{item.platform}</div>
                       </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                    ))}
+                    {stageItems.length === 0 && (
+                      <div className="text-xs text-muted-foreground py-3 text-center">Belum ada item</div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="bg-card border border-border rounded-2xl overflow-hidden">
+            <div className="px-5 py-3 border-b border-border flex flex-wrap items-center gap-3">
+              <span className="text-sm font-black text-muted-foreground">Semua Item Pipeline</span>
+              <select
+                value={stageFilter}
+                onChange={e => setStageFilter(e.target.value)}
+                className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
+              >
+                <option value="">Semua Tahap</option>
+                {STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Cari produk..."
+                  className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+                />
+              </div>
+              <div className="ml-auto">
+                <LimitSelector value={limit} onChange={v => { setLimit(v); setPage(1) }} />
+              </div>
+            </div>
+            <table className="w-full text-sm">
+              <thead className="bg-muted/20 border-b border-border">
+                <tr>
+                  <SortableHeader label="Urutan" field="order" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <SortableHeader label="Produk" field="product_name" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <th className="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Platform</th>
+                  <SortableHeader label="Tahap" field="stage" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <th className="px-5 py-3.5 text-center text-xs font-black uppercase tracking-wider text-muted-foreground">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {items.map(item => {
+                  const stage = STAGE_MAP[item.stage]
+                  return (
+                    <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-5 py-3.5 font-black text-muted-foreground">{item.order}</td>
+                      <td className="px-5 py-3.5 font-black font-mono text-sm">{item.product_name}</td>
+                      <td className="px-5 py-3.5 text-muted-foreground">{item.platform}</td>
+                      <td className="px-5 py-3.5">
+                        <span className={cn('px-2.5 py-1 rounded-lg text-xs font-black uppercase border', stage.color)}>
+                          {stage.label}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        <div className="flex gap-1 justify-center">
+                          <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {items.length === 0 && (
+                  <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground text-sm">Belum ada data.</td></tr>
+                )}
+              </tbody>
+            </table>
+            <Pagination page={page} total={total} limit={limit} onChange={setPage} />
+          </div>
         </div>
-      </div>
+      )}
 
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
@@ -158,7 +255,7 @@ export default function Pipeline() {
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
               </div>
             </div>
           </div>

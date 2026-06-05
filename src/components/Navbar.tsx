@@ -66,7 +66,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <Link
-                to="/app"
+                to="/cms"
                 className="flex items-center gap-2 text-sm font-bold bg-gold-gradient text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition-all active:scale-95"
               >
                 Dashboard <ArrowRight className="w-4 h-4" />
@@ -141,7 +141,7 @@ export function Navbar() {
               </Link>
               {isAuthenticated ? (
                 <Link
-                  to="/app"
+                  to="/cms"
                   onClick={() => setMobileOpen(false)}
                   className="block w-full text-center bg-gold-gradient text-white text-sm font-bold py-3 rounded-xl mt-2"
                 >

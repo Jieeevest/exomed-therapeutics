@@ -1,23 +1,12 @@
-import { useState } from 'react'
-import { Plus, Pencil, Trash2, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
+import { fetchWithAuth } from '@/lib/api'
+import { Pagination } from '@/components/cms/Pagination'
+import { LimitSelector } from '@/components/cms/LimitSelector'
 import { cn } from '@/lib/utils'
 import type { Product } from '@/types'
-
-const DUMMY: Product[] = [
-  { id: '1',  name: 'ExoMed 1',   series: 'amniotic',  nanoparticles: '200 Million',   type: 'MSC Amniotic Derived (with HA)',        description: 'Formulasi dengan Hyaluronic Acid untuk regenerasi sendi dan jaringan.',               status: 'aktif' },
-  { id: '2',  name: 'ExoMed 2',   series: 'amniotic',  nanoparticles: '1 Billion',     type: 'MSC Amniotic Derived (with HA)',        description: 'Konsentrasi tinggi dengan HA untuk aplikasi ortopedi intensif.',                      status: 'aktif' },
-  { id: '3',  name: 'ExoTher',    series: 'amniotic',  nanoparticles: '200 Million',   type: 'MSC Amniotic Derived',                  description: 'Formulasi dasar standar untuk aplikasi regeneratif umum.',                            status: 'aktif' },
-  { id: '4',  name: 'ExoTher 1',  series: 'amniotic',  nanoparticles: '1 Billion',     type: 'MSC Amniotic Derived',                  description: 'Konsentrasi optimal untuk dermatologi, estetika medis, dan restorasi rambut.',        status: 'aktif' },
-  { id: '5',  name: 'ExoTher 2',  series: 'amniotic',  nanoparticles: '10 Billion',    type: 'MSC Amniotic Derived',                  description: 'Formulasi potent untuk kasus kompleks dermatologi dan anti-aging.',                    status: 'aktif' },
-  { id: '6',  name: 'ExoTher 3',  series: 'amniotic',  nanoparticles: '100 Billion',   type: 'MSC Amniotic Derived',                  description: 'Konsentrasi tinggi untuk ortopedi dan pemulihan cedera berat.',                       status: 'aktif' },
-  { id: '7',  name: 'ExoPro',     series: 'amniotic',  nanoparticles: '300 Billion',   type: 'MSC Amniotic Derived',                  description: 'Formulasi profesional konsentrasi tinggi untuk kasus klinis advanced.',               status: 'aktif' },
-  { id: '8',  name: 'ExoFit',     series: 'amniotic',  nanoparticles: '750 Billion',   type: 'MSC Amniotic Derived',                  description: 'Konsentrasi premium untuk sports medicine dan regenerasi intensif.',                   status: 'aktif' },
-  { id: '9',  name: 'ExoMatrix',  series: 'amniotic',  nanoparticles: '1.5 Trillion',  type: 'MSC Amniotic Derived',                  description: 'Formulasi ultra-konsentrasi. Special order dengan supervisi medis penuh.',             status: 'special_order' },
-  { id: '10', name: 'ExoLite',    series: 'placental', nanoparticles: '750 Billion',   type: 'Placental Cord MSC',                    description: 'Formulasi Placental Cord standar untuk estetika dan dermatologi.',                    status: 'aktif' },
-  { id: '11', name: 'ExoGen',     series: 'placental', nanoparticles: '1.5 Trillion',  type: 'Placental Cord MSC',                    description: 'Formulasi Placental Cord ultra-konsentrasi. Special order dengan supervisi medis penuh.', status: 'special_order' },
-]
 
 const STATUS_COLOR: Record<string, string> = {
   aktif:        'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -40,13 +29,34 @@ const EMPTY_FORM: Omit<Product, 'id'> = {
 export default function Products() {
   useSessionGuard()
 
-  const [items, setItems] = useState<Product[]>(DUMMY)
+  const [items, setItems] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [limit, setLimit] = useState(5)
   const [tab, setTab] = useState<SeriesFilter>('semua')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [search, setSearch] = useState('')
   const [modal, setModal] = useState<null | 'create' | 'edit'>(null)
   const [form, setForm] = useState<Omit<Product, 'id'>>(EMPTY_FORM)
   const [editId, setEditId] = useState<string | null>(null)
 
-  const visible = tab === 'semua' ? items : items.filter(i => i.series === tab)
+  useEffect(() => { setPage(1) }, [tab, statusFilter, search, limit])
+  useEffect(() => { fetchItems() }, [page, tab, statusFilter, search, limit])
+
+  const fetchItems = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit) })
+      if (tab !== 'semua') params.set('series', tab)
+      if (statusFilter) params.set('status', statusFilter)
+      if (search) params.set('search', search)
+      const res = await fetchWithAuth(`/api/cms/products?${params}`)
+      const data = await res.json()
+      if (data.success) { setItems(data.data); setTotal(data.total ?? data.data.length) }
+    } catch {}
+    finally { setLoading(false) }
+  }
 
   const openCreate = () => {
     setForm(EMPTY_FORM)
@@ -61,19 +71,33 @@ export default function Products() {
     setModal('edit')
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.nanoparticles || !form.type) return
     if (modal === 'edit' && editId) {
-      setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      const res = await fetchWithAuth(`/api/cms/products/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.success) setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
     } else {
-      setItems(prev => [...prev, { id: String(Date.now()), ...form }])
+      const res = await fetchWithAuth('/api/cms/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.success) setItems(prev => [data.data, ...prev])
     }
     setModal(null)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Hapus produk ini?')) return
-    setItems(prev => prev.filter(i => i.id !== id))
+    const res = await fetchWithAuth(`/api/cms/products/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
   }
 
   return (
@@ -91,46 +115,75 @@ export default function Products() {
       }
     >
       <div className="space-y-5">
-        <div className="flex gap-1 p-1 bg-muted/30 border border-border rounded-xl w-fit">
-          {(['semua', 'amniotic', 'placental'] as SeriesFilter[]).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={cn(
-                'px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-all',
-                tab === t ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground',
-              )}
-            >
-              {t === 'amniotic' ? 'Amniotic Series' : t === 'placental' ? 'Placental Cord Series' : 'Semua'}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex gap-1 p-1 bg-muted/30 border border-border rounded-xl">
+            {(['semua', 'amniotic', 'placental'] as SeriesFilter[]).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={cn(
+                  'px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-all',
+                  tab === t ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {t === 'amniotic' ? 'Amniotic Series' : t === 'placental' ? 'Placental Cord Series' : 'Semua'}
+              </button>
+            ))}
+          </div>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
+          >
+            <option value="">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="special_order">Special Order</option>
+            <option value="nonaktif">Nonaktif</option>
+          </select>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Cari nama produk..."
+              className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+            />
+          </div>
+          <div className="ml-auto">
+            <LimitSelector value={limit} onChange={v => { setLimit(v); setPage(1) }} />
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {visible.map(item => (
-            <div key={item.id} className="bg-card border border-border rounded-2xl p-5 flex flex-col">
-              <div className="flex justify-between items-start mb-3">
-                <span className={cn('px-2 py-0.5 rounded text-xs font-black uppercase border', STATUS_COLOR[item.status])}>
-                  {STATUS_LABEL[item.status]}
-                </span>
-                <div className="flex gap-1">
-                  <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+        {loading ? (
+          <div className="py-16 flex justify-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.map(item => (
+              <div key={item.id} className="bg-card border border-border rounded-2xl p-5 flex flex-col">
+                <div className="flex justify-between items-start mb-3">
+                  <span className={cn('px-2 py-0.5 rounded text-xs font-black uppercase border', STATUS_COLOR[item.status])}>
+                    {STATUS_LABEL[item.status]}
+                  </span>
+                  <div className="flex gap-1">
+                    <button onClick={() => openEdit(item)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
                 </div>
+                <div className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-1">
+                  {item.series === 'amniotic' ? 'Amniotic Series' : 'Placental Cord Series'}
+                </div>
+                <h3 className="font-black text-base mb-0.5">{item.name}</h3>
+                <div className="text-xs font-bold text-primary mb-0.5">{item.nanoparticles} Nanopartikel</div>
+                <div className="text-[11px] text-muted-foreground font-semibold mb-3">{item.type}</div>
+                <p className="text-xs text-muted-foreground leading-relaxed flex-1">{item.description}</p>
               </div>
-              <div className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-1">
-                {item.series === 'amniotic' ? 'Amniotic Series' : 'Placental Cord Series'}
-              </div>
-              <h3 className="font-black text-base mb-0.5">{item.name}</h3>
-              <div className="text-xs font-bold text-primary mb-0.5">{item.nanoparticles} Nanopartikel</div>
-              <div className="text-[11px] text-muted-foreground font-semibold mb-3">{item.type}</div>
-              <p className="text-xs text-muted-foreground leading-relaxed flex-1">{item.description}</p>
-            </div>
-          ))}
-          {visible.length === 0 && (
-            <div className="col-span-3 py-16 text-center text-muted-foreground text-sm">Belum ada produk pada series ini.</div>
-          )}
-        </div>
+            ))}
+            {items.length === 0 && (
+              <div className="col-span-3 py-12 text-center text-muted-foreground text-sm">Belum ada data.</div>
+            )}
+          </div>
+        )}
+        <Pagination page={page} total={total} limit={limit} onChange={setPage} />
       </div>
 
       {modal && (
@@ -168,7 +221,7 @@ export default function Products() {
               <FormField label="URL Gambar Vial (opsional)" value={form.image_url ?? ''} onChange={v => setForm(p => ({ ...p, image_url: v }))} />
               <div className="flex justify-end gap-3 pt-2">
                 <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity">Simpan</button>
+                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
               </div>
             </div>
           </div>

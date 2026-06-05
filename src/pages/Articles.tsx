@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Logo } from "@/components/Logo";
-import { useSessionGuard } from "@/hooks/useSessionGuard";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -36,7 +35,6 @@ const CAT_COLORS: Record<string, string> = {
 };
 
 export default function Articles() {
-  useSessionGuard();
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

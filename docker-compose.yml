@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_API_URL: ""
+    ports:
+      - "5173:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

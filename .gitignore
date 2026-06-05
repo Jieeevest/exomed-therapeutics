@@ -1,4 +1,5 @@
 node_modules/
+docs/node_modules/
 dist/
 coverage/
 .vite/
@@ -8,7 +9,9 @@ coverage/
 !.env.example
 
 .DS_Store
+Thumbs.db
 *.log
+*.tsbuildinfo
 
 .claude/
 
@@ -16,6 +19,9 @@ coverage/
 public/docs/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+# VS Code workspace file
+*.code-workspace
 
 # npm lockfile — proyek ini pakai bun
 package-lock.json

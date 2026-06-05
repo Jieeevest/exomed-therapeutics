@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, Mail, Lock, AlertCircle, ArrowRight, Microscope, Award, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
 
-const ADMIN_EMAIL = 'admin@exomed.id'
-const ADMIN_PASSWORD = 'exomed2026'
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5174'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -30,20 +29,26 @@ export default function Login() {
     setErrorMsg('')
     setIsLoading(true)
 
-    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-      setErrorMsg('Email atau password salah')
-      setIsLoading(false)
-      return
-    }
+    try {
+      const res  = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
 
-    login('hardcoded-token', 'hardcoded-refresh', {
-      id: '1',
-      username: 'admin',
-      email: ADMIN_EMAIL,
-      role: 'admin',
-      subscription_tier: 'pro',
-    })
-    navigate('/app', { replace: true })
+      if (!data.success) {
+        setErrorMsg(data.message || 'Email atau password salah')
+        return
+      }
+
+      login(data.data.accessToken, data.data.refreshToken, data.data.user)
+      navigate('/cms', { replace: true })
+    } catch {
+      setErrorMsg('Tidak dapat terhubung ke server. Coba lagi.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
