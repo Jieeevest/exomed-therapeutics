@@ -144,6 +144,14 @@ const CASE_STUDIES = [
   },
 ];
 
+const CASE_COVER_IMAGES = [
+  "https://picsum.photos/seed/exomed-neuro/480/560",
+  "https://picsum.photos/seed/exomed-skin/480/560",
+  "https://picsum.photos/seed/exomed-stroke/480/560",
+  "https://picsum.photos/seed/exomed-ortho/480/560",
+  "https://picsum.photos/seed/exomed-pediatric/480/560",
+];
+
 const PIPELINE = [
   {
     product: "ExoMatrix",
@@ -214,11 +222,12 @@ export default function Landing() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [caseIndex, setCaseIndex] = useState(0);
-  const [caseDir, setCaseDir] = useState(1);
+  const [canCaseScrollLeft, setCanCaseScrollLeft] = useState(false);
+  const [canCaseScrollRight, setCanCaseScrollRight] = useState(true);
 
   const { scrollY } = useScroll();
   const formRef = useRef<HTMLElement>(null);
+  const caseScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsub = scrollY.on("change", (v) => setScrolled(v > 80));
@@ -232,6 +241,18 @@ export default function Landing() {
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  useEffect(() => {
+    const el = caseScrollRef.current;
+    if (!el) return;
+    const check = () => {
+      setCanCaseScrollLeft(el.scrollLeft > 0);
+      setCanCaseScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+    };
+    check();
+    el.addEventListener("scroll", check);
+    return () => el.removeEventListener("scroll", check);
+  }, []);
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -653,116 +674,76 @@ export default function Landing() {
       </section>
 
       {/* ── Studi Kasus ─────────────────────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
+      <section className="py-24 border-t border-black/[0.06] dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-6">
-            <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
-              {t("cases.label")}
-            </p>
-            <h2 className="text-4xl font-black">{t("cases.title")}</h2>
+          <div className="flex items-start justify-between px-6 mb-6 gap-4">
+            <div>
+              <p className="text-xs font-black text-primary uppercase tracking-widest mb-2">
+                {t("cases.label")}
+              </p>
+              <h2 className="text-4xl font-black">{t("cases.title")}</h2>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 shrink-0 mt-2">
+              <button
+                onClick={() => caseScrollRef.current?.scrollBy({ left: -caseScrollRef.current.clientWidth * 0.8, behavior: "smooth" })}
+                disabled={!canCaseScrollLeft}
+                aria-label="Scroll left"
+                className="p-2 rounded-full border border-black/[0.08] dark:border-white/[0.10] bg-white dark:bg-white/[0.04] text-gray-600 dark:text-slate-300 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => caseScrollRef.current?.scrollBy({ left: caseScrollRef.current.clientWidth * 0.8, behavior: "smooth" })}
+                disabled={!canCaseScrollRight}
+                aria-label="Scroll right"
+                className="p-2 rounded-full border border-black/[0.08] dark:border-white/[0.10] bg-white dark:bg-white/[0.04] text-gray-600 dark:text-slate-300 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-start gap-3 p-4 mb-10 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl max-w-3xl mx-auto">
+
+          <div className="flex items-start gap-3 p-4 mb-8 mx-6 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl">
             <Shield className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-700 dark:text-amber-300/80 leading-relaxed">
               {t("cases.disclaimer")}
             </p>
           </div>
-          <div className="relative">
-            <div className="overflow-hidden">
-              <AnimatePresence mode="wait" custom={caseDir}>
-                <motion.div
-                  key={caseIndex}
-                  custom={caseDir}
-                  initial={{ opacity: 0, x: caseDir * 80 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: caseDir * -80 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl overflow-hidden max-w-2xl mx-auto"
-                >
-                  {(() => {
-                    const cs = CASE_STUDIES[caseIndex];
-                    return (
-                      <>
-                        {cs.images && cs.images.length > 0 && (
-                          <div className={cn(
-                            "grid gap-0.5",
-                            cs.images.length === 1 ? "grid-cols-1" :
-                            cs.images.length === 2 ? "grid-cols-2" : "grid-cols-3"
-                          )}>
-                            {cs.images.map((img) => (
-                              <div key={img.src} className="relative aspect-[4/3] bg-black/[0.06] dark:bg-white/[0.04] overflow-hidden">
-                                <img
-                                  src={img.src}
-                                  alt={img.caption}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                                />
-                                <div className="absolute bottom-0 inset-x-0 bg-black/60 px-2 py-1">
-                                  <span className="text-[10px] text-white/80 font-medium">{img.caption}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        <div className="p-6">
-                          <span className="text-xs font-black uppercase tracking-widest text-primary">
-                            {t(cs.specialtyKey)}
-                          </span>
-                          <h3 className="font-black text-base mt-2 mb-3 leading-snug">
-                            {cs.title}
-                          </h3>
-                          <p className="text-sm text-gray-500 dark:text-slate-500 leading-relaxed mb-5">
-                            {cs.description}
+
+          <div
+            ref={caseScrollRef}
+            className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-4"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {CASE_STUDIES.map((cs, idx) => (
+              <div key={cs.title} className="flex-shrink-0 w-[260px] sm:w-[300px] snap-start">
+                <div className="group cursor-default">
+                  <div className="relative overflow-hidden rounded-2xl mb-3 transition-all duration-300 ease-in-out group-hover:shadow-xl group-hover:-translate-y-1">
+                    <img
+                      src={CASE_COVER_IMAGES[idx]}
+                      alt={cs.title}
+                      className="w-full h-[340px] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent p-4 flex flex-col justify-between text-white">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/80">
+                        {t(cs.specialtyKey)}
+                      </span>
+                      <div>
+                        <h3 className="font-black text-sm leading-snug">{cs.title}</h3>
+                        {cs.metrics[0] && (
+                          <p className="text-[11px] text-white/60 mt-1">
+                            {cs.metrics[0].label}:{" "}
+                            <span className="font-bold text-white/90">{cs.metrics[0].value}</span>
                           </p>
-                          <div className="space-y-2">
-                            {cs.metrics.map((m) => (
-                              <div
-                                key={m.label}
-                                className="flex justify-between items-start gap-3 py-2 border-t border-black/[0.06] dark:border-white/[0.06]"
-                              >
-                                <span className="text-sm text-gray-500 dark:text-slate-400 shrink-0">
-                                  {m.label}
-                                </span>
-                                <span className="text-sm font-black text-gray-900 dark:text-white text-right">
-                                  {m.value}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <button
-              onClick={() => { setCaseDir(-1); setCaseIndex((i) => (i - 1 + CASE_STUDIES.length) % CASE_STUDIES.length); }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-white dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.10] flex items-center justify-center shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-slate-300" />
-            </button>
-            <button
-              onClick={() => { setCaseDir(1); setCaseIndex((i) => (i + 1) % CASE_STUDIES.length); }}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-white dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.10] flex items-center justify-center shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30 transition-colors"
-            >
-              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-slate-300" />
-            </button>
-          </div>
-
-          <div className="flex justify-center gap-2 mt-6">
-            {CASE_STUDIES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setCaseDir(i > caseIndex ? 1 : -1); setCaseIndex(i); }}
-                className={cn(
-                  "w-2 h-2 rounded-full transition-all duration-300",
-                  i === caseIndex
-                    ? "bg-primary w-6"
-                    : "bg-black/20 dark:bg-white/20 hover:bg-black/40 dark:hover:bg-white/40"
-                )}
-              />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-slate-500 leading-relaxed line-clamp-2">
+                    {cs.description}
+                  </p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
