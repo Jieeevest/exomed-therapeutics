@@ -1,10 +1,9 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, FileText, ChevronRight, ShieldCheck, Scale, HelpCircle, Activity, Map, ListChecks } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 
-// Icon mapping for sidebar
 const ICON_MAP: Record<string, any> = {
   changelog: ListChecks,
   roadmap: Map,
@@ -120,7 +119,7 @@ Semua sistem Exomed Therapeutics Indonesia berjalan normal. Tidak ada gangguan y
   terms: {
     title: 'Syarat & Ketentuan',
     category: 'Legal',
-    date: 'Berlaku Sejak: 1 Januari 2026',
+    date: '',
     content: `Dengan mengakses dan menggunakan portal Exomed Therapeutics Indonesia, Anda menyatakan telah membaca, memahami, dan menyetujui Syarat & Ketentuan berikut.
 
 ### 1. Persyaratan Pengguna
@@ -141,7 +140,7 @@ Kami berhak memperbarui syarat dan ketentuan ini sewaktu-waktu. Perubahan berlak
   privacy: {
     title: 'Kebijakan Privasi',
     category: 'Legal',
-    date: 'Berlaku Sejak: 1 Januari 2026',
+    date: '',
     content: `Exomed Therapeutics Indonesia ("kami") berkomitmen untuk melindungi privasi data seluruh pengguna terdaftar portal ini.
 
 ### 1. Data yang Dikumpulkan
@@ -162,7 +161,7 @@ Anda berhak mengakses, memperbarui, atau meminta penghapusan data pribadi Anda k
   disclaimer: {
     title: 'Disclaimer',
     category: 'Legal',
-    date: 'Berlaku Sejak: 1 Januari 2026',
+    date: '',
     content: `### Penggunaan Profesional
 
 Seluruh produk yang didistribusikan oleh Exomed Therapeutics Indonesia diperuntukkan khusus untuk penggunaan oleh tenaga medis berlisensi dalam setting klinis profesional. Produk ini **bukan** untuk penggunaan langsung oleh konsumen umum.
@@ -183,37 +182,38 @@ Exomed Therapeutics Indonesia beroperasi sesuai regulasi distribusi alat kesehat
   }
 }
 
-// Simple markdown parser for basic formatting without external libs
 const SimpleMarkdown = ({ content }: { content: string }) => {
   const blocks = content.split('\n\n')
-  
+
   return (
     <div className="space-y-6">
       {blocks.map((block, i) => {
         if (block.startsWith('### ')) {
-          return <h3 key={i} className="text-xl md:text-2xl font-bold text-white mt-8 mb-4 tracking-tight">{block.replace('### ', '')}</h3>
+          return (
+            <h3 key={i} className="text-base font-bold text-gray-900 dark:text-white mt-6 mb-2 tracking-tight">
+              {block.replace('### ', '')}
+            </h3>
+          )
         }
-        
-        // Check if block is a list
+
         if (block.includes('\n- ') || block.startsWith('- ')) {
           const lines = block.split('\n')
-          // If first line isn't a list item, it's a paragraph before the list
           const hasIntro = !lines[0].startsWith('- ')
-          
           return (
             <div key={i} className="space-y-3">
-              {hasIntro && <p className="text-slate-300 leading-relaxed">{lines[0]}</p>}
+              {hasIntro && (
+                <p className="text-gray-600 dark:text-slate-300 leading-relaxed text-sm">{lines[0]}</p>
+              )}
               <ul className="space-y-3 pl-2">
                 {lines.filter(l => l.startsWith('- ')).map((line, j) => {
-                  // Basic bold parsing `**text**`
                   const parts = line.replace('- ', '').split(/(\*\*.*?\*\*)/)
                   return (
-                    <li key={j} className="flex items-start gap-3 text-slate-300 leading-relaxed">
+                    <li key={j} className="flex items-start gap-3 text-gray-600 dark:text-slate-300 leading-relaxed text-sm">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
                       <div>
-                        {parts.map((part, k) => 
-                          part.startsWith('**') && part.endsWith('**') 
-                            ? <strong key={k} className="text-white font-semibold">{part.slice(2, -2)}</strong>
+                        {parts.map((part, k) =>
+                          part.startsWith('**') && part.endsWith('**')
+                            ? <strong key={k} className="text-gray-900 dark:text-white font-semibold">{part.slice(2, -2)}</strong>
                             : part
                         )}
                       </div>
@@ -225,13 +225,12 @@ const SimpleMarkdown = ({ content }: { content: string }) => {
           )
         }
 
-        // Regular paragraph with bold support
         const parts = block.split(/(\*\*.*?\*\*)/)
         return (
-          <p key={i} className="text-slate-300 leading-relaxed md:text-lg">
-            {parts.map((part, k) => 
-              part.startsWith('**') && part.endsWith('**') 
-                ? <strong key={k} className="text-white font-semibold">{part.slice(2, -2)}</strong>
+          <p key={i} className="text-gray-600 dark:text-slate-300 leading-relaxed text-sm">
+            {parts.map((part, k) =>
+              part.startsWith('**') && part.endsWith('**')
+                ? <strong key={k} className="text-gray-900 dark:text-white font-semibold">{part.slice(2, -2)}</strong>
                 : part
             )}
           </p>
@@ -244,8 +243,7 @@ const SimpleMarkdown = ({ content }: { content: string }) => {
 export default function StaticPage() {
   const { slug } = useParams<{ slug: string }>()
 
-  // Scroll to top on slug change
-  useMemo(() => {
+  useEffect(() => {
     window.scrollTo(0, 0)
   }, [slug])
 
@@ -256,7 +254,6 @@ export default function StaticPage() {
     content: 'Halaman yang Anda cari tidak tersedia atau sedang dalam perbaikan.'
   }
 
-  // Group pages by category for sidebar
   const sidebarGroups = useMemo(() => {
     const groups: Record<string, { slug: string; title: string }[]> = {}
     Object.entries(PAGE_CONTENT).forEach(([key, val]) => {
@@ -267,46 +264,46 @@ export default function StaticPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#030303] text-white font-sans selection:bg-primary/30 selection:text-white">
-      
+    <div className="min-h-screen bg-white dark:bg-[#030303] text-gray-900 dark:text-white font-sans selection:bg-primary/30">
+
       <Navbar />
 
       {/* ── HEADER BREADCRUMB ── */}
-      <div className="pt-24 pb-6 border-b border-white/5 bg-black/20">
+      <div className="pt-24 pb-6 border-b border-black/[0.06] dark:border-white/5 bg-gray-50 dark:bg-black/20">
         <div className="max-w-7xl mx-auto px-6 flex items-center gap-3 text-sm font-semibold">
-          <Link to="/" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+          <Link to="/" className="text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" /> Beranda
           </Link>
-          <ChevronRight className="w-4 h-4 text-slate-600" />
-          <span className="text-slate-500">{page.category}</span>
-          <ChevronRight className="w-4 h-4 text-slate-600" />
+          <ChevronRight className="w-4 h-4 text-gray-300 dark:text-slate-600" />
+          <span className="text-gray-400 dark:text-slate-500">{page.category}</span>
+          <ChevronRight className="w-4 h-4 text-gray-300 dark:text-slate-600" />
           <span className="text-primary truncate">{page.title}</span>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row gap-12 py-12">
-        
+
         {/* ── SIDEBAR NAVIGATION ── */}
         <aside className="w-full md:w-64 shrink-0">
           <div className="sticky top-28 space-y-8">
             {Object.entries(sidebarGroups).map(([cat, items]) => (
               <div key={cat}>
-                <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 px-2">{cat}</h4>
+                <h4 className="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-2">{cat}</h4>
                 <ul className="space-y-1">
                   {items.map(item => {
                     const isActive = slug === item.slug
                     const Icon = ICON_MAP[item.slug] || FileText
                     return (
                       <li key={item.slug}>
-                        <Link 
+                        <Link
                           to={`/page/${item.slug}`}
                           className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                            isActive 
-                              ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(56,189,248,0.1)]' 
-                              : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                            isActive
+                              ? 'bg-primary/10 text-primary border border-primary/20'
+                              : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/5 border border-transparent'
                           }`}
                         >
-                          <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-slate-500'}`} />
+                          <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-gray-400 dark:text-slate-500'}`} />
                           {item.title}
                         </Link>
                       </li>
@@ -320,34 +317,36 @@ export default function StaticPage() {
 
         {/* ── MAIN CONTENT ── */}
         <main className="flex-1 max-w-3xl min-h-[60vh]">
-          <motion.div 
-            key={slug} 
-            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+          <motion.div
+            key={slug}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
           >
-            {/* Header Content */}
-            <div className="mb-10 pb-8 border-b border-white/10 relative">
+            <div className="mb-10 pb-8 border-b border-black/[0.06] dark:border-white/10 relative">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-[60px] pointer-events-none" />
               <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 relative z-10">{page.title}</h1>
               {page.date && (
-                <p className="text-slate-500 font-semibold uppercase tracking-widest text-xs flex items-center gap-2">
+                <p className="text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-widest text-xs flex items-center gap-2">
                   <Activity className="w-3.5 h-3.5" /> {page.date}
                 </p>
               )}
             </div>
 
-            {/* Markdown Body */}
-            <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-6 md:p-10 shadow-xl">
+            <div className="bg-gray-50 dark:bg-[#0a0a0a] border border-black/[0.06] dark:border-white/5 rounded-[32px] p-6 md:p-10 shadow-sm dark:shadow-xl">
               <SimpleMarkdown content={page.content} />
             </div>
 
-            {/* Footer Content */}
-            <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <p className="text-sm text-slate-500 text-center sm:text-left max-w-sm">
+            <div className="mt-12 pt-8 border-t border-black/[0.06] dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+              <p className="text-sm text-gray-500 dark:text-slate-500 text-center sm:text-left max-w-sm">
                 Tidak menemukan jawaban yang Anda cari? Tim support kami siap membantu 24/7.
               </p>
-              <Link to="/support" className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white hover:bg-white/10 transition-colors whitespace-nowrap">
-                Hubungi Support CS
-              </Link>
+              <a
+                href="/#kontak"
+                className="px-6 py-3 bg-black/[0.04] dark:bg-white/5 border border-black/[0.08] dark:border-white/10 rounded-xl text-sm font-bold text-gray-700 dark:text-white hover:bg-black/[0.08] dark:hover:bg-white/10 transition-colors whitespace-nowrap"
+              >
+                Hubungi Kami
+              </a>
             </div>
           </motion.div>
         </main>

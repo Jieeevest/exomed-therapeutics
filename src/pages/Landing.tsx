@@ -287,14 +287,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#050505] text-gray-900 dark:text-white overflow-x-hidden">
       {/* ── Navbar ──────────────────────────────────────────────────────────── */}
-      <nav
-        className={cn(
-          "fixed top-0 inset-x-0 z-50 border-b transition-all duration-300",
-          scrolled
-            ? "bg-white/95 dark:bg-[#050505]/95 backdrop-blur-xl border-black/[0.06] dark:border-white/[0.06] shadow-sm dark:shadow-none"
-            : "bg-transparent border-transparent",
-        )}
-      >
+      <nav className="fixed top-0 inset-x-0 z-50 bg-white dark:bg-[#050505] border-b border-black/[0.06] dark:border-white/[0.06] shadow-sm dark:shadow-none">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Logo className="h-16 w-auto" variant="horizontal" />
 
@@ -395,8 +388,13 @@ export default function Landing() {
       {/* ── Hero ────────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-20 px-6">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/[0.05] rounded-full blur-3xl" />
-          <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-blue-500/[0.03] rounded-full blur-3xl" />
+          <img
+            src="https://picsum.photos/seed/exomed-hero/1920/1080"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/65" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
         </div>
 
         <div className="max-w-4xl mx-auto relative">
@@ -415,7 +413,7 @@ export default function Landing() {
             ).map((badge) => (
               <span
                 key={badge}
-                className="px-3 py-1.5 text-xs font-bold bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-full text-gray-500 dark:text-slate-400 tracking-wide"
+                className="px-3 py-1.5 text-xs font-bold bg-white text-gray-700 rounded-full tracking-wide"
               >
                 {badge}
               </span>
@@ -426,7 +424,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-2"
+            className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-2 text-white"
           >
             {t("hero.headline")}
           </motion.h1>
@@ -436,7 +434,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mb-10 leading-relaxed"
+            className="text-lg text-white/70 max-w-2xl mb-10 leading-relaxed"
           >
             {t("hero.subtext")}
           </motion.p>
@@ -458,7 +456,7 @@ export default function Landing() {
               href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_DEFAULT)}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-black/[0.05] dark:bg-white/[0.06] border border-black/[0.10] dark:border-white/[0.10] text-gray-700 dark:text-white font-bold rounded-2xl hover:bg-black/[0.09] dark:hover:bg-white/[0.10] transition-colors text-base"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gray-900 font-bold rounded-2xl hover:bg-gray-100 transition-colors text-base"
             >
               <Phone className="w-4 h-4" />
               WhatsApp
@@ -470,11 +468,16 @@ export default function Landing() {
       {/* ── Tentang Exomed ──────────────────────────────────────────────────── */}
       <section
         id="tentang"
-        className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]"
+        className="scroll-mt-24 py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]"
       >
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: -28 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
               <p className="text-xs font-black text-primary uppercase tracking-widest mb-4">
                 {t("about.label")}
               </p>
@@ -487,7 +490,7 @@ export default function Landing() {
               <p className="text-gray-500 dark:text-slate-400 leading-relaxed">
                 {t("about.body2")}
               </p>
-            </div>
+            </motion.div>
             <div className="grid grid-cols-1 gap-3">
               {[
                 {
@@ -501,9 +504,13 @@ export default function Landing() {
                   lk: "about.cred3.label",
                   sk: "about.cred3.sub",
                 },
-              ].map((item) => (
-                <div
+              ].map((item, i) => (
+                <motion.div
                   key={item.lk}
+                  initial={{ opacity: 0, x: 28 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                   className="flex items-start gap-4 p-4 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl"
                 >
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -515,7 +522,7 @@ export default function Landing() {
                       {t(item.sk)}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -525,10 +532,16 @@ export default function Landing() {
       {/* ── Mengapa Exosome ─────────────────────────────────────────────────── */}
       <section
         id="riset"
-        className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]"
+        className="scroll-mt-24 py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]"
       >
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-14"
+          >
             <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
               {t("why.label")}
             </p>
@@ -536,15 +549,19 @@ export default function Landing() {
             <p className="text-gray-500 dark:text-slate-400 mt-3 max-w-xl mx-auto text-base leading-relaxed">
               {t("why.subtitle")}
             </p>
-          </div>
+          </motion.div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { icon: Dna, tk: "why.card1.title", bk: "why.card1.body" },
               { icon: Microscope, tk: "why.card2.title", bk: "why.card2.body" },
               { icon: Zap, tk: "why.card3.title", bk: "why.card3.body" },
-            ].map((item) => (
-              <div
+            ].map((item, i) => (
+              <motion.div
                 key={item.tk}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 className="p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-primary/20 transition-colors group"
               >
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors">
@@ -554,7 +571,7 @@ export default function Landing() {
                 <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
                   {t(item.bk)}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -563,19 +580,35 @@ export default function Landing() {
       {/* ── Area Aplikasi ───────────────────────────────────────────────────── */}
       <section className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-5">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-5"
+          >
             <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
               {t("areas.label")}
             </p>
             <h2 className="text-4xl font-black">{t("areas.title")}</h2>
-          </div>
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 border border-black/[0.07] dark:border-white/[0.06] bg-black/[0.02] dark:bg-white/[0.02] rounded-xl px-4 py-2.5 max-w-xl mx-auto mb-10">
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center text-sm text-gray-500 dark:text-slate-500 border border-black/[0.07] dark:border-white/[0.06] bg-black/[0.02] dark:bg-white/[0.02] rounded-xl px-4 py-2.5 max-w-xl mx-auto mb-10"
+          >
             {t("areas.disclaimer")}
-          </p>
+          </motion.p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {CLINICAL_AREAS.map((area) => (
-              <div
+            {CLINICAL_AREAS.map((area, i) => (
+              <motion.div
                 key={area.nameKey}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
                 className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-black/[0.14] dark:hover:border-white/[0.12] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all cursor-default"
               >
                 {area.filled
@@ -589,7 +622,7 @@ export default function Landing() {
                 <div className="text-sm text-gray-500 dark:text-slate-500 leading-snug">
                   {t(area.descKey)}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -598,10 +631,16 @@ export default function Landing() {
       {/* ── Produk ──────────────────────────────────────────────────────────── */}
       <section
         id="produk"
-        className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]"
+        className="scroll-mt-24 py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]"
       >
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-10"
+          >
             <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
               {t("products.label")}
             </p>
@@ -609,7 +648,7 @@ export default function Landing() {
             <p className="text-base text-gray-500 dark:text-slate-400 mt-3 max-w-lg mx-auto">
               {t("products.subtitle")}
             </p>
-          </div>
+          </motion.div>
 
           <div className="flex gap-2 mb-8 bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-1.5 max-w-sm mx-auto">
             {(["amniotic", "placental"] as const).map((tab) => (
@@ -636,9 +675,13 @@ export default function Landing() {
             {(activeTab === "amniotic"
               ? AMNIOTIC_PRODUCTS
               : PLACENTAL_PRODUCTS
-            ).map((product) => (
-              <div
+            ).map((product, i) => (
+              <motion.div
                 key={product.name}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="p-6 bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl hover:border-primary/20 transition-colors flex flex-col"
               >
                 <div className="text-xs font-black text-primary uppercase tracking-widest mb-2">
@@ -667,7 +710,7 @@ export default function Landing() {
                   <Phone className="w-3.5 h-3.5" />
                   {t("products.cta")}
                 </a>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -676,7 +719,13 @@ export default function Landing() {
       {/* ── Studi Kasus ─────────────────────────────────────────────────────── */}
       <section className="py-24 border-t border-black/[0.06] dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-start justify-between px-6 mb-6 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-start justify-between px-6 mb-6 gap-4"
+          >
             <div>
               <p className="text-xs font-black text-primary uppercase tracking-widest mb-2">
                 {t("cases.label")}
@@ -701,7 +750,7 @@ export default function Landing() {
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
-          </div>
+          </motion.div>
 
           <div className="flex items-start gap-3 p-4 mb-8 mx-6 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl">
             <Shield className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -752,12 +801,18 @@ export default function Landing() {
       {/* ── Kepatuhan & Sertifikasi ─────────────────────────────────────────── */}
       <section className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-12"
+          >
             <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
               {t("compliance.label")}
             </p>
             <h2 className="text-4xl font-black">{t("compliance.title")}</h2>
-          </div>
+          </motion.div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               {
@@ -780,9 +835,13 @@ export default function Landing() {
                 lk: "compliance.cert4.label",
                 sk: "compliance.cert4.sub",
               },
-            ].map((item) => (
-              <div
+            ].map((item, i) => (
+              <motion.div
                 key={item.lk}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl text-center"
               >
                 <item.icon className="w-7 h-7 text-primary mx-auto mb-3" />
@@ -790,7 +849,7 @@ export default function Landing() {
                 <div className="text-sm text-gray-500 dark:text-slate-500">
                   {t(item.sk)}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
           <div className="text-center">
@@ -815,12 +874,18 @@ export default function Landing() {
       {/* ── Pipeline ────────────────────────────────────────────────────────── */}
       <section className="py-24 px-6 border-t border-black/[0.06] dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-12"
+          >
             <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
               {t("pipeline.label")}
             </p>
             <h2 className="text-4xl font-black">{t("pipeline.title")}</h2>
-          </div>
+          </motion.div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -840,9 +905,13 @@ export default function Landing() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
-                {PIPELINE.map((item) => (
-                  <tr
+                {PIPELINE.map((item, i) => (
+                  <motion.tr
                     key={item.product}
+                    initial={{ opacity: 0, x: -16 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                     className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
                   >
                     <td className="py-4 px-4 font-black">{item.product}</td>
@@ -859,7 +928,7 @@ export default function Landing() {
                         {STAGE_LABELS[item.stage]}
                       </span>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
@@ -874,7 +943,13 @@ export default function Landing() {
         className="py-24 px-6 bg-black/[0.015] dark:bg-white/[0.01] border-t border-black/[0.06] dark:border-white/[0.06]"
       >
         <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-10"
+          >
             <p className="text-xs font-black text-primary uppercase tracking-widest mb-3">
               {t("form.label")}
             </p>
@@ -882,7 +957,7 @@ export default function Landing() {
             <p className="text-base text-gray-500 dark:text-slate-400 mt-3">
               {t("form.subtitle")}
             </p>
-          </div>
+          </motion.div>
 
           <AnimatePresence mode="wait">
             {submitted ? (
@@ -1038,13 +1113,23 @@ export default function Landing() {
       <footer className="border-t border-black/[0.06] dark:border-white/[0.06] py-14 px-6 bg-gray-50 dark:bg-transparent">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-10 mb-10">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
               <Logo className="h-14 w-auto mb-4" variant="horizontal" />
               <p className="text-xs text-gray-500 dark:text-slate-500 leading-relaxed">
                 {t("footer.about")}
               </p>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
               <div className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-slate-600 mb-4">
                 {t("footer.contact")}
               </div>
@@ -1069,8 +1154,13 @@ export default function Landing() {
                   Jakarta, Indonesia
                 </div>
               </div>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
               <div className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-slate-600 mb-4">
                 {t("footer.legal")}
               </div>
@@ -1094,7 +1184,7 @@ export default function Landing() {
                   {t("footer.disclaimer.link")}
                 </a>
               </div>
-            </div>
+            </motion.div>
           </div>
           <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.05] flex flex-col md:flex-row justify-between gap-3 text-xs text-gray-400 dark:text-slate-600">
             <p>

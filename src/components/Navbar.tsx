@@ -1,103 +1,63 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import { Menu, X, ArrowRight } from "lucide-react";
-import { useAuth } from "@/store/useAuth";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/store/useLanguage";
+import { tr } from "@/lib/i18n";
 
 export function Navbar() {
-  const { isAuthenticated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { scrollY } = useScroll();
-  const navBg = useTransform(
-    scrollY,
-    [0, 80],
-    ["rgba(0,0,0,0)", "rgba(5,5,5,0.95)"],
-  );
-  const navBorder = useTransform(
-    scrollY,
-    [0, 80],
-    ["rgba(255,255,255,0)", "rgba(255,255,255,0.06)"],
-  );
+  const { lang } = useLanguage();
+  const t = (key: string) => tr(lang, key);
 
   return (
-    <motion.nav
-      style={{ backgroundColor: navBg, borderColor: navBorder }}
-      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b transition-all"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center shrink-0">
-            <Logo variant="horizontal" className="h-16 w-auto" />
-          </Link>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#050505] border-b border-black/[0.06] dark:border-white/[0.06] shadow-sm dark:shadow-none">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <Link to="/">
+          <Logo variant="horizontal" className="h-16 w-auto" />
+        </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="/#fitur"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              Fitur
-            </a>
-            <a
-              href="/#harga"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              Harga
-            </a>
-            <Link
-              to="/articles"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              Artikel
-            </Link>
-            <Link
-              to="/support"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              Support
-            </Link>
-          </div>
+        <div className="hidden md:flex items-center gap-1 text-sm font-semibold text-gray-500 dark:text-slate-400">
+          <a
+            href="/#tentang"
+            className="px-3 py-2 rounded-xl hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all"
+          >
+            {t("nav.about")}
+          </a>
+          <a
+            href="/#produk"
+            className="px-3 py-2 rounded-xl hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all"
+          >
+            {t("nav.products")}
+          </a>
+          <a
+            href="/#riset"
+            className="px-3 py-2 rounded-xl hover:text-gray-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all"
+          >
+            {t("nav.research")}
+          </a>
+          <div className="w-px h-5 bg-black/[0.10] dark:bg-white/[0.10] mx-1" />
+          <LanguageSelector />
+          <ThemeToggle />
+          <a
+            href="/#kontak"
+            className="ms-1 px-5 py-2 bg-gold-gradient text-white rounded-xl hover:opacity-90 transition-opacity font-bold"
+          >
+            {t("nav.consultation")}
+          </a>
+        </div>
 
-          <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated ? (
-              <Link
-                to="/cms"
-                className="flex items-center gap-2 text-sm font-bold bg-gold-gradient text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition-all active:scale-95"
-              >
-                Dashboard <ArrowRight className="w-4 h-4" />
-              </Link>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-sm text-slate-300 hover:text-white px-4 py-2 transition-colors"
-                >
-                  Masuk
-                </Link>
-                <Link
-                  to="/login"
-                  className="text-sm font-bold bg-gold-gradient text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition-all active:scale-95"
-                >
-                  Coba Gratis
-                </Link>
-              </>
-            )}
-          </div>
-
+        <div className="flex items-center gap-1 md:hidden">
+          <LanguageSelector />
+          <ThemeToggle />
           <button
             onClick={() => setMobileOpen((v) => !v)}
-            className="md:hidden text-slate-400 hover:text-white p-2"
+            className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
           >
-            {mobileOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -108,58 +68,41 @@ export function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-xl overflow-hidden"
+            className="md:hidden border-t border-black/[0.06] dark:border-white/[0.06] bg-white dark:bg-[#050505] overflow-hidden"
           >
-            <div className="px-6 py-4 space-y-3">
+            <div className="px-6 py-4 space-y-1">
               <a
-                href="/#fitur"
+                href="/#tentang"
                 onClick={() => setMobileOpen(false)}
-                className="block text-sm text-slate-300 py-2"
+                className="block text-sm text-gray-600 dark:text-slate-300 py-2 hover:text-gray-900 dark:hover:text-white"
               >
-                Fitur
+                {t("nav.about")}
               </a>
               <a
-                href="/#harga"
+                href="/#produk"
                 onClick={() => setMobileOpen(false)}
-                className="block text-sm text-slate-300 py-2"
+                className="block text-sm text-gray-600 dark:text-slate-300 py-2 hover:text-gray-900 dark:hover:text-white"
               >
-                Harga
+                {t("nav.products")}
               </a>
-              <Link
-                to="/articles"
+              <a
+                href="/#riset"
                 onClick={() => setMobileOpen(false)}
-                className="block text-sm text-slate-300 py-2"
+                className="block text-sm text-gray-600 dark:text-slate-300 py-2 hover:text-gray-900 dark:hover:text-white"
               >
-                Artikel
-              </Link>
-              <Link
-                to="/support"
+                {t("nav.research")}
+              </a>
+              <a
+                href="/#kontak"
                 onClick={() => setMobileOpen(false)}
-                className="block text-sm text-slate-300 py-2"
+                className="block w-full text-center bg-gold-gradient text-white text-sm font-bold py-3 rounded-xl mt-2"
               >
-                Support
-              </Link>
-              {isAuthenticated ? (
-                <Link
-                  to="/cms"
-                  onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center bg-gold-gradient text-white text-sm font-bold py-3 rounded-xl mt-2"
-                >
-                  Dashboard
-                </Link>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center bg-gold-gradient text-white text-sm font-bold py-3 rounded-xl mt-2"
-                >
-                  Mulai Gratis
-                </Link>
-              )}
+                {t("nav.consultation")}
+              </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </nav>
   );
 }
