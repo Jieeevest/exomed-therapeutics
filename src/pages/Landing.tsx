@@ -3,6 +3,7 @@ import { motion, useScroll, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
+  ChevronLeft,
   ChevronRight,
   Shield,
   Award,
@@ -213,6 +214,8 @@ export default function Landing() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [caseIndex, setCaseIndex] = useState(0);
+  const [caseDir, setCaseDir] = useState(1);
 
   const { scrollY } = useScroll();
   const formRef = useRef<HTMLElement>(null);
@@ -664,60 +667,102 @@ export default function Landing() {
               {t("cases.disclaimer")}
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {CASE_STUDIES.map((cs) => (
-              <div
-                key={cs.title}
-                className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl overflow-hidden"
-              >
-                {cs.images && cs.images.length > 0 && (
-                  <div className={cn(
-                    "grid gap-0.5",
-                    cs.images.length === 1 ? "grid-cols-1" :
-                    cs.images.length === 2 ? "grid-cols-2" : "grid-cols-3"
-                  )}>
-                    {cs.images.map((img) => (
-                      <div key={img.src} className="relative aspect-[4/3] bg-black/[0.06] dark:bg-white/[0.04] group overflow-hidden">
-                        <img
-                          src={img.src}
-                          alt={img.caption}
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                        />
-                        <div className="absolute bottom-0 inset-x-0 bg-black/60 px-2 py-1">
-                          <span className="text-[10px] text-white/80 font-medium">{img.caption}</span>
+          <div className="relative">
+            <div className="overflow-hidden">
+              <AnimatePresence mode="wait" custom={caseDir}>
+                <motion.div
+                  key={caseIndex}
+                  custom={caseDir}
+                  initial={{ opacity: 0, x: caseDir * 80 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: caseDir * -80 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl overflow-hidden max-w-2xl mx-auto"
+                >
+                  {(() => {
+                    const cs = CASE_STUDIES[caseIndex];
+                    return (
+                      <>
+                        {cs.images && cs.images.length > 0 && (
+                          <div className={cn(
+                            "grid gap-0.5",
+                            cs.images.length === 1 ? "grid-cols-1" :
+                            cs.images.length === 2 ? "grid-cols-2" : "grid-cols-3"
+                          )}>
+                            {cs.images.map((img) => (
+                              <div key={img.src} className="relative aspect-[4/3] bg-black/[0.06] dark:bg-white/[0.04] overflow-hidden">
+                                <img
+                                  src={img.src}
+                                  alt={img.caption}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                                />
+                                <div className="absolute bottom-0 inset-x-0 bg-black/60 px-2 py-1">
+                                  <span className="text-[10px] text-white/80 font-medium">{img.caption}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="p-6">
+                          <span className="text-xs font-black uppercase tracking-widest text-primary">
+                            {t(cs.specialtyKey)}
+                          </span>
+                          <h3 className="font-black text-base mt-2 mb-3 leading-snug">
+                            {cs.title}
+                          </h3>
+                          <p className="text-sm text-gray-500 dark:text-slate-500 leading-relaxed mb-5">
+                            {cs.description}
+                          </p>
+                          <div className="space-y-2">
+                            {cs.metrics.map((m) => (
+                              <div
+                                key={m.label}
+                                className="flex justify-between items-start gap-3 py-2 border-t border-black/[0.06] dark:border-white/[0.06]"
+                              >
+                                <span className="text-sm text-gray-500 dark:text-slate-400 shrink-0">
+                                  {m.label}
+                                </span>
+                                <span className="text-sm font-black text-gray-900 dark:text-white text-right">
+                                  {m.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      </>
+                    );
+                  })()}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <button
+              onClick={() => { setCaseDir(-1); setCaseIndex((i) => (i - 1 + CASE_STUDIES.length) % CASE_STUDIES.length); }}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-white dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.10] flex items-center justify-center shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-slate-300" />
+            </button>
+            <button
+              onClick={() => { setCaseDir(1); setCaseIndex((i) => (i + 1) % CASE_STUDIES.length); }}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-white dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.10] flex items-center justify-center shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-slate-300" />
+            </button>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-6">
+            {CASE_STUDIES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => { setCaseDir(i > caseIndex ? 1 : -1); setCaseIndex(i); }}
+                className={cn(
+                  "w-2 h-2 rounded-full transition-all duration-300",
+                  i === caseIndex
+                    ? "bg-primary w-6"
+                    : "bg-black/20 dark:bg-white/20 hover:bg-black/40 dark:hover:bg-white/40"
                 )}
-                <div className="p-6">
-                  <span className="text-xs font-black uppercase tracking-widest text-primary">
-                    {t(cs.specialtyKey)}
-                  </span>
-                  <h3 className="font-black text-base mt-2 mb-3 leading-snug">
-                    {cs.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-slate-500 leading-relaxed mb-5">
-                    {cs.description}
-                  </p>
-                  <div className="space-y-2">
-                    {cs.metrics.map((m) => (
-                      <div
-                        key={m.label}
-                        className="flex justify-between items-start gap-3 py-2 border-t border-black/[0.06] dark:border-white/[0.06]"
-                      >
-                        <span className="text-sm text-gray-500 dark:text-slate-400 shrink-0">
-                          {m.label}
-                        </span>
-                        <span className="text-sm font-black text-gray-900 dark:text-white text-right">
-                          {m.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              />
             ))}
           </div>
         </div>
