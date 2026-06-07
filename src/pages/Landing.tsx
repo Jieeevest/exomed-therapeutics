@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
@@ -204,7 +204,7 @@ export default function Landing() {
   const t = (key: string) => tr(lang, key);
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+
   const [activeTab, setActiveTab] = useState<"amniotic" | "placental">(
     "amniotic",
   );
@@ -225,14 +225,10 @@ export default function Landing() {
   const [canCaseScrollLeft, setCanCaseScrollLeft] = useState(false);
   const [canCaseScrollRight, setCanCaseScrollRight] = useState(true);
 
-  const { scrollY } = useScroll();
+
   const formRef = useRef<HTMLElement>(null);
   const caseScrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const unsub = scrollY.on("change", (v) => setScrolled(v > 80));
-    return unsub;
-  }, [scrollY]);
 
   useEffect(() => {
     if (mobileOpen) document.body.style.overflow = "hidden";
