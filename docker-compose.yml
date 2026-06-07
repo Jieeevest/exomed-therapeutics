@@ -1,6 +1,7 @@
 services:
   web:
     image: exomed-fe
+    container_name: exomed-fe
     build:
       context: .
       args:
