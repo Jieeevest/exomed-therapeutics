@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
 import { Pagination } from '@/components/cms/Pagination'
@@ -168,14 +169,15 @@ export default function Pipeline() {
           <div className="bg-card border border-border rounded-2xl overflow-hidden">
             <div className="px-5 py-3 border-b border-border flex flex-wrap items-center gap-3">
               <span className="text-sm font-black text-muted-foreground">Semua Item Pipeline</span>
-              <select
-                value={stageFilter}
-                onChange={e => setStageFilter(e.target.value)}
-                className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-              >
-                <option value="">Semua Tahap</option>
-                {STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-              </select>
+              <Select
+                value={stageFilter ? STAGES.find(s => s.value === stageFilter) ?? null : null}
+                onChange={opt => setStageFilter(opt?.value ?? '')}
+                options={STAGES}
+                placeholder="Semua Tahap"
+                isClearable
+                isSearchable={false}
+                wrapperClassName="w-44"
+              />
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                 <input
@@ -242,12 +244,13 @@ export default function Pipeline() {
               <Field label="Nama Produk" value={form.product_name} onChange={v => setForm(p => ({ ...p, product_name: v }))} />
               <Field label="Platform / Indikasi" value={form.platform} onChange={v => setForm(p => ({ ...p, platform: v }))} />
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Tahap</label>
-                  <select value={form.stage} onChange={e => setForm(p => ({ ...p, stage: e.target.value as PipelineItem['stage'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
-                    {STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                  </select>
-                </div>
+                <Select
+                  label="Tahap"
+                  value={STAGES.find(s => s.value === form.stage) ?? null}
+                  onChange={opt => setForm(p => ({ ...p, stage: opt!.value as PipelineItem['stage'] }))}
+                  options={STAGES}
+                  isSearchable={false}
+                />
                 <div className="space-y-1.5">
                   <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Urutan Tampil</label>
                   <input type="number" value={form.order} onChange={e => setForm(p => ({ ...p, order: Number(e.target.value) }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground" />

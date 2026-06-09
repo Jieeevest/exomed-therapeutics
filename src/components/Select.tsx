@@ -6,6 +6,75 @@ export interface SelectOption<V = string> {
   label: string
 }
 
+const buildPublicStyles = <V, IsMulti extends boolean>(): StylesConfig<SelectOption<V>, IsMulti, GroupBase<SelectOption<V>>> => ({
+  control: (base, state) => ({
+    ...base,
+    backgroundColor: 'hsl(var(--background))',
+    borderColor: state.isFocused ? 'hsl(var(--primary) / 0.5)' : 'hsl(var(--border))',
+    borderRadius: '1rem',
+    padding: '0.25rem 0.25rem',
+    boxShadow: state.isFocused ? '0 0 0 4px hsl(var(--primary) / 0.1)' : 'none',
+    minHeight: '48px',
+    cursor: 'pointer',
+    '&:hover': {
+      borderColor: state.isFocused ? 'hsl(var(--primary) / 0.5)' : 'hsl(var(--border))',
+    },
+  }),
+  valueContainer: (base) => ({ ...base, padding: '0 0.5rem', gap: '4px' }),
+  singleValue: (base) => ({ ...base, color: 'hsl(var(--foreground))', fontSize: '0.875rem' }),
+  placeholder: (base) => ({ ...base, color: 'hsl(var(--muted-foreground) / 0.5)', fontSize: '0.875rem' }),
+  input: (base) => ({ ...base, color: 'hsl(var(--foreground))', fontSize: '0.875rem' }),
+  indicatorSeparator: () => ({ display: 'none' }),
+  dropdownIndicator: (base, state) => ({
+    ...base,
+    color: state.isFocused ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+    transition: 'color 150ms, transform 200ms',
+    transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+    '&:hover': { color: 'hsl(var(--foreground))' },
+  }),
+  clearIndicator: (base) => ({
+    ...base,
+    color: 'hsl(var(--muted-foreground))',
+    '&:hover': { color: 'hsl(var(--foreground))' },
+    cursor: 'pointer',
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: 'hsl(var(--card))',
+    border: '1px solid hsl(var(--border))',
+    borderRadius: '0.75rem',
+    boxShadow: '0 20px 40px -10px rgba(0,0,0,0.15)',
+    overflow: 'hidden',
+    zIndex: 50,
+  }),
+  menuList: (base) => ({ ...base, padding: '4px', maxHeight: '240px' }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isSelected
+      ? 'hsl(var(--primary) / 0.15)'
+      : state.isFocused
+        ? 'hsl(var(--muted) / 0.5)'
+        : 'transparent',
+    color: state.isSelected ? 'hsl(var(--primary))' : 'hsl(var(--foreground))',
+    fontSize: '0.875rem',
+    borderRadius: '0.5rem',
+    cursor: 'pointer',
+    fontWeight: state.isSelected ? 600 : 400,
+    '&:active': { backgroundColor: 'hsl(var(--primary) / 0.2)' },
+  }),
+  noOptionsMessage: (base) => ({ ...base, color: 'hsl(var(--muted-foreground))', fontSize: '0.875rem' }),
+  loadingMessage: (base) => ({ ...base, color: 'hsl(var(--muted-foreground))', fontSize: '0.875rem' }),
+  groupHeading: (base) => ({
+    ...base,
+    color: 'hsl(var(--muted-foreground))',
+    fontSize: '0.65rem',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+    padding: '8px 12px 4px',
+  }),
+})
+
 const buildStyles = <V, IsMulti extends boolean>(): StylesConfig<SelectOption<V>, IsMulti, GroupBase<SelectOption<V>>> => ({
   control: (base, state) => ({
     ...base,
@@ -133,6 +202,7 @@ interface SelectProps<V = string, IsMulti extends boolean = false>
   error?: string
   hint?: string
   wrapperClassName?: string
+  variant?: 'public'
 }
 
 export function Select<V = string, IsMulti extends boolean = false>({
@@ -141,9 +211,11 @@ export function Select<V = string, IsMulti extends boolean = false>({
   hint,
   wrapperClassName,
   inputId,
+  variant,
   ...props
 }: SelectProps<V, IsMulti>) {
   const id = inputId ?? label?.toLowerCase().replace(/\s+/g, '-')
+  const styles = variant === 'public' ? buildPublicStyles<V, IsMulti>() : buildStyles<V, IsMulti>()
 
   return (
     <div className={cn('space-y-1.5', wrapperClassName)}>
@@ -154,7 +226,7 @@ export function Select<V = string, IsMulti extends boolean = false>({
       )}
       <ReactSelect<SelectOption<V>, IsMulti, GroupBase<SelectOption<V>>>
         inputId={id}
-        styles={buildStyles<V, IsMulti>()}
+        styles={styles}
         classNamePrefix="rs"
         noOptionsMessage={() => 'Tidak ada pilihan'}
         loadingMessage={() => 'Memuat...'}

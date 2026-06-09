@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
 import { Pagination } from '@/components/cms/Pagination'
@@ -130,16 +131,19 @@ export default function Products() {
               </button>
             ))}
           </div>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-          >
-            <option value="">Semua Status</option>
-            <option value="aktif">Aktif</option>
-            <option value="special_order">Special Order</option>
-            <option value="nonaktif">Nonaktif</option>
-          </select>
+          <Select
+            value={statusFilter ? { value: statusFilter, label: statusFilter === 'aktif' ? 'Aktif' : statusFilter === 'special_order' ? 'Special Order' : 'Nonaktif' } : null}
+            onChange={opt => setStatusFilter(opt?.value ?? '')}
+            options={[
+              { value: 'aktif', label: 'Aktif' },
+              { value: 'special_order', label: 'Special Order' },
+              { value: 'nonaktif', label: 'Nonaktif' },
+            ]}
+            placeholder="Semua Status"
+            isClearable
+            isSearchable={false}
+            wrapperClassName="w-44"
+          />
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
@@ -196,21 +200,27 @@ export default function Products() {
             <div className="p-6 space-y-4">
               <FormField label="Nama Produk" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Series</label>
-                  <select value={form.series} onChange={e => setForm(p => ({ ...p, series: e.target.value as Product['series'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
-                    <option value="amniotic">Amniotic Series</option>
-                    <option value="placental">Placental Cord Series</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Status</label>
-                  <select value={form.status} onChange={e => setForm(p => ({ ...p, status: e.target.value as Product['status'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
-                    <option value="aktif">Aktif</option>
-                    <option value="special_order">Special Order</option>
-                    <option value="nonaktif">Nonaktif</option>
-                  </select>
-                </div>
+                <Select
+                  label="Series"
+                  value={{ value: form.series, label: form.series === 'amniotic' ? 'Amniotic Series' : 'Placental Cord Series' }}
+                  onChange={opt => setForm(p => ({ ...p, series: opt!.value as Product['series'] }))}
+                  options={[
+                    { value: 'amniotic', label: 'Amniotic Series' },
+                    { value: 'placental', label: 'Placental Cord Series' },
+                  ]}
+                  isSearchable={false}
+                />
+                <Select
+                  label="Status"
+                  value={{ value: form.status, label: form.status === 'aktif' ? 'Aktif' : form.status === 'special_order' ? 'Special Order' : 'Nonaktif' }}
+                  onChange={opt => setForm(p => ({ ...p, status: opt!.value as Product['status'] }))}
+                  options={[
+                    { value: 'aktif', label: 'Aktif' },
+                    { value: 'special_order', label: 'Special Order' },
+                    { value: 'nonaktif', label: 'Nonaktif' },
+                  ]}
+                  isSearchable={false}
+                />
               </div>
               <FormField label="Jumlah Nanopartikel (mis. 100 Juta)" value={form.nanoparticles} onChange={v => setForm(p => ({ ...p, nanoparticles: v }))} />
               <FormField label="Tipe (mis. MSC Amniotic Derived)" value={form.type} onChange={v => setForm(p => ({ ...p, type: v }))} />

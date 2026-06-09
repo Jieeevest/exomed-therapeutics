@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Trash2, X, ExternalLink, FileText, Lock, Globe, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
 import { Pagination } from '@/components/cms/Pagination'
@@ -114,15 +115,15 @@ export default function Documents() {
                 </button>
               ))}
             </div>
-            <select
-              value={accessFilter}
-              onChange={e => setAccessFilter(e.target.value)}
-              className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-            >
-              <option value="">Semua Akses</option>
-              <option value="publik">Publik</option>
-              <option value="gated">Gated</option>
-            </select>
+            <Select
+              value={accessFilter ? { value: accessFilter, label: accessFilter === 'publik' ? 'Publik' : 'Gated' } : null}
+              onChange={opt => setAccessFilter(opt?.value ?? '')}
+              options={[{ value: 'publik', label: 'Publik' }, { value: 'gated', label: 'Gated' }]}
+              placeholder="Semua Akses"
+              isClearable
+              isSearchable={false}
+              wrapperClassName="w-36"
+            />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input
@@ -202,22 +203,28 @@ export default function Documents() {
             <div className="p-6 space-y-4">
               <Field label="Nama Dokumen" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Kategori</label>
-                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value as CmsDocument['category'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
-                    <option value="coa">COA</option>
-                    <option value="legal">Legal</option>
-                    <option value="brosur">Brosur</option>
-                    <option value="protokol">Protokol</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Akses</label>
-                  <select value={form.access} onChange={e => setForm(p => ({ ...p, access: e.target.value as CmsDocument['access'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
-                    <option value="gated">Gated (isi form dulu)</option>
-                    <option value="publik">Publik (langsung download)</option>
-                  </select>
-                </div>
+                <Select
+                  label="Kategori"
+                  value={{ value: form.category, label: form.category === 'coa' ? 'COA' : form.category === 'legal' ? 'Legal' : form.category === 'brosur' ? 'Brosur' : 'Protokol' }}
+                  onChange={opt => setForm(p => ({ ...p, category: opt!.value as CmsDocument['category'] }))}
+                  options={[
+                    { value: 'coa', label: 'COA' },
+                    { value: 'legal', label: 'Legal' },
+                    { value: 'brosur', label: 'Brosur' },
+                    { value: 'protokol', label: 'Protokol' },
+                  ]}
+                  isSearchable={false}
+                />
+                <Select
+                  label="Akses"
+                  value={{ value: form.access, label: form.access === 'gated' ? 'Gated (isi form dulu)' : 'Publik (langsung download)' }}
+                  onChange={opt => setForm(p => ({ ...p, access: opt!.value as CmsDocument['access'] }))}
+                  options={[
+                    { value: 'gated', label: 'Gated (isi form dulu)' },
+                    { value: 'publik', label: 'Publik (langsung download)' },
+                  ]}
+                  isSearchable={false}
+                />
               </div>
               <Field label="URL File PDF" value={form.file_url} onChange={v => setForm(p => ({ ...p, file_url: v }))} />
               <p className="text-xs text-muted-foreground">Upload file ke storage terlebih dahulu, lalu paste URL-nya di sini.</p>

@@ -1,6 +1,12 @@
 export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5174'
 
 export const API_URLS = {
+  public: {
+    products:    `${API_BASE}/api/public/products`,
+    pipeline:    `${API_BASE}/api/public/pipeline`,
+    caseStudies: `${API_BASE}/api/public/case-studies`,
+    areas:       `${API_BASE}/api/public/application-areas`,
+  },
   auth: {
     login:    `${API_BASE}/api/auth/login`,
     register: `${API_BASE}/api/auth/register`,

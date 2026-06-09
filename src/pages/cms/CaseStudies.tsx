@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, X, PlusCircle, MinusCircle, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
 import { Pagination } from '@/components/cms/Pagination'
@@ -151,15 +152,15 @@ export default function CaseStudies() {
               placeholder="Filter spesialisasi..."
               className="px-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
             />
-            <select
-              value={publishedFilter}
-              onChange={e => setPublishedFilter(e.target.value)}
-              className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-            >
-              <option value="">Semua Status</option>
-              <option value="true">Published</option>
-              <option value="false">Draft</option>
-            </select>
+            <Select
+              value={publishedFilter ? { value: publishedFilter, label: publishedFilter === 'true' ? 'Published' : 'Draft' } : null}
+              onChange={opt => setPublishedFilter(opt?.value ?? '')}
+              options={[{ value: 'true', label: 'Published' }, { value: 'false', label: 'Draft' }]}
+              placeholder="Semua Status"
+              isClearable
+              isSearchable={false}
+              wrapperClassName="w-40"
+            />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input

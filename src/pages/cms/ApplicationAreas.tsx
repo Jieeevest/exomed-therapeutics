@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, X, ToggleLeft, ToggleRight, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
 import { Pagination } from '@/components/cms/Pagination'
@@ -117,15 +118,15 @@ export default function ApplicationAreas() {
       <div className="space-y-4">
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3 border-b border-border flex flex-wrap items-center gap-3">
-            <select
-              value={activeFilter}
-              onChange={e => setActiveFilter(e.target.value)}
-              className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-            >
-              <option value="">Semua Status</option>
-              <option value="true">Aktif</option>
-              <option value="false">Nonaktif</option>
-            </select>
+            <Select
+              value={activeFilter ? { value: activeFilter, label: activeFilter === 'true' ? 'Aktif' : 'Nonaktif' } : null}
+              onChange={opt => setActiveFilter(opt?.value ?? '')}
+              options={[{ value: 'true', label: 'Aktif' }, { value: 'false', label: 'Nonaktif' }]}
+              placeholder="Semua Status"
+              isClearable
+              isSearchable={false}
+              wrapperClassName="w-40"
+            />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input

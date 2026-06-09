@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
 import { Pagination } from '@/components/cms/Pagination'
@@ -133,25 +134,28 @@ export default function BlogArticles() {
       <div className="space-y-4">
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3 border-b border-border flex flex-wrap items-center gap-3">
-            <select
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-              className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-            >
-              <option value="">Semua Status</option>
-              <option value="draft">Draft</option>
-              <option value="publish">Publish</option>
-            </select>
-            <select
-              value={categoryFilter}
-              onChange={e => setCategoryFilter(e.target.value)}
-              className="bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground outline-none focus:border-primary/40 transition-colors"
-            >
-              <option value="">Semua Kategori</option>
-              <option value="edukasi-exosome">Edukasi Exosome</option>
-              <option value="riset">Riset</option>
-              <option value="update-perusahaan">Update Perusahaan</option>
-            </select>
+            <Select
+              value={statusFilter ? { value: statusFilter, label: statusFilter === 'draft' ? 'Draft' : 'Publish' } : null}
+              onChange={opt => setStatusFilter(opt?.value ?? '')}
+              options={[{ value: 'draft', label: 'Draft' }, { value: 'publish', label: 'Publish' }]}
+              placeholder="Semua Status"
+              isClearable
+              isSearchable={false}
+              wrapperClassName="w-36"
+            />
+            <Select
+              value={categoryFilter ? { value: categoryFilter, label: categoryFilter === 'edukasi-exosome' ? 'Edukasi Exosome' : categoryFilter === 'riset' ? 'Riset' : 'Update Perusahaan' } : null}
+              onChange={opt => setCategoryFilter(opt?.value ?? '')}
+              options={[
+                { value: 'edukasi-exosome', label: 'Edukasi Exosome' },
+                { value: 'riset', label: 'Riset' },
+                { value: 'update-perusahaan', label: 'Update Perusahaan' },
+              ]}
+              placeholder="Semua Kategori"
+              isClearable
+              isSearchable={false}
+              wrapperClassName="w-48"
+            />
             <div className="relative flex-1 max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input
@@ -234,14 +238,17 @@ export default function BlogArticles() {
             <div className="p-6 overflow-y-auto space-y-4">
               <Field label="Judul Artikel" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Kategori</label>
-                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value as BlogArticle['category'] }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground">
-                    <option value="edukasi-exosome">Edukasi Exosome</option>
-                    <option value="riset">Riset</option>
-                    <option value="update-perusahaan">Update Perusahaan</option>
-                  </select>
-                </div>
+                <Select
+                  label="Kategori"
+                  value={{ value: form.category, label: form.category === 'edukasi-exosome' ? 'Edukasi Exosome' : form.category === 'riset' ? 'Riset' : 'Update Perusahaan' }}
+                  onChange={opt => setForm(p => ({ ...p, category: opt!.value as BlogArticle['category'] }))}
+                  options={[
+                    { value: 'edukasi-exosome', label: 'Edukasi Exosome' },
+                    { value: 'riset', label: 'Riset' },
+                    { value: 'update-perusahaan', label: 'Update Perusahaan' },
+                  ]}
+                  isSearchable={false}
+                />
                 <Field label="Author" value={form.author} onChange={v => setForm(p => ({ ...p, author: v }))} />
               </div>
               <Field label="Slug URL (opsional — auto-generate jika kosong)" value={form.slug} onChange={v => setForm(p => ({ ...p, slug: v }))} />

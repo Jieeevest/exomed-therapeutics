@@ -24,178 +24,19 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/store/useLanguage";
 import { tr } from "@/lib/i18n";
 import { API_URLS } from "@/constants/apiUrls";
-
-// ── Static Data ───────────────────────────────────────────────────────────────
-
-const AMNIOTIC_PRODUCTS = [
-  {
-    name: "ExoTher 1",
-    nanoparticles: "1 Billion Nanoparticles",
-    type: "MSC Amniotic Derived",
-    description: "Optimal concentration for dermatology, aesthetic medicine, and hair restoration.",
-  },
-  {
-    name: "ExoPro",
-    nanoparticles: "300 Billion Nanoparticles",
-    type: "MSC Amniotic Derived",
-    description: "Professional-grade high-concentration formulation for advanced clinical cases.",
-  },
-  {
-    name: "ExoMatrix",
-    nanoparticles: "1.5 Trillion Nanoparticles",
-    type: "MSC Amniotic Derived — Special Order",
-    description: "Ultra-high concentration formulation. Available as special order under full medical supervision.",
-  },
-];
-
-const PLACENTAL_PRODUCTS = [
-  {
-    name: "ExoLite",
-    nanoparticles: "750 Billion Nanoparticles",
-    type: "Placental Cord MSC",
-    description: "Standard Placental Cord formulation for aesthetic and dermatology applications.",
-  },
-  {
-    name: "ExoGen",
-    nanoparticles: "1.5 Trillion Nanoparticles",
-    type: "Placental Cord MSC — Special Order",
-    description: "Ultra-high concentration Placental Cord formulation. Available as special order under full medical supervision.",
-  },
-];
-
-const CLINICAL_AREAS = [
-  { filled: true,  nameKey: "areas.1.name", catKey: "areas.1.cat", descKey: "areas.1.desc" },
-  { filled: true,  nameKey: "areas.2.name", catKey: "areas.2.cat", descKey: "areas.2.desc" },
-  { filled: true,  nameKey: "areas.3.name", catKey: "areas.3.cat", descKey: "areas.3.desc" },
-  { filled: false, nameKey: "areas.4.name", catKey: "areas.4.cat", descKey: "areas.4.desc" },
-  { filled: true,  nameKey: "areas.5.name", catKey: "areas.5.cat", descKey: "areas.5.desc" },
-  { filled: true,  nameKey: "areas.6.name", catKey: "areas.6.cat", descKey: "areas.6.desc" },
-  { filled: true,  nameKey: "areas.7.name", catKey: "areas.7.cat", descKey: "areas.7.desc" },
-  { filled: false, nameKey: "areas.8.name", catKey: "areas.8.cat", descKey: "areas.8.desc" },
-];
-
-const CASE_STUDIES = [
-  {
-    specialtyKey: "cases.1.spec",
-    title: "Facial Tics & Involuntary Movement",
-    description: "Patient with facial tics (involuntary movement) and pain.",
-    images: [
-      { src: "/case-images/facial-tics-pre.jpg", caption: "Pretreatment" },
-      { src: "/case-images/facial-tics-20s.jpg", caption: "20 sec post treatment" },
-      { src: "/case-images/facial-tics-3w.jpg", caption: "3rd visit (3 weeks)" },
-    ],
-    metrics: [
-      { label: "Initial response — immediate tic reduction", value: "20 seconds" },
-      { label: "3rd visit — sustained resolution, no pain reported", value: "3 weeks" },
-    ],
-  },
-  {
-    specialtyKey: "cases.2.spec",
-    title: "Severe Psoriasis — Full Body Coverage",
-    description: "37-year-old patient · >95% BSA affected · Treatment: ExoTher 1 Billion Nanoparticles.",
-    images: [
-      { src: "/case-images/psoriasis-pre.jpg", caption: "Pre-treatment" },
-      { src: "/case-images/psoriasis-post.jpg", caption: "2 Weeks Post-treatment" },
-    ],
-    metrics: [
-      { label: "Body surface area affected pre-treatment", value: ">95% BSA" },
-      { label: "Near-complete skin clearance post ExoTher", value: "2 Weeks" },
-    ],
-  },
-  {
-    specialtyKey: "cases.3.spec",
-    title: "Hemorrhagic Stroke Recovery",
-    description: "Wheelchair-bound patient with lower limb paralysis — 2-month exosome treatment protocol.",
-    images: [
-      { src: "/case-images/stroke-pre.jpg", caption: "Pre-treatment" },
-      { src: "/case-images/stroke-post.jpg", caption: "2 Months Post-treatment" },
-    ],
-    metrics: [
-      { label: "Treatment duration to ambulation", value: "2 Months" },
-      { label: "Patient walking with cane support post-treatment", value: "Ambulatory" },
-    ],
-  },
-  {
-    specialtyKey: "cases.4.spec",
-    title: "Knee Osteoarthritis (OA)",
-    description: "Radiographic joint space increase at 1 month · VRS pain scale near-zero at 6 months.",
-    images: [
-      { src: "/case-images/oa-before.jpg", caption: "Before" },
-      { src: "/case-images/oa-after.jpg", caption: "After 1 Month" },
-    ],
-    metrics: [
-      { label: "Visible joint space increase on X-ray", value: "1 Month" },
-      { label: "Pain-free at rest & activity — sustained to 6 months", value: "VRS Score 0" },
-    ],
-  },
-  {
-    specialtyKey: "cases.5.spec",
-    title: "Cerebral Palsy — Pediatric Case",
-    description: "Patient Syamil — Improvement in sitting endurance and core strength from Day 3.",
-    images: [
-      { src: "/case-images/cp-syamil.jpg", caption: "Patient Syamil" },
-    ],
-    metrics: [
-      { label: "Day 3", value: "Sitting endurance improved — from 5 min to sustained periods without fatigue" },
-      { label: "Motor", value: "Visible core muscle activation improvement; physical therapy ongoing alongside treatment" },
-      { label: "Neurological", value: "No severe headache episodes reported through observation period" },
-      { label: "Adverse Events", value: "Mild transient facial rash noted — self-resolving, non-distressing" },
-    ],
-  },
-];
-
-const CASE_COVER_IMAGES = [
-  "https://picsum.photos/seed/exomed-neuro/480/560",
-  "https://picsum.photos/seed/exomed-skin/480/560",
-  "https://picsum.photos/seed/exomed-stroke/480/560",
-  "https://picsum.photos/seed/exomed-ortho/480/560",
-  "https://picsum.photos/seed/exomed-pediatric/480/560",
-];
-
-const PIPELINE = [
-  {
-    product: "ExoMatrix",
-    platform: "Neurological Platform",
-    stage: "pre-clinical" as const,
-  },
-  {
-    product: "ExoTher 3",
-    platform: "Orthopedic Platform",
-    stage: "research" as const,
-  },
-  {
-    product: "ExoGen",
-    platform: "Dermatology Platform",
-    stage: "special-order" as const,
-  },
-  {
-    product: "ExoPro",
-    platform: "Aesthetic Platform",
-    stage: "early-research" as const,
-  },
-];
-
-const STAGE_STYLE: Record<string, string> = {
-  "pre-clinical":
-    "text-purple-500 dark:text-purple-400 bg-purple-500/10 border-purple-500/20",
-  research:
-    "text-blue-500 dark:text-blue-400 bg-blue-500/10 border-blue-500/20",
-  "special-order":
-    "text-amber-500 dark:text-amber-400 bg-amber-500/10 border-amber-500/20",
-  "early-research":
-    "text-slate-500 dark:text-slate-400 bg-black/[0.04] dark:bg-slate-500/10 border-black/[0.08] dark:border-slate-500/20",
-};
-
-const STAGE_LABELS: Record<string, string> = {
-  "pre-clinical": "Pre-Clinical",
-  research: "Research",
-  "special-order": "Special Order",
-  "early-research": "Early Research",
-};
-
-const WA_NUMBER = "6281234567890";
-const WA_DEFAULT =
-  "Halo Exomed, saya ingin berkonsultasi mengenai produk exosome untuk klinik saya.";
+import {
+  STAGE_STYLE,
+  STAGE_LABELS,
+  WA_NUMBER,
+  WA_DEFAULT,
+  type LandingProduct,
+  type LandingArea,
+  type LandingCaseStudy,
+  type LandingPipelineItem,
+} from "@/constants/landingStatic";
+import { usePageLoader } from "@/store/usePageLoader";
+import { SectionEmpty } from "@/components/SectionEmpty";
+import { Select } from "@/components/Select";
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -208,6 +49,16 @@ export default function Landing() {
   const [activeTab, setActiveTab] = useState<"amniotic" | "placental">(
     "amniotic",
   );
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [amnioticProducts, setAmnioticProducts] = useState<LandingProduct[]>([]);
+  const [placentalProducts, setPlacentalProducts] = useState<LandingProduct[]>([]);
+  const [areas, setAreas] = useState<LandingArea[]>([]);
+  const [caseStudies, setCaseStudies] = useState<LandingCaseStudy[]>([]);
+  const [pipeline, setPipeline] = useState<LandingPipelineItem[]>([]);
+
+  const push = usePageLoader((s) => s.push);
+  const pop = usePageLoader((s) => s.pop);
   const [coaModal, setCoaModal] = useState(false);
   const [coaForm, setCoaForm] = useState({ name: "", email: "" });
   const [coaDone, setCoaDone] = useState(false);
@@ -229,6 +80,62 @@ export default function Landing() {
   const formRef = useRef<HTMLElement>(null);
   const caseScrollRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const fetchHomepageData = async () => {
+      push();
+      const [prodRes, pipeRes, caseRes, areaRes] = await Promise.allSettled([
+        fetch(API_URLS.public.products).then((r) => r.json()),
+        fetch(API_URLS.public.pipeline).then((r) => r.json()),
+        fetch(API_URLS.public.caseStudies).then((r) => r.json()),
+        fetch(API_URLS.public.areas).then((r) => r.json()),
+      ]);
+
+      if (prodRes.status === "fulfilled" && prodRes.value.success) {
+        const all: { series: string; name: string; nanoparticles: string; type: string; description: string }[] = prodRes.value.data;
+        setAmnioticProducts(all.filter((p) => p.series === "amniotic").map(({ name, nanoparticles, type, description }) => ({ name, nanoparticles, type, description })));
+        setPlacentalProducts(all.filter((p) => p.series === "placental").map(({ name, nanoparticles, type, description }) => ({ name, nanoparticles, type, description })));
+      }
+
+      if (pipeRes.status === "fulfilled" && pipeRes.value.success) {
+        setPipeline(
+          pipeRes.value.data.map((item: { product_name: string; platform: string; stage: string }) => ({
+            product: item.product_name,
+            platform: item.platform,
+            stage: item.stage,
+          }))
+        );
+      }
+
+      if (caseRes.status === "fulfilled" && caseRes.value.success) {
+        setCaseStudies(
+          caseRes.value.data.map((cs: {
+            specialty: string; title: string; patient_description: string
+            images: { src: string }[]; metrics: { label: string; value: string }[]
+          }) => ({
+            specialty: cs.specialty,
+            title: cs.title,
+            description: cs.patient_description,
+            coverImage: cs.images[0]?.src ?? "",
+            metrics: cs.metrics,
+          }))
+        );
+      }
+
+      if (areaRes.status === "fulfilled" && areaRes.value.success) {
+        setAreas(
+          areaRes.value.data.map(({ name, specialty, description }: { name: string; specialty: string; description: string }) => ({
+            name,
+            specialty,
+            description,
+          }))
+        );
+      }
+      pop();
+      setIsLoading(false);
+    };
+
+    fetchHomepageData();
+  }, [push, pop]);
 
   useEffect(() => {
     if (mobileOpen) document.body.style.overflow = "hidden";
@@ -262,6 +169,37 @@ export default function Landing() {
   ) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  const productGroups = [
+    {
+      label: 'Amniotic Series',
+      options: [
+        { value: 'ExoMed 1', label: 'ExoMed 1 — 200M Nanoparticles (with HA)' },
+        { value: 'ExoMed 2', label: 'ExoMed 2 — 1B Nanoparticles (with HA)' },
+        { value: 'ExoTher', label: 'ExoTher — 200M Nanoparticles' },
+        { value: 'ExoTher 1', label: 'ExoTher 1 — 1B Nanoparticles' },
+        { value: 'ExoTher 2', label: 'ExoTher 2 — 10B Nanoparticles' },
+        { value: 'ExoTher 3', label: 'ExoTher 3 — 100B Nanoparticles' },
+        { value: 'ExoPro', label: 'ExoPro — 300B Nanoparticles' },
+        { value: 'ExoFit', label: 'ExoFit — 750B Nanoparticles' },
+        { value: 'ExoMatrix', label: 'ExoMatrix — 1.5T Nanoparticles (Special Order)' },
+      ],
+    },
+    {
+      label: 'Placental Cord Series',
+      options: [
+        { value: 'ExoLite', label: 'ExoLite — 750B Nanoparticles' },
+        { value: 'ExoGen', label: 'ExoGen — 1.5T Nanoparticles (Special Order)' },
+      ],
+    },
+    {
+      label: 'Lainnya',
+      options: [
+        { value: 'unknown', label: t('form.product.unknown') },
+      ],
+    },
+  ];
+  const flatProductOptions = productGroups.flatMap((g) => g.options);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -598,25 +536,29 @@ export default function Landing() {
             {t("areas.disclaimer")}
           </motion.p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {CLINICAL_AREAS.map((area, i) => (
+            {!isLoading && areas.length === 0 ? (
+              <div className="col-span-2 md:col-span-4">
+                <SectionEmpty message="Area aplikasi klinis belum tersedia" />
+              </div>
+            ) : areas.map((area, i) => (
               <motion.div
-                key={area.nameKey}
+                key={area.name}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
                 className="p-5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.07] dark:border-white/[0.06] rounded-2xl hover:border-black/[0.14] dark:hover:border-white/[0.12] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all cursor-default"
               >
-                {area.filled
+                {i % 4 !== 3
                   ? <div className="w-2.5 h-2.5 bg-primary rotate-45 mb-4" />
                   : <div className="w-2.5 h-2.5 border-2 border-primary/50 rounded-full mb-4" />
                 }
-                <div className="font-black text-base mb-1">{t(area.nameKey)}</div>
+                <div className="font-black text-base mb-1">{area.name}</div>
                 <div className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-2">
-                  {t(area.catKey)}
+                  {area.specialty}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-slate-500 leading-snug">
-                  {t(area.descKey)}
+                  {area.description}
                 </div>
               </motion.div>
             ))}
@@ -668,9 +610,13 @@ export default function Landing() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
-            {(activeTab === "amniotic"
-              ? AMNIOTIC_PRODUCTS
-              : PLACENTAL_PRODUCTS
+            {!isLoading && (activeTab === "amniotic" ? amnioticProducts : placentalProducts).length === 0 ? (
+              <div className="col-span-3">
+                <SectionEmpty message="Produk belum tersedia" />
+              </div>
+            ) : (activeTab === "amniotic"
+              ? amnioticProducts
+              : placentalProducts
             ).map((product, i) => (
               <motion.div
                 key={product.name}
@@ -755,23 +701,28 @@ export default function Landing() {
             </p>
           </div>
 
+          {!isLoading && caseStudies.length === 0 ? (
+            <div className="px-6">
+              <SectionEmpty message="Studi kasus belum tersedia" />
+            </div>
+          ) : (
           <div
             ref={caseScrollRef}
             className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-4"
             style={{ scrollbarWidth: "none" }}
           >
-            {CASE_STUDIES.map((cs, idx) => (
+            {caseStudies.map((cs) => (
               <div key={cs.title} className="flex-shrink-0 w-[260px] sm:w-[300px] snap-start">
                 <div className="group cursor-default">
                   <div className="relative overflow-hidden rounded-2xl mb-3 transition-all duration-300 ease-in-out group-hover:shadow-xl group-hover:-translate-y-1">
                     <img
-                      src={CASE_COVER_IMAGES[idx]}
+                      src={cs.coverImage}
                       alt={cs.title}
                       className="w-full h-[340px] object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent p-4 flex flex-col justify-between text-white">
                       <span className="text-[10px] font-black uppercase tracking-widest text-white/80">
-                        {t(cs.specialtyKey)}
+                        {cs.specialty}
                       </span>
                       <div>
                         <h3 className="font-black text-sm leading-snug">{cs.title}</h3>
@@ -791,6 +742,7 @@ export default function Landing() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
 
@@ -882,6 +834,9 @@ export default function Landing() {
             </p>
             <h2 className="text-4xl font-black">{t("pipeline.title")}</h2>
           </motion.div>
+          {!isLoading && pipeline.length === 0 ? (
+            <SectionEmpty message="Data pipeline belum tersedia" />
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -901,7 +856,7 @@ export default function Landing() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
-                {PIPELINE.map((item, i) => (
+                {pipeline.map((item, i) => (
                   <motion.tr
                     key={item.product}
                     initial={{ opacity: 0, x: -16 }}
@@ -929,6 +884,7 @@ export default function Landing() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
       </section>
 
@@ -1034,38 +990,15 @@ export default function Landing() {
                     placeholder={t("form.wa.ph")}
                     type="tel"
                   />
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-slate-500">
-                      {t("form.product")}
-                    </label>
-                    <select
-                      name="product_interest"
-                      value={form.product_interest}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-2xl px-4 py-3.5 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all"
-                    >
-                      <option value="">{t("form.product.ph")}</option>
-                      <optgroup label="Amniotic Series">
-                        <option value="ExoMed 1">ExoMed 1 — 200M Nanoparticles (with HA)</option>
-                        <option value="ExoMed 2">ExoMed 2 — 1B Nanoparticles (with HA)</option>
-                        <option value="ExoTher">ExoTher — 200M Nanoparticles</option>
-                        <option value="ExoTher 1">ExoTher 1 — 1B Nanoparticles</option>
-                        <option value="ExoTher 2">ExoTher 2 — 10B Nanoparticles</option>
-                        <option value="ExoTher 3">ExoTher 3 — 100B Nanoparticles</option>
-                        <option value="ExoPro">ExoPro — 300B Nanoparticles</option>
-                        <option value="ExoFit">ExoFit — 750B Nanoparticles</option>
-                        <option value="ExoMatrix">ExoMatrix — 1.5T Nanoparticles (Special Order)</option>
-                      </optgroup>
-                      <optgroup label="Placental Cord Series">
-                        <option value="ExoLite">ExoLite — 750B Nanoparticles</option>
-                        <option value="ExoGen">ExoGen — 1.5T Nanoparticles (Special Order)</option>
-                      </optgroup>
-                      <option value="unknown">
-                        {t("form.product.unknown")}
-                      </option>
-                    </select>
-                  </div>
+                  <Select
+                    variant="public"
+                    label={t("form.product")}
+                    options={productGroups}
+                    value={form.product_interest ? (flatProductOptions.find((o) => o.value === form.product_interest) ?? null) : null}
+                    onChange={(opt) => setForm((p) => ({ ...p, product_interest: opt?.value ?? '' }))}
+                    placeholder={t("form.product.ph")}
+                    isSearchable={false}
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-slate-500">

@@ -1,4 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { PageLoader } from '@/components/PageLoader'
+import { usePageLoader } from '@/store/usePageLoader'
 import Login from '@/pages/Login'
 import Landing from '@/pages/Landing'
 import Articles from '@/pages/Articles'
@@ -19,11 +22,27 @@ import ClientUsers from '@/pages/cms/ClientUsers'
 import { AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
 
+function RouteChangeTracker() {
+  const location = useLocation()
+  const push = usePageLoader((s) => s.push)
+  const pop = usePageLoader((s) => s.pop)
+
+  useEffect(() => {
+    push()
+    const t = setTimeout(pop, 600)
+    return () => { clearTimeout(t); pop() }
+  }, [location.pathname, push, pop])
+
+  return null
+}
+
 export default function App() {
   const isAuthenticated = useAuth((state) => state.isAuthenticated)
 
   return (
     <BrowserRouter>
+      <PageLoader />
+      <RouteChangeTracker />
       <Routes>
         {/* Public */}
         <Route path="/" element={<Landing />} />
