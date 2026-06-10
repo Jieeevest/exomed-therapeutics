@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
@@ -142,6 +143,7 @@ export default function Products() {
             placeholder="Semua Status"
             isClearable
             isSearchable={false}
+            compact
             wrapperClassName="w-44"
           />
           <div className="relative">
@@ -150,7 +152,7 @@ export default function Products() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Cari nama produk..."
-              className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+              className="pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
             />
           </div>
           <div className="ml-auto">
@@ -190,62 +192,83 @@ export default function Products() {
         <Pagination page={page} total={total} limit={limit} onChange={setPage} />
       </div>
 
-      {modal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="p-6 border-b border-border flex justify-between items-center">
-              <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Produk' : 'Edit Produk'}</h2>
-              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <FormField label="Nama Produk" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Series"
-                  value={{ value: form.series, label: form.series === 'amniotic' ? 'Amniotic Series' : 'Placental Cord Series' }}
-                  onChange={opt => setForm(p => ({ ...p, series: opt!.value as Product['series'] }))}
-                  options={[
-                    { value: 'amniotic', label: 'Amniotic Series' },
-                    { value: 'placental', label: 'Placental Cord Series' },
-                  ]}
-                  isSearchable={false}
-                />
-                <Select
-                  label="Status"
-                  value={{ value: form.status, label: form.status === 'aktif' ? 'Aktif' : form.status === 'special_order' ? 'Special Order' : 'Nonaktif' }}
-                  onChange={opt => setForm(p => ({ ...p, status: opt!.value as Product['status'] }))}
-                  options={[
-                    { value: 'aktif', label: 'Aktif' },
-                    { value: 'special_order', label: 'Special Order' },
-                    { value: 'nonaktif', label: 'Nonaktif' },
-                  ]}
-                  isSearchable={false}
-                />
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setModal(null) }}
+          >
+            <motion.div
+              className="bg-card border border-border rounded-2xl w-full max-w-xl shadow-2xl"
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="p-6 border-b border-border flex justify-between items-center">
+                <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Produk' : 'Edit Produk'}</h2>
+                <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
               </div>
-              <FormField label="Jumlah Nanopartikel (mis. 100 Juta)" value={form.nanoparticles} onChange={v => setForm(p => ({ ...p, nanoparticles: v }))} />
-              <FormField label="Tipe (mis. MSC Amniotic Derived)" value={form.type} onChange={v => setForm(p => ({ ...p, type: v }))} />
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Singkat</label>
-                <textarea rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
+              <div className="p-6 space-y-4">
+                <FormField label="Nama Produk" required placeholder="cth. Exomed Gold 100 Series" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
+                <div className="grid grid-cols-2 gap-4">
+                  <Select
+                    label="Series"
+                    value={{ value: form.series, label: form.series === 'amniotic' ? 'Amniotic Series' : 'Placental Cord Series' }}
+                    onChange={opt => setForm(p => ({ ...p, series: opt!.value as Product['series'] }))}
+                    options={[
+                      { value: 'amniotic', label: 'Amniotic Series' },
+                      { value: 'placental', label: 'Placental Cord Series' },
+                    ]}
+                    isSearchable={false}
+                  />
+                  <Select
+                    label="Status"
+                    value={{ value: form.status, label: form.status === 'aktif' ? 'Aktif' : form.status === 'special_order' ? 'Special Order' : 'Nonaktif' }}
+                    onChange={opt => setForm(p => ({ ...p, status: opt!.value as Product['status'] }))}
+                    options={[
+                      { value: 'aktif', label: 'Aktif' },
+                      { value: 'special_order', label: 'Special Order' },
+                      { value: 'nonaktif', label: 'Nonaktif' },
+                    ]}
+                    isSearchable={false}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Jumlah Nanopartikel" required placeholder="cth. 100 Juta" value={form.nanoparticles} onChange={v => setForm(p => ({ ...p, nanoparticles: v }))} />
+                  <FormField label="Tipe Sel" required placeholder="cth. MSC Amniotic Derived" value={form.type} onChange={v => setForm(p => ({ ...p, type: v }))} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Singkat</label>
+                  <textarea autoComplete="off" rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Tuliskan deskripsi singkat produk..." className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
+                </div>
+                <FormField label="URL Gambar Vial" placeholder="https://example.com/vial.png" value={form.image_url ?? ''} onChange={v => setForm(p => ({ ...p, image_url: v }))} />
+                <div className="flex justify-end gap-3 pt-2">
+                  <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                  <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
+                </div>
               </div>
-              <FormField label="URL Gambar Vial (opsional)" value={form.image_url ?? ''} onChange={v => setForm(p => ({ ...p, image_url: v }))} />
-              <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }
 
-function FormField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function FormField({ label, value, onChange, placeholder, required }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean
+}) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <input autoComplete="off" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

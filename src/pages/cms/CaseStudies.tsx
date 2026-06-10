@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, PlusCircle, MinusCircle, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
@@ -222,19 +223,35 @@ export default function CaseStudies() {
         </div>
       </div>
 
-      {modal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setModal(null) }}
+          >
+          <motion.div
+            className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl"
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="p-6 border-b border-border flex justify-between items-center">
               <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Studi Kasus' : 'Edit Studi Kasus'}</h2>
               <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
             </div>
             <div className="p-6 overflow-y-auto space-y-4">
-              <Field label="Spesialisasi" value={form.specialty} onChange={v => setForm(p => ({ ...p, specialty: v }))} />
-              <Field label="Judul Studi Kasus" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Spesialisasi" required placeholder="cth. Orthopedi" value={form.specialty} onChange={v => setForm(p => ({ ...p, specialty: v }))} />
+                <Field label="Judul Studi Kasus" required placeholder="cth. Regenerasi Sendi Lutut OA Grade III" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
+              </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Pasien / Metode</label>
-                <textarea rows={3} value={form.patient_description} onChange={e => setForm(p => ({ ...p, patient_description: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
+                <textarea autoComplete="off" rows={3} value={form.patient_description} onChange={e => setForm(p => ({ ...p, patient_description: e.target.value }))} placeholder="cth. Pasien wanita 58 tahun dengan OA grade III, diberikan injeksi tunggal 100 juta MSC amniotic..." className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
               </div>
 
               <div>
@@ -245,8 +262,8 @@ export default function CaseStudies() {
                 <div className="space-y-2">
                   {(form.images ?? []).map((img, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
-                      <input placeholder="URL gambar (mis. /case-images/foto.jpg)" value={img.src} onChange={e => updateImage(idx, 'src', e.target.value)} className="flex-[2] bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
-                      <input placeholder="Caption (mis. Pre-treatment)" value={img.caption} onChange={e => updateImage(idx, 'caption', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <input autoComplete="off" placeholder="URL gambar (mis. /case-images/foto.jpg)" value={img.src} onChange={e => updateImage(idx, 'src', e.target.value)} className="flex-[2] bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <input autoComplete="off" placeholder="Caption (mis. Pre-treatment)" value={img.caption} onChange={e => updateImage(idx, 'caption', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
                       <button onClick={() => removeImage(idx)} className="text-muted-foreground hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
                     </div>
                   ))}
@@ -264,8 +281,8 @@ export default function CaseStudies() {
                 <div className="space-y-2">
                   {form.metrics.map((m, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
-                      <input placeholder="Label (mis. VAS Score)" value={m.label} onChange={e => updateMetric(idx, 'label', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
-                      <input placeholder="Nilai (mis. −4.1 poin)" value={m.value} onChange={e => updateMetric(idx, 'value', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <input autoComplete="off" placeholder="Label (mis. VAS Score)" value={m.label} onChange={e => updateMetric(idx, 'label', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
+                      <input autoComplete="off" placeholder="Nilai (mis. −4.1 poin)" value={m.value} onChange={e => updateMetric(idx, 'value', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
                       {form.metrics.length > 1 && (
                         <button onClick={() => removeMetric(idx)} className="text-muted-foreground hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
                       )}
@@ -276,7 +293,7 @@ export default function CaseStudies() {
 
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Disclaimer</label>
-                <textarea rows={2} value={form.disclaimer} onChange={e => setForm(p => ({ ...p, disclaimer: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground" />
+                <textarea autoComplete="off" rows={2} value={form.disclaimer} onChange={e => setForm(p => ({ ...p, disclaimer: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground" />
               </div>
 
               <label className="flex items-center gap-2 cursor-pointer text-sm">
@@ -289,18 +306,23 @@ export default function CaseStudies() {
                 <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function Field({ label, value, onChange, placeholder, required }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean
+}) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <input autoComplete="off" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X, Download } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
@@ -179,9 +180,23 @@ export default function Inquiries() {
         </div>
       </div>
 
-      {selected && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setSelected(null) }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl">
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setSelected(null) }}
+          >
+          <motion.div
+            className="bg-card border border-border rounded-2xl w-full max-w-xl shadow-2xl"
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="p-6 border-b border-border flex justify-between items-start">
               <div>
                 <h2 className="font-black text-lg">{selected.name}</h2>
@@ -225,6 +240,7 @@ export default function Inquiries() {
                 <div className="text-xs text-muted-foreground mb-1.5">Catatan Internal</div>
                 <textarea
                   rows={3}
+                  autoComplete="off"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   placeholder="Tambah catatan untuk tim..."
@@ -238,9 +254,10 @@ export default function Inquiries() {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }

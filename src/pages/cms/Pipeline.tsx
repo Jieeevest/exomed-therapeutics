@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
@@ -233,46 +234,67 @@ export default function Pipeline() {
         </div>
       )}
 
-      {modal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-border flex justify-between items-center">
-              <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Item Pipeline' : 'Edit Item Pipeline'}</h2>
-              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <Field label="Nama Produk" value={form.product_name} onChange={v => setForm(p => ({ ...p, product_name: v }))} />
-              <Field label="Platform / Indikasi" value={form.platform} onChange={v => setForm(p => ({ ...p, platform: v }))} />
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Tahap"
-                  value={STAGES.find(s => s.value === form.stage) ?? null}
-                  onChange={opt => setForm(p => ({ ...p, stage: opt!.value as PipelineItem['stage'] }))}
-                  options={STAGES}
-                  isSearchable={false}
-                />
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Urutan Tampil</label>
-                  <input type="number" value={form.order} onChange={e => setForm(p => ({ ...p, order: Number(e.target.value) }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground" />
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setModal(null) }}
+          >
+            <motion.div
+              className="bg-card border border-border rounded-2xl w-full max-w-xl shadow-2xl"
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="p-6 border-b border-border flex justify-between items-center">
+                <h2 className="font-black text-lg">{modal === 'create' ? 'Tambah Item Pipeline' : 'Edit Item Pipeline'}</h2>
+                <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Nama Produk" required placeholder="cth. EXO-BONE" value={form.product_name} onChange={v => setForm(p => ({ ...p, product_name: v }))} />
+                  <Field label="Platform / Indikasi" required placeholder="cth. Degenerasi Sendi / OA" value={form.platform} onChange={v => setForm(p => ({ ...p, platform: v }))} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Select
+                    label="Tahap"
+                    value={STAGES.find(s => s.value === form.stage) ?? null}
+                    onChange={opt => setForm(p => ({ ...p, stage: opt!.value as PipelineItem['stage'] }))}
+                    options={STAGES}
+                    isSearchable={false}
+                  />
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Urutan Tampil</label>
+                    <input type="number" autoComplete="off" value={form.order} onChange={e => setForm(p => ({ ...p, order: Number(e.target.value) }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 text-foreground" />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                  <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
                 </div>
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function Field({ label, value, onChange, placeholder, required }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean
+}) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <input autoComplete="off" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

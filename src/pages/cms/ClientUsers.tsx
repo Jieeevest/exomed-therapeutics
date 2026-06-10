@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Trash2, X, Search, Pencil, Check, UserCheck } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
@@ -243,64 +244,81 @@ export default function ClientUsers() {
         </datalist>
       </div>
 
-      {modal && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={e => { if (e.target === e.currentTarget) setModal(false) }}
-        >
-          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-border flex justify-between items-center">
-              <h2 className="font-black text-lg text-foreground">Tambah Klien Baru</h2>
-              <button onClick={() => setModal(false)}>
-                <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-              </button>
-            </div>
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
-              <Field label="Username" value={form.username} onChange={v => setForm(p => ({ ...p, username: v }))} />
-              <Field label="Email"    value={form.email}    onChange={v => setForm(p => ({ ...p, email: v }))}    type="email" />
-              <Field label="Password" value={form.password} onChange={v => setForm(p => ({ ...p, password: v }))} type="password" placeholder="Min. 8 karakter" />
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Tipe Klien</label>
-                <input
-                  list="tier-suggestions"
-                  value={form.subscription_tier}
-                  onChange={e => setForm(p => ({ ...p, subscription_tier: e.target.value }))}
-                  placeholder="Misal: Rumah Sakit, Klinik..."
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/40"
-                />
-              </div>
-              {formError && (
-                <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{formError}</p>
-              )}
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors text-foreground">
-                  Batal
-                </button>
-                <button type="submit" disabled={saving} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity disabled:opacity-50">
-                  <UserCheck className="w-4 h-4" />
-                  {saving ? 'Menyimpan...' : 'Buat Akun'}
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setModal(false) }}
+          >
+            <motion.div
+              className="bg-card border border-border rounded-2xl w-full max-w-xl shadow-2xl"
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="p-6 border-b border-border flex justify-between items-center">
+                <h2 className="font-black text-lg text-foreground">Tambah Klien Baru</h2>
+                <button onClick={() => setModal(false)}>
+                  <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+              <form onSubmit={handleCreate} className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Username" required placeholder="cth. drSantoso" value={form.username} onChange={v => setForm(p => ({ ...p, username: v }))} />
+                  <Field label="Email" required placeholder="cth. dr.santoso@klinik.co.id" value={form.email} onChange={v => setForm(p => ({ ...p, email: v }))} type="email" />
+                </div>
+                <Field label="Password" required value={form.password} onChange={v => setForm(p => ({ ...p, password: v }))} type="password" placeholder="Min. 8 karakter" />
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Tipe Klien</label>
+                  <input
+                    list="tier-suggestions"
+                    autoComplete="off"
+                    value={form.subscription_tier}
+                    onChange={e => setForm(p => ({ ...p, subscription_tier: e.target.value }))}
+                    placeholder="cth. Rumah Sakit, Klinik..."
+                    className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/40"
+                  />
+                </div>
+                {formError && (
+                  <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{formError}</p>
+                )}
+                <div className="flex justify-end gap-3 pt-2">
+                  <button type="button" onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors text-foreground">
+                    Batal
+                  </button>
+                  <button type="submit" disabled={saving} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity disabled:opacity-50">
+                    <UserCheck className="w-4 h-4" />
+                    {saving ? 'Menyimpan...' : 'Buat Akun'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }
 
-function Field({ label, value, onChange, type = 'text', placeholder }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string
+function Field({ label, value, onChange, type = 'text', placeholder, required }: {
+  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; required?: boolean
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
       <input
         type={type}
+        autoComplete="off"
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        required
         className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30"
       />
     </div>

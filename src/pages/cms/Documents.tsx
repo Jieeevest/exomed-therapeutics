@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Trash2, X, ExternalLink, FileText, Lock, Globe, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
@@ -193,58 +194,77 @@ export default function Documents() {
         </div>
       </div>
 
-      {modal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(false) }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-border flex justify-between items-center">
-              <h2 className="font-black text-lg">Upload Dokumen</h2>
-              <button onClick={() => setModal(false)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <Field label="Nama Dokumen" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Kategori"
-                  value={{ value: form.category, label: form.category === 'coa' ? 'COA' : form.category === 'legal' ? 'Legal' : form.category === 'brosur' ? 'Brosur' : 'Protokol' }}
-                  onChange={opt => setForm(p => ({ ...p, category: opt!.value as CmsDocument['category'] }))}
-                  options={[
-                    { value: 'coa', label: 'COA' },
-                    { value: 'legal', label: 'Legal' },
-                    { value: 'brosur', label: 'Brosur' },
-                    { value: 'protokol', label: 'Protokol' },
-                  ]}
-                  isSearchable={false}
-                />
-                <Select
-                  label="Akses"
-                  value={{ value: form.access, label: form.access === 'gated' ? 'Gated (isi form dulu)' : 'Publik (langsung download)' }}
-                  onChange={opt => setForm(p => ({ ...p, access: opt!.value as CmsDocument['access'] }))}
-                  options={[
-                    { value: 'gated', label: 'Gated (isi form dulu)' },
-                    { value: 'publik', label: 'Publik (langsung download)' },
-                  ]}
-                  isSearchable={false}
-                />
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setModal(false) }}
+          >
+            <motion.div
+              className="bg-card border border-border rounded-2xl w-full max-w-xl shadow-2xl"
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="p-6 border-b border-border flex justify-between items-center">
+                <h2 className="font-black text-lg">Upload Dokumen</h2>
+                <button onClick={() => setModal(false)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
               </div>
-              <Field label="URL File PDF" value={form.file_url} onChange={v => setForm(p => ({ ...p, file_url: v }))} />
-              <p className="text-xs text-muted-foreground">Upload file ke storage terlebih dahulu, lalu paste URL-nya di sini.</p>
-              <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
+              <div className="p-6 space-y-4">
+                <Field label="Nama Dokumen" required placeholder="cth. COA Batch #2025-001" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
+                <div className="grid grid-cols-2 gap-4">
+                  <Select
+                    label="Kategori"
+                    value={{ value: form.category, label: form.category === 'coa' ? 'COA' : form.category === 'legal' ? 'Legal' : form.category === 'brosur' ? 'Brosur' : 'Protokol' }}
+                    onChange={opt => setForm(p => ({ ...p, category: opt!.value as CmsDocument['category'] }))}
+                    options={[
+                      { value: 'coa', label: 'COA' },
+                      { value: 'legal', label: 'Legal' },
+                      { value: 'brosur', label: 'Brosur' },
+                      { value: 'protokol', label: 'Protokol' },
+                    ]}
+                    isSearchable={false}
+                  />
+                  <Select
+                    label="Akses"
+                    value={{ value: form.access, label: form.access === 'gated' ? 'Gated (isi form dulu)' : 'Publik (langsung download)' }}
+                    onChange={opt => setForm(p => ({ ...p, access: opt!.value as CmsDocument['access'] }))}
+                    options={[
+                      { value: 'gated', label: 'Gated (isi form dulu)' },
+                      { value: 'publik', label: 'Publik (langsung download)' },
+                    ]}
+                    isSearchable={false}
+                  />
+                </div>
+                <Field label="URL File PDF" required placeholder="https://storage.example.com/coa.pdf" value={form.file_url} onChange={v => setForm(p => ({ ...p, file_url: v }))} />
+                <p className="text-xs text-muted-foreground">Upload file ke storage terlebih dahulu, lalu paste URL-nya di sini.</p>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                  <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function Field({ label, value, onChange, placeholder, required }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean
+}) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <input autoComplete="off" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }

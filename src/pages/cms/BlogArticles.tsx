@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
@@ -228,56 +229,79 @@ export default function BlogArticles() {
         </div>
       </div>
 
-      {modal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
-          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-            <div className="p-6 border-b border-border flex justify-between items-center">
-              <h2 className="font-black text-lg">{modal === 'create' ? 'Tulis Artikel' : 'Edit Artikel'}</h2>
-              <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
-            </div>
-            <div className="p-6 overflow-y-auto space-y-4">
-              <Field label="Judul Artikel" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Kategori"
-                  value={{ value: form.category, label: form.category === 'edukasi-exosome' ? 'Edukasi Exosome' : form.category === 'riset' ? 'Riset' : 'Update Perusahaan' }}
-                  onChange={opt => setForm(p => ({ ...p, category: opt!.value as BlogArticle['category'] }))}
-                  options={[
-                    { value: 'edukasi-exosome', label: 'Edukasi Exosome' },
-                    { value: 'riset', label: 'Riset' },
-                    { value: 'update-perusahaan', label: 'Update Perusahaan' },
-                  ]}
-                  isSearchable={false}
-                />
-                <Field label="Author" value={form.author} onChange={v => setForm(p => ({ ...p, author: v }))} />
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={e => { if (e.target === e.currentTarget) setModal(null) }}
+          >
+            <motion.div
+              className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl"
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="p-6 border-b border-border flex justify-between items-center">
+                <h2 className="font-black text-lg">{modal === 'create' ? 'Tulis Artikel' : 'Edit Artikel'}</h2>
+                <button onClick={() => setModal(null)}><X className="w-5 h-5 text-muted-foreground hover:text-foreground" /></button>
               </div>
-              <Field label="Slug URL (opsional — auto-generate jika kosong)" value={form.slug} onChange={v => setForm(p => ({ ...p, slug: v }))} />
-              <Field label="URL Thumbnail (opsional)" value={form.thumbnail_url ?? ''} onChange={v => setForm(p => ({ ...p, thumbnail_url: v }))} />
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Konten Artikel</label>
-                <textarea rows={12} value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-y font-mono text-foreground placeholder:text-foreground/20" placeholder="Tulis konten artikel di sini..." />
+              <div className="p-6 overflow-y-auto space-y-4">
+                <Field label="Judul Artikel" required placeholder="cth. Manfaat Exosome untuk Regenerasi Kulit" value={form.title} onChange={v => setForm(p => ({ ...p, title: v }))} />
+                <div className="grid grid-cols-2 gap-4">
+                  <Select
+                    label="Kategori"
+                    value={{ value: form.category, label: form.category === 'edukasi-exosome' ? 'Edukasi Exosome' : form.category === 'riset' ? 'Riset' : 'Update Perusahaan' }}
+                    onChange={opt => setForm(p => ({ ...p, category: opt!.value as BlogArticle['category'] }))}
+                    options={[
+                      { value: 'edukasi-exosome', label: 'Edukasi Exosome' },
+                      { value: 'riset', label: 'Riset' },
+                      { value: 'update-perusahaan', label: 'Update Perusahaan' },
+                    ]}
+                    isSearchable={false}
+                  />
+                  <Field label="Author" required placeholder="cth. dr. Ahmad Santoso, Sp.OT" value={form.author} onChange={v => setForm(p => ({ ...p, author: v }))} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Slug URL" placeholder="cth. manfaat-exosome-kulit (auto jika kosong)" value={form.slug} onChange={v => setForm(p => ({ ...p, slug: v }))} />
+                  <Field label="URL Thumbnail" placeholder="https://..." value={form.thumbnail_url ?? ''} onChange={v => setForm(p => ({ ...p, thumbnail_url: v }))} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+                    Konten Artikel<span className="text-red-500 ml-0.5">*</span>
+                  </label>
+                  <textarea autoComplete="off" rows={12} value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-y font-mono text-foreground placeholder:text-foreground/20" placeholder="Tulis konten artikel di sini..." />
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer text-sm">
+                  <input type="checkbox" checked={form.status === 'publish'} onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'publish' : 'draft' }))} className="rounded" />
+                  Publish langsung
+                </label>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
+                  <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
+                </div>
               </div>
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
-                <input type="checkbox" checked={form.status === 'publish'} onChange={e => setForm(p => ({ ...p, status: e.target.checked ? 'publish' : 'draft' }))} className="rounded" />
-                Publish langsung
-              </label>
-              <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
-                <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CmsLayout>
   )
 }
 
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function Field({ label, value, onChange, placeholder, required }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean
+}) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">{label}</label>
-      <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
+      <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <input autoComplete="off" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/30" />
     </div>
   )
 }
