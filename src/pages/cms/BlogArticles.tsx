@@ -142,6 +142,7 @@ export default function BlogArticles() {
               placeholder="Semua Status"
               isClearable
               isSearchable={false}
+              compact
               wrapperClassName="w-36"
             />
             <Select
@@ -155,6 +156,7 @@ export default function BlogArticles() {
               placeholder="Semua Kategori"
               isClearable
               isSearchable={false}
+              compact
               wrapperClassName="w-48"
             />
             <div className="relative flex-1 max-w-xs">
@@ -163,7 +165,7 @@ export default function BlogArticles() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Cari judul..."
-                className="w-full pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+                className="w-full pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
               />
             </div>
             <div className="ml-auto">

@@ -126,6 +126,7 @@ export default function ApplicationAreas() {
               placeholder="Semua Status"
               isClearable
               isSearchable={false}
+              compact
               wrapperClassName="w-40"
             />
             <div className="relative">
@@ -134,7 +135,7 @@ export default function ApplicationAreas() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Cari nama area..."
-                className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+                className="pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
               />
             </div>
             <div className="ml-auto">

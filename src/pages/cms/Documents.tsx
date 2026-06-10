@@ -123,6 +123,7 @@ export default function Documents() {
               placeholder="Semua Akses"
               isClearable
               isSearchable={false}
+              compact
               wrapperClassName="w-36"
             />
             <div className="relative">
@@ -131,7 +132,7 @@ export default function Documents() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Cari nama dokumen..."
-                className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+                className="pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
               />
             </div>
             <div className="ml-auto">

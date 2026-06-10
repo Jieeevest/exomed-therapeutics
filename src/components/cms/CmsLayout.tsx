@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquare, Package, MapPin,
   FlaskConical, GitBranch, FileText, BookOpen,
-  Settings, Sliders, Users, ExternalLink, ChevronRight, UserCheck,
+  Settings, Sliders, ExternalLink, ChevronRight, UserCheck, UserCog,
   LogOut, KeyRound, X, Check, AlertCircle,
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
@@ -53,7 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { path: '/cms/page-settings',    label: 'Pengaturan Halaman', icon: Settings },
       { path: '/cms/general-settings', label: 'Pengaturan Umum',    icon: Sliders },
-      { path: '/cms/admin-users',      label: 'Manajemen Admin',    icon: Users },
+      { path: '/cms/internal-users',   label: 'Manajemen Admin',    icon: UserCog },
     ],
   },
 ]

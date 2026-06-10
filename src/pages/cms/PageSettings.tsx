@@ -51,29 +51,31 @@ export default function PageSettings() {
         </button>
       }
     >
-      <div className="max-w-2xl space-y-6">
+      <div className="grid grid-cols-2 gap-6">
         <Section title="Hero Section">
           <TextareaField label="Tagline Hero (H1)" value={form.hero_tagline} rows={2} onChange={v => handleChange('hero_tagline', v)} />
           <TextareaField label="Subtext Hero" value={form.hero_subtext} rows={4} onChange={v => handleChange('hero_subtext', v)} />
         </Section>
 
         <Section title="Tentang Exomed">
-          <TextareaField label="Teks Tentang Perusahaan" value={form.about_text} rows={5} onChange={v => handleChange('about_text', v)} />
+          <TextareaField label="Teks Tentang Perusahaan" value={form.about_text} rows={8} onChange={v => handleChange('about_text', v)} />
         </Section>
 
-        <Section title="Kontak">
-          <InputField label="Nomor WhatsApp (tanpa +)" value={form.contact_wa} onChange={v => handleChange('contact_wa', v)} placeholder="6281234567890" />
-          <InputField label="Email" value={form.contact_email} onChange={v => handleChange('contact_email', v)} placeholder="info@exomed.id" />
-          <InputField label="Alamat" value={form.address} onChange={v => handleChange('address', v)} placeholder="Jakarta, Indonesia" />
+        <Section title="Kontak" className="col-span-2">
+          <div className="grid grid-cols-3 gap-4">
+            <InputField label="Nomor WhatsApp (tanpa +)" value={form.contact_wa} onChange={v => handleChange('contact_wa', v)} placeholder="6281234567890" />
+            <InputField label="Email" value={form.contact_email} onChange={v => handleChange('contact_email', v)} placeholder="info@exomed.id" />
+            <InputField label="Alamat" value={form.address} onChange={v => handleChange('address', v)} placeholder="Jakarta, Indonesia" />
+          </div>
         </Section>
       </div>
     </CmsLayout>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+    <div className={`bg-card border border-border rounded-2xl p-6 space-y-4 ${className ?? ''}`}>
       <div className="font-black text-sm text-foreground border-b border-border pb-3">{title}</div>
       {children}
     </div>

@@ -55,7 +55,7 @@ export default function GeneralSettings() {
         </button>
       }
     >
-      <div className="max-w-2xl space-y-6">
+      <div className="grid grid-cols-2 gap-6">
         <Section title="Identitas Perusahaan">
           <InputField label="Nama Perusahaan" value={form.company_name} onChange={v => handleChange('company_name', v)} />
           <InputField label="URL Logo" value={form.logo_url} onChange={v => handleChange('logo_url', v)} />
@@ -73,24 +73,28 @@ export default function GeneralSettings() {
               className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-foreground"
             />
           </div>
-          <InputField label="Google Analytics ID (mis. G-XXXXXXXXXX)" value={form.ga_id} onChange={v => handleChange('ga_id', v)} placeholder="G-XXXXXXXXXX" />
+          <InputField label="Google Analytics ID" value={form.ga_id} onChange={v => handleChange('ga_id', v)} placeholder="G-XXXXXXXXXX" />
         </Section>
 
-        <Section title="Integrasi WhatsApp Business">
-          <InputField label="Nomor WA (tanpa +, mis. 6281234567890)" value={form.wa_number} onChange={v => handleChange('wa_number', v)} placeholder="6281234567890" />
-          <div className="space-y-1.5">
-            <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Pesan Default WA</label>
-            <textarea
-              value={form.wa_default_message}
-              onChange={e => handleChange('wa_default_message', e.target.value)}
-              rows={2}
-              className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-foreground"
-            />
-          </div>
-          <div className="p-3 bg-muted/20 border border-border rounded-xl">
-            <div className="text-xs text-muted-foreground">Preview link WhatsApp:</div>
-            <div className="text-xs text-primary mt-1 font-mono break-all">
-              {`https://wa.me/${form.wa_number}?text=${encodeURIComponent(form.wa_default_message)}`}
+        <Section title="Integrasi WhatsApp Business" className="col-span-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <InputField label="Nomor WA (tanpa +)" value={form.wa_number} onChange={v => handleChange('wa_number', v)} placeholder="6281234567890" />
+              <div className="space-y-1.5">
+                <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Pesan Default WA</label>
+                <textarea
+                  value={form.wa_default_message}
+                  onChange={e => handleChange('wa_default_message', e.target.value)}
+                  rows={3}
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none transition-colors text-foreground"
+                />
+              </div>
+            </div>
+            <div className="p-4 bg-muted/20 border border-border rounded-xl flex flex-col gap-2">
+              <div className="text-xs font-black uppercase tracking-wider text-muted-foreground">Preview Link WhatsApp</div>
+              <div className="text-xs text-primary font-mono break-all leading-relaxed">
+                {`https://wa.me/${form.wa_number}?text=${encodeURIComponent(form.wa_default_message)}`}
+              </div>
             </div>
           </div>
         </Section>
@@ -99,9 +103,9 @@ export default function GeneralSettings() {
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+    <div className={`bg-card border border-border rounded-2xl p-6 space-y-4 ${className ?? ''}`}>
       <div className="font-black text-sm text-foreground border-b border-border pb-3">{title}</div>
       {children}
     </div>

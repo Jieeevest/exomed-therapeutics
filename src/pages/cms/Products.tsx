@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import type { Product } from '@/types'
 
 const STATUS_COLOR: Record<string, string> = {
-  aktif:        'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  aktif:        'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
   special_order:'bg-amber-500/10 text-amber-400 border-amber-500/20',
   nonaktif:     'bg-slate-500/10 text-muted-foreground border-slate-500/20',
 }

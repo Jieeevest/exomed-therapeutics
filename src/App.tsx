@@ -19,6 +19,7 @@ import PageSettings from '@/pages/cms/PageSettings'
 import GeneralSettings from '@/pages/cms/GeneralSettings'
 import AdminUsers from '@/pages/cms/AdminUsers'
 import ClientUsers from '@/pages/cms/ClientUsers'
+import InternalUsers from '@/pages/cms/InternalUsers'
 import { AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
 
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/cms/general-settings"      element={<GeneralSettings />} />
           <Route path="/cms/admin-users"           element={<AdminUsers />} />
           <Route path="/cms/users"                 element={<ClientUsers />} />
+          <Route path="/cms/internal-users"        element={<InternalUsers />} />
         </Route>
 
         {/* Fallback */}

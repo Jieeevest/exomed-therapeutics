@@ -151,7 +151,7 @@ export default function CaseStudies() {
               value={specialtyFilter}
               onChange={e => setSpecialtyFilter(e.target.value)}
               placeholder="Filter spesialisasi..."
-              className="px-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+              className="px-3 py-2 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
             />
             <Select
               value={publishedFilter ? { value: publishedFilter, label: publishedFilter === 'true' ? 'Published' : 'Draft' } : null}
@@ -160,6 +160,7 @@ export default function CaseStudies() {
               placeholder="Semua Status"
               isClearable
               isSearchable={false}
+              compact
               wrapperClassName="w-40"
             />
             <div className="relative">
@@ -168,7 +169,7 @@ export default function CaseStudies() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Cari judul..."
-                className="pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
+                className="pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs outline-none focus:border-primary/40 transition-colors text-foreground placeholder:text-muted-foreground/50"
               />
             </div>
             <div className="ml-auto">
