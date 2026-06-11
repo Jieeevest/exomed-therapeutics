@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Plus, Trash2, X, ExternalLink, FileText, Lock, Globe, Search, Save } from 'lucide-react'
+import { Plus, Trash2, X, ExternalLink, FileText, Lock, Globe, Search, Save, Info } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { FileUpload } from '@/components/cms/FileUpload'
 import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -74,15 +76,25 @@ export default function Documents() {
       body: JSON.stringify(form),
     })
     const data = await res.json()
-    if (data.success) setItems(prev => [data.data, ...prev])
+    if (data.success) {
+      setItems(prev => [data.data, ...prev])
+      toast.success('Dokumen berhasil ditambahkan')
+    }
     setModal(false)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus dokumen ini?')) return
-    const res = await fetchWithAuth(`/api/cms/documents/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
+  const handleDelete = (id: string) => {
+    toast.warning('Hapus dokumen ini?', {
+      action: { label: 'Hapus', onClick: async () => {
+        const res = await fetchWithAuth(`/api/cms/documents/${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          setItems(prev => prev.filter(i => i.id !== id))
+          toast.success('Dokumen berhasil dihapus')
+        }
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   return (
@@ -233,6 +245,15 @@ export default function Documents() {
                   />
                   <Select
                     label="Akses"
+                    labelExtra={
+                      <div className="relative group/tip">
+                        <Info className="w-3.5 h-3.5 text-muted-foreground/50 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-card border border-border rounded-xl p-3 text-xs text-foreground shadow-xl opacity-0 group-hover/tip:opacity-100 pointer-events-none transition-opacity z-50 space-y-1.5">
+                          <div><span className="font-semibold text-primary">Gated</span> — pengunjung harus isi form kontak sebelum bisa download</div>
+                          <div><span className="font-semibold text-foreground">Publik</span> — siapa saja bisa langsung download tanpa form</div>
+                        </div>
+                      </div>
+                    }
                     value={{ value: form.access, label: form.access === 'gated' ? 'Gated (isi form dulu)' : 'Publik (langsung download)' }}
                     onChange={opt => setForm(p => ({ ...p, access: opt!.value as CmsDocument['access'] }))}
                     options={[
@@ -242,8 +263,7 @@ export default function Documents() {
                     isSearchable={false}
                   />
                 </div>
-                <Field label="URL File PDF" required placeholder="https://storage.example.com/coa.pdf" value={form.file_url} onChange={v => setForm(p => ({ ...p, file_url: v }))} />
-                <p className="text-xs text-muted-foreground">Upload file ke storage terlebih dahulu, lalu paste URL-nya di sini.</p>
+                <FileUpload label="File PDF" required accept="application/pdf" folder="documents" value={form.file_url} onChange={v => setForm(p => ({ ...p, file_url: v }))} hint="Maks. 10 MB" />
                 <div className="flex justify-end gap-3 pt-2">
                   <button onClick={() => setModal(false)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
                   <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>

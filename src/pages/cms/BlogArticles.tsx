@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { FileUpload } from '@/components/cms/FileUpload'
 import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -90,7 +92,10 @@ export default function BlogArticles() {
         body: JSON.stringify(body),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => prev.map(i => i.id === editId ? { ...i, ...body } : i))
+      if (data.success) {
+        setItems(prev => prev.map(i => i.id === editId ? { ...i, ...body } : i))
+        toast.success('Artikel berhasil diperbarui')
+      }
     } else {
       const res = await fetchWithAuth('/api/cms/articles', {
         method: 'POST',
@@ -98,16 +103,26 @@ export default function BlogArticles() {
         body: JSON.stringify(body),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => [data.data, ...prev])
+      if (data.success) {
+        setItems(prev => [data.data, ...prev])
+        toast.success('Artikel berhasil ditambahkan')
+      }
     }
     setModal(null)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus artikel ini?')) return
-    const res = await fetchWithAuth(`/api/cms/articles/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
+  const handleDelete = (id: string) => {
+    toast.warning('Hapus artikel ini?', {
+      action: { label: 'Hapus', onClick: async () => {
+        const res = await fetchWithAuth(`/api/cms/articles/${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          setItems(prev => prev.filter(i => i.id !== id))
+          toast.success('Artikel berhasil dihapus')
+        }
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   const toggleStatus = async (item: BlogArticle) => {
@@ -268,10 +283,8 @@ export default function BlogArticles() {
                   />
                   <Field label="Author" required placeholder="cth. dr. Ahmad Santoso, Sp.OT" value={form.author} onChange={v => setForm(p => ({ ...p, author: v }))} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Slug URL" placeholder="cth. manfaat-exosome-kulit (auto jika kosong)" value={form.slug} onChange={v => setForm(p => ({ ...p, slug: v }))} />
-                  <Field label="URL Thumbnail" placeholder="https://..." value={form.thumbnail_url ?? ''} onChange={v => setForm(p => ({ ...p, thumbnail_url: v }))} />
-                </div>
+                <Field label="Slug URL" placeholder="cth. manfaat-exosome-kulit (auto jika kosong)" value={form.slug} onChange={v => setForm(p => ({ ...p, slug: v }))} />
+                <FileUpload label="Thumbnail" accept="image/*" folder="articles" value={form.thumbnail_url ?? ''} onChange={v => setForm(p => ({ ...p, thumbnail_url: v }))} hint="JPG, PNG, WebP. Tampil sebagai cover artikel." />
                 <div className="space-y-1.5">
                   <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">
                     Konten Artikel<span className="text-red-500 ml-0.5">*</span>

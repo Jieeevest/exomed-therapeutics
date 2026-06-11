@@ -14,7 +14,7 @@ const buildPublicStyles = <V, IsMulti extends boolean>(): StylesConfig<SelectOpt
     borderRadius: '1rem',
     padding: '0.25rem 0.25rem',
     boxShadow: state.isFocused ? '0 0 0 4px hsl(var(--primary) / 0.1)' : 'none',
-    minHeight: '48px',
+    minHeight: '50px',
     cursor: 'pointer',
     '&:hover': {
       borderColor: state.isFocused ? 'hsl(var(--primary) / 0.5)' : 'hsl(var(--border))',
@@ -201,6 +201,7 @@ const buildStyles = <V, IsMulti extends boolean>(compact = false): StylesConfig<
 interface SelectProps<V = string, IsMulti extends boolean = false>
   extends Omit<ReactSelectProps<SelectOption<V>, IsMulti, GroupBase<SelectOption<V>>>, 'styles' | 'classNamePrefix'> {
   label?: string
+  labelExtra?: React.ReactNode
   error?: string
   hint?: string
   wrapperClassName?: string
@@ -211,6 +212,7 @@ interface SelectProps<V = string, IsMulti extends boolean = false>
 
 export function Select<V = string, IsMulti extends boolean = false>({
   label,
+  labelExtra,
   error,
   hint,
   wrapperClassName,
@@ -226,9 +228,12 @@ export function Select<V = string, IsMulti extends boolean = false>({
   return (
     <div className={cn('space-y-1.5', wrapperClassName)}>
       {label && (
-        <label htmlFor={id} className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
+        <div className="flex items-center gap-1.5">
+          <label htmlFor={id} className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+            {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+          {labelExtra}
+        </div>
       )}
       <ReactSelect<SelectOption<V>, IsMulti, GroupBase<SelectOption<V>>>
         inputId={id}

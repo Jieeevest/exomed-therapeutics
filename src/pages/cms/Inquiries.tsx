@@ -4,6 +4,7 @@ import { Search, X, Download } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -65,6 +66,7 @@ export default function Inquiries() {
     if (data.success) {
       setItems(prev => prev.map(i => i.id === id ? { ...i, status } : i))
       if (selected?.id === id) setSelected(prev => prev ? { ...prev, status } : null)
+      toast.success('Status berhasil diperbarui')
     }
   }
 
@@ -78,6 +80,7 @@ export default function Inquiries() {
     if (data.success) {
       setItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i))
       if (selected?.id === id) setSelected(prev => prev ? { ...prev, notes } : null)
+      toast.success('Catatan berhasil disimpan')
     }
   }
 

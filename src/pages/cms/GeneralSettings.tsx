@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Save, CheckCircle } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { FileUpload } from '@/components/cms/FileUpload'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 
 interface GeneralData {
@@ -38,6 +40,7 @@ export default function GeneralSettings() {
 
   const handleSave = () => {
     setSaved(true)
+    toast.success('Pengaturan umum tersimpan')
     setTimeout(() => setSaved(false), 3000)
   }
 
@@ -58,8 +61,8 @@ export default function GeneralSettings() {
       <div className="grid grid-cols-2 gap-6">
         <Section title="Identitas Perusahaan">
           <InputField label="Nama Perusahaan" value={form.company_name} onChange={v => handleChange('company_name', v)} />
-          <InputField label="URL Logo" value={form.logo_url} onChange={v => handleChange('logo_url', v)} />
-          <InputField label="URL Favicon" value={form.favicon_url} onChange={v => handleChange('favicon_url', v)} />
+          <FileUpload label="Logo" folder="settings" value={form.logo_url} onChange={v => handleChange('logo_url', v)} hint="SVG, PNG, atau WebP" />
+          <FileUpload label="Favicon" folder="settings" value={form.favicon_url} onChange={v => handleChange('favicon_url', v)} hint="PNG atau ICO, 32×32 px" />
         </Section>
 
         <Section title="SEO (Meta Tags)">

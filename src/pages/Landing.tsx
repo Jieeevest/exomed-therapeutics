@@ -980,7 +980,7 @@ export default function Landing() {
                     placeholder={t("form.city.ph")}
                   />
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-4 items-start">
                   <Field
                     label={t("form.wa")}
                     name="whatsapp"

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Save, CheckCircle } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
@@ -34,6 +35,7 @@ export default function PageSettings() {
 
   const handleSave = () => {
     setSaved(true)
+    toast.success('Pengaturan halaman tersimpan')
     setTimeout(() => setSaved(false), 3000)
   }
 

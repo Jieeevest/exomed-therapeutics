@@ -22,6 +22,8 @@ import ClientUsers from '@/pages/cms/ClientUsers'
 import InternalUsers from '@/pages/cms/InternalUsers'
 import { AdminRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/store/useAuth'
+import { useTheme } from '@/store/useTheme'
+import { Toaster } from 'sonner'
 
 function RouteChangeTracker() {
   const location = useLocation()
@@ -39,9 +41,12 @@ function RouteChangeTracker() {
 
 export default function App() {
   const isAuthenticated = useAuth((state) => state.isAuthenticated)
+  const { theme } = useTheme()
 
   return (
-    <BrowserRouter>
+    <>
+      <Toaster theme={theme} position="top-right" richColors closeButton />
+      <BrowserRouter>
       <PageLoader />
       <RouteChangeTracker />
       <Routes>
@@ -78,5 +83,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </>
   )
 }

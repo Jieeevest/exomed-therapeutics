@@ -55,5 +55,7 @@ export const API_URLS = {
     adminUsers:      `${API_BASE}/api/cms/admin-users`,
     adminUser:       (id: string) => `${API_BASE}/api/cms/admin-users/${id}`,
     inquirySubmit:   `${API_BASE}/api/submit/inquiry`,
+    mediaUpload:     `${API_BASE}/api/cms/media/upload`,
+    mediaDelete:     (path: string) => `${API_BASE}/api/cms/media/${encodeURIComponent(path)}`,
   },
 }

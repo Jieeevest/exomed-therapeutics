@@ -5,6 +5,7 @@ import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -74,7 +75,10 @@ export default function ApplicationAreas() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      if (data.success) {
+        setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+        toast.success('Area aplikasi berhasil diperbarui')
+      }
     } else {
       const res = await fetchWithAuth('/api/cms/application-areas', {
         method: 'POST',
@@ -82,16 +86,26 @@ export default function ApplicationAreas() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => [...prev, data.data])
+      if (data.success) {
+        setItems(prev => [...prev, data.data])
+        toast.success('Area aplikasi berhasil ditambahkan')
+      }
     }
     setModal(null)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus area ini?')) return
-    const res = await fetchWithAuth(`/api/cms/application-areas/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
+  const handleDelete = (id: string) => {
+    toast.warning('Hapus area aplikasi ini?', {
+      action: { label: 'Hapus', onClick: async () => {
+        const res = await fetchWithAuth(`/api/cms/application-areas/${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          setItems(prev => prev.filter(i => i.id !== id))
+          toast.success('Area aplikasi berhasil dihapus')
+        }
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   const toggleActive = async (item: ApplicationArea) => {

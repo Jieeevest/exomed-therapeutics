@@ -4,6 +4,7 @@ import { Plus, Trash2, X, Search, Pencil, Check, UserCheck } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -84,6 +85,7 @@ export default function ClientUsers() {
       setUsers(prev => [data.data, ...prev])
       setModal(false)
       setForm(EMPTY_FORM)
+      toast.success('User berhasil ditambahkan')
     } catch {
       setFormError('Terjadi kesalahan. Coba lagi.')
     } finally {
@@ -108,18 +110,29 @@ export default function ClientUsers() {
         body: JSON.stringify({ tier: trimmed }),
       })
       const data = await res.json()
-      if (data.success) setUsers(prev => prev.map(u => u.id === id ? { ...u, subscription_tier: trimmed } : u))
+      if (data.success) {
+        setUsers(prev => prev.map(u => u.id === id ? { ...u, subscription_tier: trimmed } : u))
+        toast.success('Tier berhasil diperbarui')
+      }
     } catch {}
     finally { setSavingTier(null) }
   }
 
-  const handleDelete = async (id: string, username: string) => {
-    if (!confirm(`Hapus akun klien "${username}"? Tindakan ini tidak dapat dibatalkan.`)) return
-    try {
-      const res  = await fetchWithAuth(`/api/users/${id}`, { method: 'DELETE' })
-      const data = await res.json()
-      if (data.success) setUsers(prev => prev.filter(u => u.id !== id))
-    } catch {}
+  const handleDelete = (id: string, username: string) => {
+    toast.warning(`Hapus akun "${username}"?`, {
+      description: 'Tindakan ini tidak dapat dibatalkan.',
+      action: { label: 'Hapus', onClick: async () => {
+        try {
+          const res  = await fetchWithAuth(`/api/users/${id}`, { method: 'DELETE' })
+          const data = await res.json()
+          if (data.success) {
+            setUsers(prev => prev.filter(u => u.id !== id))
+            toast.success('User berhasil dihapus')
+          }
+        } catch {}
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   return (

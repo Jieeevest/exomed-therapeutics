@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { FileUpload } from '@/components/cms/FileUpload'
 import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { cn } from '@/lib/utils'
@@ -82,7 +84,10 @@ export default function Products() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      if (data.success) {
+        setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+        toast.success('Produk berhasil diperbarui')
+      }
     } else {
       const res = await fetchWithAuth('/api/cms/products', {
         method: 'POST',
@@ -90,16 +95,26 @@ export default function Products() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => [data.data, ...prev])
+      if (data.success) {
+        setItems(prev => [data.data, ...prev])
+        toast.success('Produk berhasil ditambahkan')
+      }
     }
     setModal(null)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus produk ini?')) return
-    const res = await fetchWithAuth(`/api/cms/products/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
+  const handleDelete = (id: string) => {
+    toast.warning('Hapus produk ini?', {
+      action: { label: 'Hapus', onClick: async () => {
+        const res = await fetchWithAuth(`/api/cms/products/${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          setItems(prev => prev.filter(i => i.id !== id))
+          toast.success('Produk berhasil dihapus')
+        }
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   return (
@@ -246,7 +261,7 @@ export default function Products() {
                   <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Deskripsi Singkat</label>
                   <textarea autoComplete="off" rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Tuliskan deskripsi singkat produk..." className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/40 resize-none text-foreground placeholder:text-muted-foreground/30" />
                 </div>
-                <FormField label="URL Gambar Vial" placeholder="https://example.com/vial.png" value={form.image_url ?? ''} onChange={v => setForm(p => ({ ...p, image_url: v }))} />
+                <FileUpload label="Gambar Vial" accept="image/*" folder="products" value={form.image_url ?? ''} onChange={v => setForm(p => ({ ...p, image_url: v }))} hint="JPG, PNG, atau WebP" />
                 <div className="flex justify-end gap-3 pt-2">
                   <button onClick={() => setModal(null)} className="px-5 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-bold hover:bg-muted/40 transition-colors">Batal</button>
                   <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-black hover:opacity-90 transition-opacity"><Save className="w-4 h-4" />Simpan</button>

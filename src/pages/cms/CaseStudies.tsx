@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Pencil, Trash2, X, PlusCircle, MinusCircle, Search, Save } from 'lucide-react'
 import { CmsLayout } from '@/components/cms/CmsLayout'
+import { FileUpload } from '@/components/cms/FileUpload'
 import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -81,7 +83,10 @@ export default function CaseStudies() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+      if (data.success) {
+        setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+        toast.success('Studi kasus berhasil diperbarui')
+      }
     } else {
       const res = await fetchWithAuth('/api/cms/case-studies', {
         method: 'POST',
@@ -89,16 +94,26 @@ export default function CaseStudies() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) setItems(prev => [data.data, ...prev])
+      if (data.success) {
+        setItems(prev => [data.data, ...prev])
+        toast.success('Studi kasus berhasil ditambahkan')
+      }
     }
     setModal(null)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus studi kasus ini?')) return
-    const res = await fetchWithAuth(`/api/cms/case-studies/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (data.success) setItems(prev => prev.filter(i => i.id !== id))
+  const handleDelete = (id: string) => {
+    toast.warning('Hapus studi kasus ini?', {
+      action: { label: 'Hapus', onClick: async () => {
+        const res = await fetchWithAuth(`/api/cms/case-studies/${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          setItems(prev => prev.filter(i => i.id !== id))
+          toast.success('Studi kasus berhasil dihapus')
+        }
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   const togglePublish = async (item: CaseStudy) => {
@@ -257,15 +272,21 @@ export default function CaseStudies() {
 
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Gambar (URL)</label>
+                  <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Gambar</label>
                   <button onClick={addImage} className="flex items-center gap-1 text-xs text-primary hover:underline"><PlusCircle className="w-3.5 h-3.5" /> Tambah Gambar</button>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {(form.images ?? []).map((img, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <input autoComplete="off" placeholder="URL gambar (mis. /case-images/foto.jpg)" value={img.src} onChange={e => updateImage(idx, 'src', e.target.value)} className="flex-[2] bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
-                      <input autoComplete="off" placeholder="Caption (mis. Pre-treatment)" value={img.caption} onChange={e => updateImage(idx, 'caption', e.target.value)} className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
-                      <button onClick={() => removeImage(idx)} className="text-muted-foreground hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
+                    <div key={idx} className="relative bg-white/[0.03] border border-white/[0.08] rounded-xl p-3 space-y-2">
+                      <button onClick={() => removeImage(idx)} className="absolute top-2 right-2 text-muted-foreground hover:text-red-400 transition-colors"><MinusCircle className="w-4 h-4" /></button>
+                      <FileUpload
+                        value={img.src}
+                        onChange={url => updateImage(idx, 'src', url)}
+                        accept="image/*"
+                        folder="case-studies"
+                        hint="JPG, PNG, WebP"
+                      />
+                      <input autoComplete="off" placeholder="Caption (mis. Pre-treatment)" value={img.caption} onChange={e => updateImage(idx, 'caption', e.target.value)} className="w-full bg-background border border-border rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/40 text-foreground placeholder:text-muted-foreground/30" />
                     </div>
                   ))}
                   {(form.images ?? []).length === 0 && (

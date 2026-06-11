@@ -5,6 +5,7 @@ import { CmsLayout } from '@/components/cms/CmsLayout'
 import { Select } from '@/components/Select'
 import { useSessionGuard } from '@/hooks/useSessionGuard'
 import { fetchWithAuth } from '@/lib/api'
+import { toast } from 'sonner'
 import { Pagination } from '@/components/cms/Pagination'
 import { LimitSelector } from '@/components/cms/LimitSelector'
 import { SortableHeader } from '@/components/cms/SortableHeader'
@@ -102,6 +103,7 @@ export default function Pipeline() {
       if (data.success) {
         setItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
         setAllItems(prev => prev.map(i => i.id === editId ? { ...i, ...form } : i))
+        toast.success('Pipeline berhasil diperbarui')
       }
     } else {
       const res = await fetchWithAuth('/api/cms/pipeline', {
@@ -113,19 +115,25 @@ export default function Pipeline() {
       if (data.success) {
         setItems(prev => [...prev, data.data])
         setAllItems(prev => [...prev, data.data])
+        toast.success('Pipeline berhasil ditambahkan')
       }
     }
     setModal(null)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus item pipeline ini?')) return
-    const res = await fetchWithAuth(`/api/cms/pipeline/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (data.success) {
-      setItems(prev => prev.filter(i => i.id !== id))
-      setAllItems(prev => prev.filter(i => i.id !== id))
-    }
+  const handleDelete = (id: string) => {
+    toast.warning('Hapus item pipeline ini?', {
+      action: { label: 'Hapus', onClick: async () => {
+        const res = await fetchWithAuth(`/api/cms/pipeline/${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          setItems(prev => prev.filter(i => i.id !== id))
+          setAllItems(prev => prev.filter(i => i.id !== id))
+          toast.success('Item pipeline berhasil dihapus')
+        }
+      }},
+      cancel: { label: 'Batal' },
+    })
   }
 
   return (
