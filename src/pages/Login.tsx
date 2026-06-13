@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, Mail, Lock, AlertCircle, ArrowRight, Microscope, Award, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/store/useAuth'
+import { API_BASE } from '@/constants/apiUrls'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5174'
+const API_URL = API_BASE
 
 export default function Login() {
   const [email, setEmail] = useState('')

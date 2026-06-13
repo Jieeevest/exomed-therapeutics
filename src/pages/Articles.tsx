@@ -17,7 +17,8 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Logo } from "@/components/Logo";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+import { API_BASE } from "@/constants/apiUrls";
+const API_URL = API_BASE;
 
 const CATEGORIES = [
   { value: "", label: "Semua" },

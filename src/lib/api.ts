@@ -1,6 +1,7 @@
 import { useAuth } from '@/store/useAuth'
+import { API_BASE } from '@/constants/apiUrls'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5174'
+const API_URL = API_BASE
 
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   let { accessToken, refreshToken, login, logout, user } = useAuth.getState()
