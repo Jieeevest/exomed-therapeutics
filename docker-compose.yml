@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        VITE_API_URL: ""
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5174}
     ports:
       - "5173:80"
     extra_hosts:
