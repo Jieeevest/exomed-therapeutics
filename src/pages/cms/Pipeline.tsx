@@ -132,7 +132,7 @@ export default function Pipeline() {
           toast.success('Item pipeline berhasil dihapus')
         }
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 

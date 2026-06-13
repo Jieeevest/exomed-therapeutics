@@ -131,7 +131,7 @@ export default function ClientUsers() {
           }
         } catch {}
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 

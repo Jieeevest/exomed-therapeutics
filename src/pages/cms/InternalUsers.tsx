@@ -108,7 +108,7 @@ export default function InternalUsers() {
           }
         } catch {}
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 

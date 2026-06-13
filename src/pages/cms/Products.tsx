@@ -113,7 +113,7 @@ export default function Products() {
           toast.success('Produk berhasil dihapus')
         }
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 

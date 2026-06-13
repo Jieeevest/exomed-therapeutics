@@ -93,7 +93,7 @@ export default function Documents() {
           toast.success('Dokumen berhasil dihapus')
         }
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 

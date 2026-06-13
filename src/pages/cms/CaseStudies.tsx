@@ -112,7 +112,7 @@ export default function CaseStudies() {
           toast.success('Studi kasus berhasil dihapus')
         }
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 

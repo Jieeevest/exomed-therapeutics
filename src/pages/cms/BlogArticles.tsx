@@ -121,7 +121,7 @@ export default function BlogArticles() {
           toast.success('Artikel berhasil dihapus')
         }
       }},
-      cancel: { label: 'Batal' },
+      cancel: { label: 'Batal', onClick: () => {} },
     })
   }
 
